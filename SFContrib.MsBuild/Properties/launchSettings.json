@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "SfContribTasks": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Program Files (x86)\\Microsoft Visual Studio\\Preview\\Community\\MSBuild\\15.0\\Bin\\MSBuild.exe",
+      "commandLineArgs": "/filelogger /fileloggerparameters:verbosity=diag",
+      "workingDirectory": "G:\\funrock\\rivality-backend\\Fabric.Assets"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <UsingTask TaskName="SfContribTasks.PackageSymLinkTask" AssemblyFile="SfContribTasks.dll" />
+  <UsingTask TaskName="SfContribTasks.GenerateVersionHashTask" AssemblyFile="SfContribTasks.dll" />
+
+  <Target Name="PackageSymLink" AfterTargets="CoreCompile" DependsOnTargets="ValidatePackageSettings;GetServiceProjectReferences">
+    <PackageSymLinkTask
+      ProjectReferences="@(ProjectReference)"
+      ServiceProjectReferences="@(ServiceProjectReference)"
+      ServicePackageRootFolder="$(ServicePackageRootFolder)"
+      ApplicationManifestPath="$(ApplicationManifestFilePath)"
+      IncludeInPackagePaths="@(IncludeInPackagePaths)"
+      PackageBehavior="$(PackageBehavior)"
+      BasePath="$(MSBuildProjectFullPath)"
+      PackageLocation="$(PackageLocation)"
+      Configuration="$(Configuration)"
+      Platform="$(Platform)">
+    </PackageSymLinkTask>
+  </Target>
+
+
+  <Target Name="GenerateVersionHash" DependsOnTargets="ResolveProjectReferences">
+    <GenerateVersionHashTask>
+
+    </GenerateVersionHashTask>
+  </Target>
+
+</Project>
