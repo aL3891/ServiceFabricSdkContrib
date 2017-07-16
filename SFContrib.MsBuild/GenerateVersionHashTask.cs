@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Xml.Linq;
 
 namespace SfContribTasks
 {
@@ -13,6 +14,8 @@ namespace SfContribTasks
     {
 
         public string TargetDir { get; set; }
+        public string IntermediateOutputPath { get; set; }
+        public string BasePath { get; set; }
 
 
         public override bool Execute()
@@ -27,7 +30,14 @@ namespace SfContribTasks
             }
 
             sha.TransformFinalBlock(new byte[0], offset, 0);
-            File.WriteAllText(Path.Combine(TargetDir, "serviceHash.hash"), Convert.ToBase64String(sha.Hash));
+
+            var srv = XElement.Load(Path.Combine(Path.GetDirectoryName(BasePath), "PackageRoot", "ServiceManifest.xml"));
+
+            var ver = srv.Elements("CodePackage").FirstOrDefault(c => c.Name == "Code")?.Attribute("Version");
+            ver.Value = ver.Value + "." + Convert.ToBase64String(sha.Hash);
+
+            srv.Save(Path.Combine(IntermediateOutputPath, "ServiceManifest.xml"));
+
             return true;
         }
     }

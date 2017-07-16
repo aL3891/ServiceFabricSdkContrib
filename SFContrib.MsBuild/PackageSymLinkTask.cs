@@ -9,6 +9,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace SfContribTasks
 {
@@ -32,24 +33,58 @@ namespace SfContribTasks
 
         public override bool Execute()
         {
-            Console.WriteLine("woopwoop");
+            var bp = Path.GetDirectoryName(BasePath);
 
+            foreach (var spr in ServiceProjectReferences)
+            {
+                var prp = Path.GetFullPath(Path.Combine(bp, spr.ItemSpec));
+                var p = GetProject(prp);
 
-            var ProjectFile = ProjectReferences.First().ItemSpec;
+                var path = p.GetPropertyValue("TargetDir");
 
-            ProjectFile = Path.GetFullPath(ProjectFile);
+                string servicePath = Path.Combine(bp, PackageLocation, spr.GetMetadata("ServiceManifestName"));
+                if (!Directory.Exists(servicePath))
+                    Directory.CreateDirectory(servicePath);
 
+                if (!Directory.Exists(Path.Combine(servicePath, spr.GetMetadata("CodePackageName"))))
+                    CreateSymbolicLink(Path.Combine(servicePath, spr.GetMetadata("CodePackageName")), path, SymbolicLink.Directory);
 
-            var apa = ProjectCollection.GlobalProjectCollection.LoadedProjects.FirstOrDefault(p => p.FullPath.ToLower() == ProjectFile.ToLower());
+                if (!Directory.Exists(Path.Combine(servicePath, "Config")))
+                    CreateSymbolicLink(Path.Combine(servicePath, "Config"), Path.Combine(Path.GetDirectoryName(prp), "PackageRoot", "Config"), SymbolicLink.Directory);
 
-            if (apa == null)
-                apa = new Project(ProjectFile);
+                var manifestFile = Path.Combine(Path.GetDirectoryName(prp), p.GetPropertyValue("IntermediateOutputPath"), "ServiceManifest.xml");
+                if (!File.Exists(manifestFile))
+                    manifestFile = Path.Combine(Path.GetDirectoryName(prp), "PackageRoot", "ServiceManifest.xml");
 
+                File.Copy(manifestFile, Path.Combine(servicePath, "ServiceManifest.xml"));
 
-            var path = apa.GetPropertyValue("TargetDir");
+            }
 
+            File.Copy(Path.Combine(bp, "ApplicationPackageRoot", "ApplicationManifest.xml"), Path.Combine(bp, PackageLocation, "ApplicationManifest.xml"));
+            XElement app = XElement.Load(Path.Combine(bp, "ApplicationPackageRoot", "ApplicationManifest.xml"));
+
+            foreach (var sr in app.Element("ServiceManifestImport").Elements("ServiceManifestRef"))
+            {
+                var srv = XElement.Load(Path.Combine(bp, PackageLocation, sr.Attribute("ServiceManifestName").Value, "ServiceManifest.xml"));
+                sr.Attribute("ServiceManifestVersion").Value = srv.Attribute("Version").Value;
+            }
+
+            var aggregatedVersion = Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Join("", app.Element("ServiceManifestImport").Elements("ServiceManifestRef").Select(smr => smr.Attribute("ServiceManifestVersion").Value))));
+            app.Attribute("ApplicationTypeVersion").Value = app.Attribute("ApplicationTypeVersion").Value + "." + aggregatedVersion;
+
+            app.Save(Path.Combine(bp, PackageLocation, "ApplicationManifest.xml"));
 
             return true;
+        }
+
+        public Project GetProject(string projectfile)
+        {
+            var apa = ProjectCollection.GlobalProjectCollection.LoadedProjects.FirstOrDefault(p => p.FullPath.ToLower() == projectfile.ToLower());
+
+            if (apa == null)
+                apa = new Project(projectfile);
+
+            return apa;
         }
     }
 
