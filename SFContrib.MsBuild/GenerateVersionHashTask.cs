@@ -33,10 +33,29 @@ namespace SfContribTasks
 
             var srv = XElement.Load(Path.Combine(Path.GetDirectoryName(BasePath), "PackageRoot", "ServiceManifest.xml"));
 
-            var ver = srv.Elements("CodePackage").FirstOrDefault(c => c.Name == "Code")?.Attribute("Version");
+            var ver = srv.Elements(srv.Name.Namespace + "CodePackage").FirstOrDefault(c => c.Attribute("Name").Value == "Code")?.Attribute("Version");
+            ver.Value = ver.Value + "." + Convert.ToBase64String(sha.Hash);
+            var codeHash = sha.Hash;
+
+            sha = new SHA256Managed();
+            offset = 0;
+
+            foreach (var f in Directory.GetFiles(Path.Combine(Path.GetDirectoryName(BasePath), "PackageRoot", "Config")))
+            {
+                var b = File.ReadAllBytes(f);
+                sha.TransformBlock(b, offset, b.Length, b, offset);
+            }
+
+            sha.TransformFinalBlock(new byte[0], offset, 0);
+            var configHash = sha.Hash;
+
+
+            ver = srv.Elements(srv.Name.Namespace + "ConfigPackage").FirstOrDefault(c => c.Attribute("Name").Value == "Config")?.Attribute("Version");
             ver.Value = ver.Value + "." + Convert.ToBase64String(sha.Hash);
 
-            srv.Save(Path.Combine(IntermediateOutputPath, "ServiceManifest.xml"));
+
+            srv.Attribute("Version").Value = srv.Attribute("Version").Value + Convert.ToBase64String(codeHash.Concat(configHash).ToArray());
+            srv.Save(Path.Combine(Path.GetDirectoryName(BasePath), IntermediateOutputPath, "ServiceManifest.xml"));
 
             return true;
         }

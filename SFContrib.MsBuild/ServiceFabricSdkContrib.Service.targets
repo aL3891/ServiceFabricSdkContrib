@@ -1,0 +1,12 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+ <UsingTask TaskName="SfContribTasks.GenerateVersionHashTask" AssemblyFile="SFContrib.MsBuild.dll" />
+  
+  <Target Name="GenerateVersionHash" AfterTargets="CoreCompile">
+    <GenerateVersionHashTask 
+      BasePath="$(MSBuildProjectFullPath)"
+      TargetDir="$(TargetDir)"
+      IntermediateOutputPath="$(IntermediateOutputPath)"
+      >
+    </GenerateVersionHashTask>
+  </Target>
+</Project>

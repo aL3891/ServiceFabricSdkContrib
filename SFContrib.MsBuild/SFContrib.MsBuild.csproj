@@ -8,6 +8,9 @@
     <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="2.6.220" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="ServiceFabricSdkContrib.Service.targets">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="ServiceFabricSdkContrib.targets">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
