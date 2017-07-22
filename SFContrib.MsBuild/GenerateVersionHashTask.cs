@@ -2,11 +2,13 @@
 using Microsoft.Build.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Fabric.Management.ServiceModel;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml.Linq;
+using System.Xml.Serialization;
 
 namespace SfContribTasks
 {
@@ -31,10 +33,12 @@ namespace SfContribTasks
 
             sha.TransformFinalBlock(new byte[0], offset, 0);
 
-            var srv = XElement.Load(Path.Combine(Path.GetDirectoryName(BasePath), "PackageRoot", "ServiceManifest.xml"));
 
-            var ver = srv.Elements(srv.Name.Namespace + "CodePackage").FirstOrDefault(c => c.Attribute("Name").Value == "Code")?.Attribute("Version");
-            ver.Value = ver.Value + "." + Convert.ToBase64String(sha.Hash);
+            XmlSerializer x = new XmlSerializer(typeof(ServiceManifestType));
+
+            var srv = (ServiceManifestType)x.Deserialize(new StreamReader(Path.Combine(Path.GetDirectoryName(BasePath), "PackageRoot", "ServiceManifest.xml")));
+            var ver = srv.CodePackage.FirstOrDefault(c => c.Name == "Code");
+            ver.Version += ("." + Convert.ToBase64String(sha.Hash));
             var codeHash = sha.Hash;
 
             sha = new SHA256Managed();
@@ -50,12 +54,11 @@ namespace SfContribTasks
             var configHash = sha.Hash;
 
 
-            ver = srv.Elements(srv.Name.Namespace + "ConfigPackage").FirstOrDefault(c => c.Attribute("Name").Value == "Config")?.Attribute("Version");
-            ver.Value = ver.Value + "." + Convert.ToBase64String(sha.Hash);
-
-
-            srv.Attribute("Version").Value = srv.Attribute("Version").Value + Convert.ToBase64String(codeHash.Concat(configHash).ToArray());
-            srv.Save(Path.Combine(Path.GetDirectoryName(BasePath), IntermediateOutputPath, "ServiceManifest.xml"));
+            var codeVer = srv.ConfigPackage.FirstOrDefault(c => c.Name == "Config");
+            codeVer.Version += "." + Convert.ToBase64String(sha.Hash);
+            
+            srv.Version += Convert.ToBase64String(codeHash.Concat(configHash).ToArray());
+            x.Serialize(new StreamWriter(Path.Combine(Path.GetDirectoryName(BasePath), IntermediateOutputPath, "ServiceManifest.xml")), srv);
 
             return true;
         }
