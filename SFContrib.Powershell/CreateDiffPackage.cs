@@ -45,19 +45,17 @@ namespace SFContrib.Powershell
                             Directory.Delete(dir, true);
                     else
                     {
-                        var serv = await client.ServiceManager.GetServiceManifestAsync(serverAppManifest.ApplicationTypeName, serverAppManifest.ApplicationTypeVersion, serviceImport.ServiceManifestRef.ServiceManifestName);
-                        var servman = serviceFromString(serv);
+                        var serverServiceManifest = serviceFromString(await client.ServiceManager.GetServiceManifestAsync(serverAppManifest.ApplicationTypeName, serverAppManifest.ApplicationTypeVersion, serviceImport.ServiceManifestRef.ServiceManifestName));
+                        var localServiceManifest = serviceFromFile(Path.Combine(PackagePath, serviceImport.ServiceManifestRef.ServiceManifestName, "ServiceManifest.xml"));
 
-                        var localServiceman = serviceFromFile(Path.Combine(PackagePath, serviceImport.ServiceManifestRef.ServiceManifestName, "ServiceManifest.xml"));
+                        foreach (var package in serverServiceManifest.CodePackage.Select(sp => localServiceManifest.CodePackage.FirstOrDefault(lp => lp.Name == sp.Name && lp.Version == sp.Version)).Where(x => x != null))
+                            Directory.Delete(Path.Combine(PackagePath, localService.ServiceManifestRef.ServiceManifestName, package.Name), true);
 
-                        foreach (var apa in servman.CodePackage.Select(ss => localServiceman.CodePackage.FirstOrDefault(ll => ll.Name == ss.Name && ll.Version == ss.Version)).Where(x => x != null))
-                            Directory.Delete(Path.Combine(PackagePath, localService.ServiceManifestRef.ServiceManifestName, apa.Name), true);
+                        foreach (var package in serverServiceManifest.ConfigPackage.Select(sp => localServiceManifest.ConfigPackage.FirstOrDefault(lp => lp.Name == sp.Name && lp.Version == sp.Version)).Where(x => x != null))
+                            Directory.Delete(Path.Combine(PackagePath, localService.ServiceManifestRef.ServiceManifestName, package.Name), true);
 
-                        foreach (var apa in servman.ConfigPackage.Select(ss => localServiceman.ConfigPackage.FirstOrDefault(ll => ll.Name == ss.Name && ll.Version == ss.Version)).Where(x => x != null))
-                            Directory.Delete(Path.Combine(PackagePath, localService.ServiceManifestRef.ServiceManifestName, apa.Name), true);
-
-                        foreach (var apa in servman.DataPackage.Select(ss => localServiceman.DataPackage.FirstOrDefault(ll => ll.Name == ss.Name && ll.Version == ss.Version)).Where(x => x != null))
-                            Directory.Delete(Path.Combine(PackagePath, localService.ServiceManifestRef.ServiceManifestName, apa.Name), true);
+                        foreach (var package in serverServiceManifest.DataPackage.Select(sp => localServiceManifest.DataPackage.FirstOrDefault(lp => lp.Name == sp.Name && lp.Version == sp.Version)).Where(x => x != null))
+                            Directory.Delete(Path.Combine(PackagePath, localService.ServiceManifestRef.ServiceManifestName, package.Name), true);
                     }
                 }
             }
