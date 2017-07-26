@@ -1,6 +1,6 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <UsingTask TaskName="SfContribTasks.PackageSymLinkTask" AssemblyFile="SFContrib.MsBuild.dll" />
+  <UsingTask TaskName="ServiceFabricSdkContrib.MsBuild.PackageSymLinkTask" AssemblyFile="ServiceFabricSdkContrib.MsBuild.dll" />
  
   <Target Name="PackageSymLink" AfterTargets="CoreCompile" DependsOnTargets="ValidatePackageSettings;GetServiceProjectReferences">
     <PackageSymLinkTask

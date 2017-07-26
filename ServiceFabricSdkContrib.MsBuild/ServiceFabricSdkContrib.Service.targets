@@ -1,5 +1,5 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
- <UsingTask TaskName="SfContribTasks.GenerateVersionHashTask" AssemblyFile="SFContrib.MsBuild.dll" />
+ <UsingTask TaskName="ServiceFabricSdkContrib.MsBuild.GenerateVersionHashTask" AssemblyFile="ServiceFabricSdkContrib.MsBuild.dll" />
   
   <Target Name="GenerateVersionHash" AfterTargets="CoreCompile">
     <GenerateVersionHashTask 

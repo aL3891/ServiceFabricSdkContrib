@@ -10,8 +10,12 @@ using System.Text;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 
-namespace SfContribTasks
+namespace ServiceFabricSdkContrib.MsBuild
 {
+
+    //git log -n 1 --pretty=format:"%h %cI" G:\funrock\rivality-backend\Services.Assets\PackageRoot\
+
+
     public class GenerateVersionHashTask : Task
     {
 

@@ -11,7 +11,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace SfContribTasks
+
+namespace ServiceFabricSdkContrib.MsBuild
 {
     public class PackageSymLinkTask : Microsoft.Build.Utilities.Task
     {

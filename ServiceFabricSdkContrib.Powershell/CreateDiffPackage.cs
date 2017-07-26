@@ -7,7 +7,7 @@ using System.Management.Automation;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace SFContrib.Powershell
+namespace ServiceFabricSdkContrib.Powershell
 {
     [Cmdlet("ConvertTo" , "ServiceFabricApplicationDiffPackage")]
     public class CreateDiffPackage : PSCmdlet

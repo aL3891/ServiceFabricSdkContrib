@@ -1,5 +1,5 @@
 $path = [Environment]::GetEnvironmentVariable("PSModulePath").Split(';')[0]
-$path += "\SfSdkContrib"
+$path += "\ServiceFabricSdkContrib"
 
 if(Test-Path $path){
 	Remove-Item $path -Recurse -Force

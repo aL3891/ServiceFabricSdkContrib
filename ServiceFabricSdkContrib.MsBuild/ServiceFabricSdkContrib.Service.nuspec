@@ -23,15 +23,13 @@
     <file src="bin\Debug\net462\Microsoft.ServiceFabric.Services.dll"                              target="build\Microsoft.ServiceFabric.Services.dll"                      />
     <file src="bin\Debug\net462\Microsoft.ServiceFabric.Services.Remoting.dll"                     target="build\Microsoft.ServiceFabric.Services.Remoting.dll"             />
     <file src="bin\Debug\net462\ServiceFabricSdkContrib.Service.targets"                           target="build\ServiceFabricSdkContrib.Service.targets"                   />
-    <file src="bin\Debug\net462\ServiceFabricSdkContrib.targets"                                   target="build\ServiceFabricSdkContrib.targets"                           />
-    <file src="bin\Debug\net462\SFContrib.MsBuild.dll"                                             target="build\SFContrib.MsBuild.dll"                                     />
+    <file src="bin\Debug\net462\ServiceFabricSdkContrib.MsBuild.dll"                               target="build\ServiceFabricSdkContrib.MsBuild.dll"                       />
     <file src="bin\Debug\net462\System.Fabric.dll"                                                 target="build\System.Fabric.dll"                                         />
     <file src="bin\Debug\net462\System.Fabric.Management.ServiceModel.dll"                         target="build\System.Fabric.Management.ServiceModel.dll"                 />
     <file src="bin\Debug\net462\System.Fabric.Management.ServiceModel.XmlSerializers.dll"          target="build\System.Fabric.Management.ServiceModel.XmlSerializers.dll"  />
     <file src="bin\Debug\net462\System.Fabric.Strings.dll"                                         target="build\System.Fabric.Strings.dll"                                 />
-    <file src="ServiceFabricSdkContrib.Service.targets"                                                    target="build\ServiceFabricSdkContrib.Service.targets"                                 />
+    <file src="ServiceFabricSdkContrib.Service.targets"                                            target="build\ServiceFabricSdkContrib.Service.targets"                   />
   </files>
   
-git log -n 1 --pretty=format:"%h %cI" G:\funrock\rivality-backend\Services.Assets\PackageRoot\
 
 </package>
