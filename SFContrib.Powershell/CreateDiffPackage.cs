@@ -9,7 +9,7 @@ using System.Xml.Serialization;
 
 namespace SFContrib.Powershell
 {
-    [Cmdlet("Create", "DiffPackage")]
+    [Cmdlet("ConvertTo" , "ServiceFabricApplicationDiffPackage")]
     public class CreateDiffPackage : PSCmdlet
     {
         static XmlSerializer serializer = new XmlSerializer(typeof(ApplicationManifestType));
