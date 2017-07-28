@@ -42,10 +42,31 @@ namespace Stateless
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                ServiceEventSource.Current.ServiceMessage(this.Context, "Working-{0}", ++iterations);
+                ServiceEventSource.Current.ServiceMessage(this.Context, "555nbvnbvncvnbcvnbcv-{0}", ++iterations);
 
                 await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
             }
         }
     }
+
+    class MyClass1
+    {
+
+    }
+
+    class MyClass2
+    {
+
+    }
+
+    class MyClass12
+    {
+
+    }
+
+    class MyClass22
+    {
+
+    }
+
 }

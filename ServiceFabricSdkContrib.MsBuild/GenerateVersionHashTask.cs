@@ -21,7 +21,7 @@ namespace ServiceFabricSdkContrib.MsBuild
 
         public override bool Execute()
         {
-            MD5 sha = MD5.Create();
+            SHA512Managed sha;
             int offset = 0;
 
             List<byte> configHash = new List<byte>();
@@ -30,10 +30,12 @@ namespace ServiceFabricSdkContrib.MsBuild
             if (srv.CodePackage != null)
                 foreach (var cv in srv.CodePackage)
                 {
-                    sha = MD5.Create();
+                    sha = new SHA512Managed();
                     offset = 0;
 
-                    foreach (var f in Directory.GetFiles(cv.Name == "Code" ? TargetDir : Path.Combine(Path.GetDirectoryName(BasePath), "PackageRoot", cv.Name), "*.dll"))
+                    var path = cv.Name == "Code" ? TargetDir : Path.Combine(Path.GetDirectoryName(BasePath), "PackageRoot", cv.Name);
+
+                    foreach (var f in Directory.GetFiles(path, "*.dll").Concat(Directory.GetFiles(path, "*.exe")))
                     {
                         var b = File.ReadAllBytes(f);
                         sha.TransformBlock(b, offset, b.Length, b, offset);
@@ -47,7 +49,7 @@ namespace ServiceFabricSdkContrib.MsBuild
             if (srv.ConfigPackage != null)
                 foreach (var cv in srv.ConfigPackage)
                 {
-                    sha = MD5.Create();
+                    sha = new SHA512Managed();
                     offset = 0;
 
                     foreach (var f in Directory.GetFiles(Path.Combine(Path.GetDirectoryName(BasePath), "PackageRoot", cv.Name)))
@@ -64,7 +66,7 @@ namespace ServiceFabricSdkContrib.MsBuild
             if (srv.DataPackage != null)
                 foreach (var cv in srv.DataPackage)
                 {
-                    sha = MD5.Create();
+                    sha = new SHA512Managed();
                     offset = 0;
 
                     foreach (var f in Directory.GetFiles(Path.Combine(Path.GetDirectoryName(BasePath), "PackageRoot", cv.Name)))
@@ -78,7 +80,7 @@ namespace ServiceFabricSdkContrib.MsBuild
                     configHash.AddRange(sha.Hash);
                 }
 
-            srv.Version += "." + Uri.EscapeDataString(Convert.ToBase64String(MD5.Create().ComputeHash(configHash.ToArray())));
+            srv.Version += "." + Uri.EscapeDataString(Convert.ToBase64String(new SHA512Managed().ComputeHash(configHash.ToArray())));
             Helper.SaveService(Path.Combine(Path.GetDirectoryName(BasePath), IntermediateOutputPath, "ServiceManifest.xml"), srv);
 
             return true;

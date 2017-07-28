@@ -18,6 +18,9 @@ namespace ServiceFabricSdkContrib.Powershell
         [Parameter(ValueFromPipeline = true, Position = 0)]
         public string PackagePath { get; set; }
 
+        [Parameter()]
+        public bool NeedsUpgrade { get; set; }
+
         protected override void ProcessRecord()
         {
             dynamic connection = GetVariableValue("ClusterConnection");
@@ -25,10 +28,13 @@ namespace ServiceFabricSdkContrib.Powershell
             if (string.IsNullOrWhiteSpace(PackagePath))
                 PackagePath = SessionState.Path.CurrentFileSystemLocation.Path;
 
-            Diff(client).Wait();
+            if (!Path.IsPathRooted(PackagePath))
+                PackagePath = Path.Combine(SessionState.Path.CurrentFileSystemLocation.Path, PackagePath);
+
+            WriteObject(Diff(client).Result);
         }
 
-        public async Task Diff(FabricClient client)
+        public async Task<bool> Diff(FabricClient client)
         {
             var localAppManifest = Helper.FromFile(Path.Combine(PackagePath, "ApplicationManifest.xml"));
             var appTypes = await client.QueryManager.GetApplicationTypeListAsync();
@@ -39,30 +45,43 @@ namespace ServiceFabricSdkContrib.Powershell
             foreach (var serverAppManifest in serverAppManifests)
             {
                 if (serverAppManifest.ApplicationTypeVersion == localAppManifest.ApplicationTypeVersion)
-                    break;
+                {
+                    return false;
+                }
 
                 foreach (var serviceImport in serverAppManifest.ServiceManifestImport)
                 {
                     var localService = localAppManifest.ServiceManifestImport.FirstOrDefault(s => s.ServiceManifestRef.ServiceManifestName == serviceImport.ServiceManifestRef.ServiceManifestName);
                     if (localService != null && localService.ServiceManifestRef.ServiceManifestVersion == serviceImport.ServiceManifestRef.ServiceManifestVersion)
                         foreach (var dir in Directory.GetDirectories(Path.Combine(PackagePath, serviceImport.ServiceManifestRef.ServiceManifestName)))
-                            Directory.Delete(dir, true);
+                            DeleteIfEx(dir);
                     else
                     {
                         var serverServiceManifest = Helper.serviceFromString(await client.ServiceManager.GetServiceManifestAsync(serverAppManifest.ApplicationTypeName, serverAppManifest.ApplicationTypeVersion, serviceImport.ServiceManifestRef.ServiceManifestName));
                         var localServiceManifest = Helper.serviceFromFile(Path.Combine(PackagePath, serviceImport.ServiceManifestRef.ServiceManifestName, "ServiceManifest.xml"));
 
-                        foreach (var package in serverServiceManifest.CodePackage.Select(sp => localServiceManifest.CodePackage.FirstOrDefault(lp => lp.Name == sp.Name && lp.Version == sp.Version)).Where(x => x != null))
-                            Directory.Delete(Path.Combine(PackagePath, localService.ServiceManifestRef.ServiceManifestName, package.Name), true);
+                        if (serverServiceManifest.CodePackage != null && localServiceManifest.CodePackage != null)
+                            foreach (var package in serverServiceManifest.CodePackage?.Select(sp => localServiceManifest.CodePackage.FirstOrDefault(lp => lp.Name == sp.Name && lp.Version == sp.Version)).Where(x => x != null))
+                                DeleteIfEx(Path.Combine(PackagePath, localService.ServiceManifestRef.ServiceManifestName, package.Name));
 
-                        foreach (var package in serverServiceManifest.ConfigPackage.Select(sp => localServiceManifest.ConfigPackage.FirstOrDefault(lp => lp.Name == sp.Name && lp.Version == sp.Version)).Where(x => x != null))
-                            Directory.Delete(Path.Combine(PackagePath, localService.ServiceManifestRef.ServiceManifestName, package.Name), true);
+                        if (serverServiceManifest.ConfigPackage != null && localServiceManifest.ConfigPackage != null)
+                            foreach (var package in serverServiceManifest.ConfigPackage?.Select(sp => localServiceManifest.ConfigPackage.FirstOrDefault(lp => lp.Name == sp.Name && lp.Version == sp.Version)).Where(x => x != null))
+                                DeleteIfEx(Path.Combine(PackagePath, localService.ServiceManifestRef.ServiceManifestName, package.Name));
 
-                        foreach (var package in serverServiceManifest.DataPackage.Select(sp => localServiceManifest.DataPackage.FirstOrDefault(lp => lp.Name == sp.Name && lp.Version == sp.Version)).Where(x => x != null))
-                            Directory.Delete(Path.Combine(PackagePath, localService.ServiceManifestRef.ServiceManifestName, package.Name), true);
+                        if (serverServiceManifest.DataPackage != null && localServiceManifest.DataPackage != null)
+                            foreach (var package in serverServiceManifest.DataPackage?.Select(sp => localServiceManifest.DataPackage.FirstOrDefault(lp => lp.Name == sp.Name && lp.Version == sp.Version)).Where(x => x != null))
+                                DeleteIfEx(Path.Combine(PackagePath, localService.ServiceManifestRef.ServiceManifestName, package.Name));
                     }
                 }
             }
+
+            return true;
+        }
+
+        public void DeleteIfEx(string path)
+        {
+            if (Directory.Exists(path))
+                Directory.Delete(path, true);
         }
 
 

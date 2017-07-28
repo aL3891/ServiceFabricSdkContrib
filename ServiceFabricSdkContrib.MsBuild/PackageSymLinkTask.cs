@@ -82,8 +82,8 @@ namespace ServiceFabricSdkContrib.MsBuild
                     serviceReference.ServiceManifestRef.ServiceManifestVersion = serviceManifest.Version;
                 }
             }
-            
-            var aggregatedVersion = Uri.EscapeDataString(Convert.ToBase64String(MD5.Create().ComputeHash( Encoding.ASCII.GetBytes(string.Join("", appManifest.ServiceManifestImport.Select(ss => ss.ServiceManifestRef.ServiceManifestVersion))))));
+
+            var aggregatedVersion = Uri.EscapeDataString(Convert.ToBase64String(new SHA512Managed().ComputeHash(Encoding.ASCII.GetBytes(string.Join("", appManifest.ServiceManifestImport.Select(ss => ss.ServiceManifestRef.ServiceManifestVersion))))));
             appManifest.ApplicationTypeVersion = appManifest.ApplicationTypeVersion + "." + aggregatedVersion;
             Helper.SaveApp(Path.Combine(basePath, PackageLocation, "ApplicationManifest.xml"), appManifest);
 
