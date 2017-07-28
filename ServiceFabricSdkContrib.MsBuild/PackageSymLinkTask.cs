@@ -2,6 +2,7 @@
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using ServiceFabricSdkContrib.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -69,17 +70,21 @@ namespace ServiceFabricSdkContrib.MsBuild
             }
 
             File.Copy(Path.Combine(basePath, "ApplicationPackageRoot", "ApplicationManifest.xml"), Path.Combine(basePath, PackageLocation, "ApplicationManifest.xml"), true);
-            XElement appManifest = XElement.Load(Path.Combine(basePath, "ApplicationPackageRoot", "ApplicationManifest.xml"));
+            var appManifest = Helper.FromFile(Path.Combine(basePath, "ApplicationPackageRoot", "ApplicationManifest.xml"));
 
-            foreach (var serviceReference in appManifest.Element(appManifest.Name.Namespace + "ServiceManifestImport").Elements(appManifest.Name.Namespace + "ServiceManifestRef"))
+            foreach (var serviceReference in appManifest.ServiceManifestImport)
             {
-                var serviceManifest = XElement.Load(Path.Combine(basePath, PackageLocation, serviceReference.Attribute("ServiceManifestName").Value, "ServiceManifest.xml"));
-                serviceReference.Attribute("ServiceManifestVersion").Value = serviceManifest.Attribute("Version").Value;
+                var servicePath = Path.Combine(basePath, PackageLocation, serviceReference.ServiceManifestRef.ServiceManifestName, "ServiceManifest.xml");
+                if (File.Exists(servicePath))
+                {
+                    var serviceManifest = Helper.serviceFromFile(servicePath);
+                    serviceReference.ServiceManifestRef.ServiceManifestVersion = serviceManifest.Version;
+                }
             }
 
-            var aggregatedVersion = Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Join("", appManifest.Element(appManifest.Name.Namespace + "ServiceManifestImport").Elements(appManifest.Name.Namespace + "ServiceManifestRef").Select(smr => smr.Attribute("ServiceManifestVersion").Value))));
-            appManifest.Attribute("ApplicationTypeVersion").Value = appManifest.Attribute("ApplicationTypeVersion").Value + "." + aggregatedVersion;
-            appManifest.Save(Path.Combine(basePath, PackageLocation, "ApplicationManifest.xml"));
+            var aggregatedVersion = Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Join("", appManifest.ServiceManifestImport.Select(ss => ss.ServiceManifestRef.ServiceManifestVersion))));
+            appManifest.ApplicationTypeVersion = appManifest.ApplicationTypeVersion + "." + aggregatedVersion;
+            Helper.SaveApp(Path.Combine(basePath, PackageLocation, "ApplicationManifest.xml"), appManifest);
 
             return true;
         }

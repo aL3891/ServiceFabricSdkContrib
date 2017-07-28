@@ -24,36 +24,58 @@ namespace ServiceFabricSdkContrib.MsBuild
             SHA1Managed sha = new SHA1Managed();
             int offset = 0;
 
-            foreach (var f in Directory.GetFiles(TargetDir, "*.dll"))
-            {
-                var b = File.ReadAllBytes(f);
-                sha.TransformBlock(b, offset, b.Length, b, offset);
-            }
+            List<byte> configHash = new List<byte>();
+            var srv = Helper.serviceFromFile(Path.Combine(Path.GetDirectoryName(BasePath), "PackageRoot", "ServiceManifest.xml"));          
 
-            sha.TransformFinalBlock(new byte[0], offset, 0);
+            if (srv.CodePackage != null)
+                foreach (var cv in srv.CodePackage)
+                {
+                    sha = new SHA1Managed();
+                    offset = 0;
 
-            var srv = Helper.serviceFromFile(Path.Combine(Path.GetDirectoryName(BasePath), "PackageRoot", "ServiceManifest.xml"));
-            var ver = srv.CodePackage.FirstOrDefault(c => c.Name == "Code");
-            ver.Version += ("." + Convert.ToBase64String(sha.Hash));
-            var codeHash = sha.Hash;
+                    foreach (var f in Directory.GetFiles(cv.Name == "Code" ? TargetDir : Path.Combine(Path.GetDirectoryName(BasePath), "PackageRoot", cv.Name), "*.dll"))
+                    {
+                        var b = File.ReadAllBytes(f);
+                        sha.TransformBlock(b, offset, b.Length, b, offset);
+                    }
 
-            sha = new SHA1Managed();
-            offset = 0;
+                    sha.TransformFinalBlock(new byte[0], offset, 0);
+                    configHash.AddRange(sha.Hash);
+                }
+            
+            if (srv.ConfigPackage != null)
+                foreach (var cv in srv.ConfigPackage)
+                {
+                    sha = new SHA1Managed();
+                    offset = 0;
 
-            foreach (var f in Directory.GetFiles(Path.Combine(Path.GetDirectoryName(BasePath), "PackageRoot", "Config")))
-            {
-                var b = File.ReadAllBytes(f);
-                sha.TransformBlock(b, offset, b.Length, b, offset);
-            }
+                    foreach (var f in Directory.GetFiles(Path.Combine(Path.GetDirectoryName(BasePath), "PackageRoot", cv.Name)))
+                    {
+                        var b = File.ReadAllBytes(f);
+                        sha.TransformBlock(b, offset, b.Length, b, offset);
+                    }
 
-            sha.TransformFinalBlock(new byte[0], offset, 0);
-            var configHash = sha.Hash;
+                    sha.TransformFinalBlock(new byte[0], offset, 0);
+                    configHash.AddRange(sha.Hash);
+                }
 
+            if (srv.DataPackage != null)
+                foreach (var cv in srv.DataPackage)
+                {
+                    sha = new SHA1Managed();
+                    offset = 0;
 
-            var codeVer = srv.ConfigPackage.FirstOrDefault(c => c.Name == "Config");
-            codeVer.Version += "." + Convert.ToBase64String(sha.Hash);
+                    foreach (var f in Directory.GetFiles(Path.Combine(Path.GetDirectoryName(BasePath), "PackageRoot", cv.Name)))
+                    {
+                        var b = File.ReadAllBytes(f);
+                        sha.TransformBlock(b, offset, b.Length, b, offset);
+                    }
 
-            srv.Version += Convert.ToBase64String(codeHash.Concat(configHash).ToArray());
+                    sha.TransformFinalBlock(new byte[0], offset, 0);
+                    configHash.AddRange(sha.Hash);
+                }
+
+            srv.Version += "." + Convert.ToBase64String(configHash.ToArray());
             Helper.SaveService(Path.Combine(Path.GetDirectoryName(BasePath), IntermediateOutputPath, "ServiceManifest.xml"), srv);
 
             return true;

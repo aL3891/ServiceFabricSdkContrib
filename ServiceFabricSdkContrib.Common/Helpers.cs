@@ -43,5 +43,11 @@ namespace ServiceFabricSdkContrib.Common
             using (var stream = new StreamWriter(v))
                 x.Serialize(stream, srv);
         }
+
+        public static void SaveApp(string v, ApplicationManifestType appManifest)
+        {
+            using (var stream = new StreamWriter(v))
+                serializer.Serialize(stream, appManifest);
+        }
     }
 }

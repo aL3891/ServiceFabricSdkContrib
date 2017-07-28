@@ -3,7 +3,7 @@
     "ServiceFabricSdkContrib.Powershell": {
       "commandName": "Executable",
       "executablePath": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
-      "commandLineArgs": "-NoExit -Command \"{Connect-ServiceFabricCluster; ipmo .\\ServiceFabricSdkContrib.Powershell.dll}\"",
+      "commandLineArgs": "-NoExit -Command \"{Connect-ServiceFabricCluster; ipmo .\\ServiceFabricSdkContrib.Powershell.dll; }\"",
       "workingDirectory": "$(TargetDir)"
     }
   }

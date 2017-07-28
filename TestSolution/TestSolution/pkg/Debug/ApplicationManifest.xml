@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="TestSolutionType" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
+<?xml version="1.0" encoding="utf-8"?>
+<ApplicationManifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ApplicationTypeName="TestSolutionType" ApplicationTypeVersion="1.0.0.MS4wLjAuT3Zpbm9JbGlNdU5aMzJ0VmZ6bnhqNGJ2OTBUbXBuTVllUjR2ZHR0WHBjWUxHY2pQZXdpVElBPT0xLjAuMC5Pdmlub0lsaU11TlozMnRWZnpueGo0YnY5MFFrYi80cUdmYXJNeGJ6UXNIN2FYOHg2UFJjUWc9PTEuMC4wMS4wLjAxLjAuMC5Xc0oyVHhueFNkemR4SHRVLzlGZ2lHQjd6aTFHSUoxTE5pYVIwUlhDbzZ2WFZrVWpuVlRqSGc9PTEuMC4wLk92aW5vSWxpTXVOWjMydFZmem54ajRidjkwVG1wbk1ZZVI0dmR0dFhwY1lMR2NqUGV3aVRJQT09MS4wLjAuT3Zpbm9JbGlNdU5aMzJ0VmZ6bnhqNGJ2OTBRa2IvNHFHZmFyTXhielFzSDdhWDh4NlBSY1FnPT0=" xmlns="http://schemas.microsoft.com/2011/01/fabric">
   <Parameters>
     <Parameter Name="StatefulCore_MinReplicaSetSize" DefaultValue="3" />
     <Parameter Name="StatefulCore_PartitionCount" DefaultValue="1" />
@@ -17,15 +17,12 @@
     <Parameter Name="Actor2ActorService_MinReplicaSetSize" DefaultValue="3" />
     <Parameter Name="Actor2ActorService_TargetReplicaSetSize" DefaultValue="3" />
   </Parameters>
-  <!-- Import the ServiceManifest from the ServicePackage. The ServiceManifestName and ServiceManifestVersion 
-       should match the Name and Version attributes of the ServiceManifest element defined in the 
-       ServiceManifest.xml file. -->
   <ServiceManifestImport>
-    <ServiceManifestRef ServiceManifestName="StatefulCorePkg" ServiceManifestVersion="1.0.0" />
+    <ServiceManifestRef ServiceManifestName="StatefulCorePkg" ServiceManifestVersion="1.0.0.OvinoIliMuNZ32tVfznxj4bv90TmpnMYeR4vdttXpcYLGcjPewiTIA==" />
     <ConfigOverrides />
   </ServiceManifestImport>
   <ServiceManifestImport>
-    <ServiceManifestRef ServiceManifestName="StatelessCorePkg" ServiceManifestVersion="1.0.0" />
+    <ServiceManifestRef ServiceManifestName="StatelessCorePkg" ServiceManifestVersion="1.0.0.OvinoIliMuNZ32tVfznxj4bv90Qkb/4qGfarMxbzQsH7aX8x6PRcQg==" />
     <ConfigOverrides />
   </ServiceManifestImport>
   <ServiceManifestImport>
@@ -37,22 +34,17 @@
     <ConfigOverrides />
   </ServiceManifestImport>
   <ServiceManifestImport>
-    <ServiceManifestRef ServiceManifestName="ActorPkg" ServiceManifestVersion="1.0.0" />
+    <ServiceManifestRef ServiceManifestName="ActorPkg" ServiceManifestVersion="1.0.0.WsJ2TxnxSdzdxHtU/9FgiGB7zi1GIJ1LNiaR0RXCo6vXVkUjnVTjHg==" />
   </ServiceManifestImport>
   <ServiceManifestImport>
-    <ServiceManifestRef ServiceManifestName="StatefulPkg" ServiceManifestVersion="1.0.0" />
+    <ServiceManifestRef ServiceManifestName="StatefulPkg" ServiceManifestVersion="1.0.0.OvinoIliMuNZ32tVfznxj4bv90TmpnMYeR4vdttXpcYLGcjPewiTIA==" />
     <ConfigOverrides />
   </ServiceManifestImport>
   <ServiceManifestImport>
-    <ServiceManifestRef ServiceManifestName="StatelessPkg" ServiceManifestVersion="1.0.0" />
+    <ServiceManifestRef ServiceManifestName="StatelessPkg" ServiceManifestVersion="1.0.0.OvinoIliMuNZ32tVfznxj4bv90Qkb/4qGfarMxbzQsH7aX8x6PRcQg==" />
     <ConfigOverrides />
   </ServiceManifestImport>
   <DefaultServices>
-    <!-- The section below creates instances of service types, when an instance of this 
-         application type is created. You can also create one or more instances of service type using the 
-         ServiceFabric PowerShell module.
-         
-         The attribute ServiceTypeName below must match the name defined in the imported ServiceManifest.xml file. -->
     <Service Name="StatefulCore">
       <StatefulService ServiceTypeName="StatefulCoreType" TargetReplicaSetSize="[StatefulCore_TargetReplicaSetSize]" MinReplicaSetSize="[StatefulCore_MinReplicaSetSize]">
         <UniformInt64Partition PartitionCount="[StatefulCore_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
