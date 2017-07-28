@@ -1,4 +1,4 @@
-﻿################################################################################
+################################################################################
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
@@ -6,3 +6,5 @@
 /**/obj
 /**/bin
 /TestSolution/TestSolution/pkg/Debug
+TestSolution/.vs/
+TestSolution/packages/
