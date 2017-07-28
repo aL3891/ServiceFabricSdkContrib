@@ -40,6 +40,7 @@ namespace ServiceFabricSdkContrib.MsBuild
                     }
 
                     sha.TransformFinalBlock(new byte[0], offset, 0);
+                    cv.Version += "." + Convert.ToBase64String(sha.Hash);
                     configHash.AddRange(sha.Hash);
                 }
             
@@ -56,6 +57,7 @@ namespace ServiceFabricSdkContrib.MsBuild
                     }
 
                     sha.TransformFinalBlock(new byte[0], offset, 0);
+                    cv.Version += "." + Convert.ToBase64String(sha.Hash);
                     configHash.AddRange(sha.Hash);
                 }
 
@@ -72,6 +74,7 @@ namespace ServiceFabricSdkContrib.MsBuild
                     }
 
                     sha.TransformFinalBlock(new byte[0], offset, 0);
+                    cv.Version += "." + Convert.ToBase64String(sha.Hash);
                     configHash.AddRange(sha.Hash);
                 }
 

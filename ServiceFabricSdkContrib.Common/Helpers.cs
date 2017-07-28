@@ -40,12 +40,18 @@ namespace ServiceFabricSdkContrib.Common
 
         public static void SaveService(string v, ServiceManifestType srv)
         {
+            if (File.Exists(v))
+                File.Delete(v);
+
             using (var stream = new StreamWriter(v))
                 x.Serialize(stream, srv);
         }
 
         public static void SaveApp(string v, ApplicationManifestType appManifest)
         {
+            if (File.Exists(v))
+                File.Delete(v);
+
             using (var stream = new StreamWriter(v))
                 serializer.Serialize(stream, appManifest);
         }
