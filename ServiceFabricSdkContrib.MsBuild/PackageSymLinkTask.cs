@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -37,7 +38,7 @@ namespace ServiceFabricSdkContrib.MsBuild
         {
             var basePath = Path.GetDirectoryName(ProjectPath);
 
-            foreach (var spr in ServiceProjectReferences)
+            foreach (var spr in PatchMetadata(ProjectReferences, ServiceProjectReferences))
             {
                 var serviceProjectPath = Path.GetFullPath(Path.Combine(basePath, spr.ItemSpec));
                 var project = GetProject(serviceProjectPath);
@@ -81,12 +82,33 @@ namespace ServiceFabricSdkContrib.MsBuild
                     serviceReference.ServiceManifestRef.ServiceManifestVersion = serviceManifest.Version;
                 }
             }
-
-            var aggregatedVersion = Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Join("", appManifest.ServiceManifestImport.Select(ss => ss.ServiceManifestRef.ServiceManifestVersion))));
+            
+            var aggregatedVersion = Uri.EscapeDataString(Convert.ToBase64String(MD5.Create().ComputeHash( Encoding.ASCII.GetBytes(string.Join("", appManifest.ServiceManifestImport.Select(ss => ss.ServiceManifestRef.ServiceManifestVersion))))));
             appManifest.ApplicationTypeVersion = appManifest.ApplicationTypeVersion + "." + aggregatedVersion;
             Helper.SaveApp(Path.Combine(basePath, PackageLocation, "ApplicationManifest.xml"), appManifest);
 
             return true;
+        }
+
+        private IEnumerable<ITaskItem> PatchMetadata(IEnumerable<ITaskItem> projectReferences, IEnumerable<ITaskItem> serviceProjectReferences)
+        {
+            if (serviceProjectReferences == null)
+                serviceProjectReferences = Enumerable.Empty<ITaskItem>();
+
+            if (projectReferences == null)
+                projectReferences = Enumerable.Empty<ITaskItem>();
+
+            var res = projectReferences.Where(p => !serviceProjectReferences.Any(spr => spr.ItemSpec == p.ItemSpec)).ToList();
+
+            foreach (var r in res)
+            {
+                var manifestFile = Path.Combine(Path.GetDirectoryName(r.ItemSpec), "PackageRoot", "ServiceManifest.xml");
+
+                r.SetMetadata("ServiceManifestName", Helper.serviceFromFile(manifestFile).Name);
+                r.SetMetadata("CodePackageName", "Code");
+            }
+
+            return serviceProjectReferences.Concat(res).ToList();
         }
 
         public Project GetProject(string projectfile)
