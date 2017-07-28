@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ServiceFabricSdkContrib.Common;
+using System;
 using System.Fabric;
 using System.Fabric.Management.ServiceModel;
 using System.IO;
@@ -9,28 +10,31 @@ using System.Xml.Serialization;
 
 namespace ServiceFabricSdkContrib.Powershell
 {
-    [Cmdlet("ConvertTo" , "ServiceFabricApplicationDiffPackage")]
+    [Cmdlet("ConvertTo", "ServiceFabricApplicationDiffPackage")]
     public class CreateDiffPackage : PSCmdlet
     {
-        static XmlSerializer serializer = new XmlSerializer(typeof(ApplicationManifestType));
-        static XmlSerializer x = new XmlSerializer(typeof(ServiceManifestType));
 
+
+        [Parameter(ValueFromPipeline = true, Position = 0)]
         public string PackagePath { get; set; }
 
         protected override void ProcessRecord()
         {
             dynamic connection = GetVariableValue("ClusterConnection");
             FabricClient client = connection.FabricClient;
+            if (string.IsNullOrWhiteSpace(PackagePath))
+                PackagePath = SessionState.Path.CurrentFileSystemLocation.Path;
+
             Diff(client).Wait();
         }
 
         public async Task Diff(FabricClient client)
         {
-            var localAppManifest = FromFile(Path.Combine(PackagePath, "ApplicationManifest.xml"));
+            var localAppManifest = Helper.FromFile(Path.Combine(PackagePath, "ApplicationManifest.xml"));
             var appTypes = await client.QueryManager.GetApplicationTypeListAsync();
             var appManifestTasks = appTypes.Where(type => type.ApplicationTypeName == localAppManifest.ApplicationTypeName).Select(type => client.ApplicationManager.GetApplicationManifestAsync(type.ApplicationTypeName, type.ApplicationTypeVersion));
             await Task.WhenAll(appManifestTasks);
-            var serverAppManifests = appManifestTasks.Select(task => FromString(task.Result)).ToList();
+            var serverAppManifests = appManifestTasks.Select(task => Helper.FromString(task.Result)).ToList();
 
             foreach (var serverAppManifest in serverAppManifests)
             {
@@ -45,8 +49,8 @@ namespace ServiceFabricSdkContrib.Powershell
                             Directory.Delete(dir, true);
                     else
                     {
-                        var serverServiceManifest = serviceFromString(await client.ServiceManager.GetServiceManifestAsync(serverAppManifest.ApplicationTypeName, serverAppManifest.ApplicationTypeVersion, serviceImport.ServiceManifestRef.ServiceManifestName));
-                        var localServiceManifest = serviceFromFile(Path.Combine(PackagePath, serviceImport.ServiceManifestRef.ServiceManifestName, "ServiceManifest.xml"));
+                        var serverServiceManifest = Helper.serviceFromString(await client.ServiceManager.GetServiceManifestAsync(serverAppManifest.ApplicationTypeName, serverAppManifest.ApplicationTypeVersion, serviceImport.ServiceManifestRef.ServiceManifestName));
+                        var localServiceManifest = Helper.serviceFromFile(Path.Combine(PackagePath, serviceImport.ServiceManifestRef.ServiceManifestName, "ServiceManifest.xml"));
 
                         foreach (var package in serverServiceManifest.CodePackage.Select(sp => localServiceManifest.CodePackage.FirstOrDefault(lp => lp.Name == sp.Name && lp.Version == sp.Version)).Where(x => x != null))
                             Directory.Delete(Path.Combine(PackagePath, localService.ServiceManifestRef.ServiceManifestName, package.Name), true);
@@ -61,28 +65,6 @@ namespace ServiceFabricSdkContrib.Powershell
             }
         }
 
-        private ApplicationManifestType FromFile(string path)
-        {
-            using (var stream = new StreamReader(path))
-                return (ApplicationManifestType)serializer.Deserialize(stream);
-        }
 
-        private static ApplicationManifestType FromString(string g)
-        {
-            using (var stream = new StringReader(g))
-                return (ApplicationManifestType)serializer.Deserialize(stream);
-        }
-
-        private static ServiceManifestType serviceFromFile(string g)
-        {
-            using (var stream = new StringReader(g))
-                return (ServiceManifestType)serializer.Deserialize(stream);
-        }
-
-        private static ServiceManifestType serviceFromString(string g)
-        {
-            using (var stream = new StringReader(g))
-                return (ServiceManifestType)x.Deserialize(stream);
-        }
     }
 }

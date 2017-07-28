@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>ServiceFabricSdkContrib.Service</id>
-    <version>0.0.1-beta</version>
+    <version>0.0.2-beta</version>
     <title>ServiceFabricSdkContrib.Service</title>
     <authors>Allan Lindqvist</authors>
     <owners>Allan Lindqvist</owners>
@@ -14,21 +14,9 @@
     <tags>msbuild Servucefabric</tags>
   </metadata>
   <files>
-    <file src="bin\Debug\net462\Microsoft.ServiceFabric.Actors.dll"                                target="build\Microsoft.ServiceFabric.Actors.dll"                        />
-    <file src="bin\Debug\net462\Microsoft.ServiceFabric.Data.dll"                                  target="build\Microsoft.ServiceFabric.Data.dll"                          />
-    <file src="bin\Debug\net462\Microsoft.ServiceFabric.Data.Interfaces.dll"                       target="build\Microsoft.ServiceFabric.Data.Interfaces.dll"               />
-    <file src="bin\Debug\net462\Microsoft.ServiceFabric.FabricTransport.dll"                       target="build\Microsoft.ServiceFabric.FabricTransport.dll"               />
-    <file src="bin\Debug\net462\Microsoft.ServiceFabric.Internal.dll"                              target="build\Microsoft.ServiceFabric.Internal.dll"                      />
-    <file src="bin\Debug\net462\Microsoft.ServiceFabric.Internal.Strings.dll"                      target="build\Microsoft.ServiceFabric.Internal.Strings.dll"              />
-    <file src="bin\Debug\net462\Microsoft.ServiceFabric.Services.dll"                              target="build\Microsoft.ServiceFabric.Services.dll"                      />
-    <file src="bin\Debug\net462\Microsoft.ServiceFabric.Services.Remoting.dll"                     target="build\Microsoft.ServiceFabric.Services.Remoting.dll"             />
     <file src="bin\Debug\net462\ServiceFabricSdkContrib.Service.targets"                           target="build\ServiceFabricSdkContrib.Service.targets"                   />
     <file src="bin\Debug\net462\ServiceFabricSdkContrib.MsBuild.dll"                               target="build\ServiceFabricSdkContrib.MsBuild.dll"                       />
-    <file src="bin\Debug\net462\System.Fabric.dll"                                                 target="build\System.Fabric.dll"                                         />
     <file src="bin\Debug\net462\System.Fabric.Management.ServiceModel.dll"                         target="build\System.Fabric.Management.ServiceModel.dll"                 />
-    <file src="bin\Debug\net462\System.Fabric.Management.ServiceModel.XmlSerializers.dll"          target="build\System.Fabric.Management.ServiceModel.XmlSerializers.dll"  />
-    <file src="bin\Debug\net462\System.Fabric.Strings.dll"                                         target="build\System.Fabric.Strings.dll"                                 />
-    <file src="ServiceFabricSdkContrib.Service.targets"                                            target="build\ServiceFabricSdkContrib.Service.targets"                   />
   </files>
   
 
