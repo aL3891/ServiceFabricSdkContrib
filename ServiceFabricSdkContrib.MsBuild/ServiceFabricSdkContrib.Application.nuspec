@@ -2,11 +2,11 @@
 <package>
   <metadata>
     <id>ServiceFabricSdkContrib.Application</id>
-    <version>0.0.2-beta</version>
+    <version>0.0.3-beta</version>
     <title>ServiceFabricSdkContrib.Application</title>
     <authors>Allan Lindqvist</authors>
     <owners>Allan Lindqvist</owners>
-    <projectUrl>https://github.com/aL3891/ServiceFabricSdk-Contrib</projectUrl>
+    <projectUrl>https://github.com/aL3891/ServiceFabricSdkContrib</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>ServiceFabricSdkContrib.Application</description>
     <releaseNotes></releaseNotes>
@@ -14,8 +14,8 @@
     <tags>MsBuild ServiceFabric</tags>
   </metadata>
   <files>
-    <file src="bin\Debug\net462\ServiceFabricSdkContrib.Application.targets"                       target="build\ServiceFabricSdkContrib.Application.targets"               />
-    <file src="bin\Debug\net462\ServiceFabricSdkContrib.MsBuild.dll"                               target="build\ServiceFabricSdkContrib.MsBuild.dll"                       />
-    <file src="bin\Debug\net462\System.Fabric.Management.ServiceModel.dll"                         target="build\System.Fabric.Management.ServiceModel.dll"                 />
+    <file src="bin\Debug\net462\ServiceFabricSdkContrib.Application.targets"                       target="build\ServiceFabricSdkContrib.Application.targets"/>
+    <file src="bin\Debug\net462\ServiceFabricSdkContrib.MsBuild.dll"                               target="build\ServiceFabricSdkContrib.MsBuild.dll"/>
+    <file src="bin\Debug\net462\ServiceFabricSdkContrib.ServiceFabric.ServiceModel.dll"            target="build\ServiceFabricSdkContrib.ServiceFabric.ServiceModel.dll"/>
   </files>
 </package>
