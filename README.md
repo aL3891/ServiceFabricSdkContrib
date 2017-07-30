@@ -69,5 +69,6 @@ sdk does not provide a way to create such a package. The service fabric contrib 
 * Create a build task for actors that allows actors in referenced projects
 * Add opt out properties for targets where it makes sense
 * Make sure all targets work with incremental builds
+* Automatically bump "real" version (that would be checked into source control) based on hash
 
 Got an idea for a target or cmdlet? Please be sure to make an issue!
