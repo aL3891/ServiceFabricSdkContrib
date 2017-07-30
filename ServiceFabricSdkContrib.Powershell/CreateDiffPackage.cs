@@ -78,12 +78,17 @@ namespace ServiceFabricSdkContrib.Powershell
             return true;
         }
 
+        private bool IsSymbolic(string path)
+        {
+            DirectoryInfo pathInfo = new DirectoryInfo(path);
+            return pathInfo.Attributes.HasFlag(FileAttributes.ReparsePoint);
+        }
+
         public void DeleteIfEx(string path)
         {
             if (Directory.Exists(path))
-                Directory.Delete(path, true);
+                Directory.Delete(path, !IsSymbolic(path));
         }
-
-
     }
 }
+

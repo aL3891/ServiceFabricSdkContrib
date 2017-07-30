@@ -4,7 +4,7 @@
 # RootModule = ''
 
 # Version number of this module.
-ModuleVersion = '0.1'
+ModuleVersion = '0.1.2'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -22,7 +22,7 @@ CompanyName = ''
 Copyright = '2017'
 
 # Description of the functionality provided by this module
-Description = 'Unofficial cmdlets working with service fabric'
+Description = 'Community cmdlets working with service fabric'
 
 # Minimum version of the Windows PowerShell engine required by this module
 # PowerShellVersion = ''
@@ -67,7 +67,7 @@ FunctionsToExport = @()
 CmdletsToExport = @('ConvertTo-ServiceFabricApplicationDiffPackage')
 
 # Variables to export from this module
-VariablesToExport = '*'
+VariablesToExport = @()
 
 # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
 AliasesToExport = @()
@@ -87,13 +87,13 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        # Tags = @()
+        Tags = @('ServiceFabric')
 
         # A URL to the license for this module.
         # LicenseUri = ''
 
         # A URL to the main website for this project.
-        # ProjectUri = ''
+        ProjectUri = 'https://github.com/aL3891/ServiceFabricSdkContrib'
 
         # A URL to an icon representing this module.
         # IconUri = ''

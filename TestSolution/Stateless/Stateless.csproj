@@ -94,5 +94,5 @@
   </Target>
   -->
 
-  <Import Project="..\..\ServiceFabricSdkContrib.MsBuild\bin\Debug\net462\ServiceFabricSdkContrib.Service.targets"/>
+  <Import Project="..\..\ServiceFabricSdkContrib.MsBuild\bin\Debug\net462\ServiceFabricSdkContrib.Services.targets"/>
 </Project>

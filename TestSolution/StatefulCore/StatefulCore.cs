@@ -41,7 +41,7 @@ namespace StatefulCore
             // TODO: Replace the following sample code with your own logic 
             //       or remove this RunAsync override if it's not needed in your service.
 
-            var myDictionary = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, long>>("myDictionary");
+            var myDictionary = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, long>>("myDict555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555ionary");
 
             while (true)
             {
@@ -65,4 +65,12 @@ namespace StatefulCore
             }
         }
     }
+
+    class apa{}
+    class apa2{}
+    class ap23a2{}
+    class ap43a2{}
+    class ap625a2{}
+    class ap431a2{}
+    class apa42{}
 }

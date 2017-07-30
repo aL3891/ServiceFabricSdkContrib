@@ -114,5 +114,5 @@
     <Error Condition="!Exists('..\packages\Microsoft.ServiceFabric.Actors.2.6.220\build\Microsoft.ServiceFabric.Actors.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ServiceFabric.Actors.2.6.220\build\Microsoft.ServiceFabric.Actors.targets'))" />
   </Target>
 
-  <Import Project="..\..\ServiceFabricSdkContrib.MsBuild\bin\Debug\net462\ServiceFabricSdkContrib.Service.targets"/>
+  <Import Project="..\..\ServiceFabricSdkContrib.MsBuild\bin\Debug\net462\ServiceFabricSdkContrib.Services.targets"/>
 </Project>

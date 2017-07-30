@@ -3,6 +3,10 @@
     <TargetFramework>NET462</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="ServiceFabricSdkContrib.Applications.nuspec" />
+    <None Include="ServiceFabricSdkContrib.Services.nuspec" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.Build" Version="15.1.1012" />
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.1.1012" />
   </ItemGroup>
@@ -11,10 +15,10 @@
     <ProjectReference Include="..\ServiceFabricSdkContrib.ServiceFabric.ServiceModel\ServiceFabricSdkContrib.ServiceFabric.ServiceModel.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="ServiceFabricSdkContrib.Service.targets">
+    <None Update="ServiceFabricSdkContrib.Services.targets">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="ServiceFabricSdkContrib.Application.targets">
+    <None Update="ServiceFabricSdkContrib.Applications.targets">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

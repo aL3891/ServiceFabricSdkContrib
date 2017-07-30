@@ -6,7 +6,7 @@ cd ..\..\..\..\TestSolution\TestSolution
 
 msbuild.exe
 if(ConvertTo-ServiceFabricApplicationDiffPackage pkg\Debug){
-.\scripts\Deploy-FabricApplication.ps1 -PublishProfileFile PublishProfiles\Local.1Node.xml -ApplicationPackagePath pkg\Debug -SkipPackageValidation -OverrideUpgradeBehavior ForceUpgrade
+.\scripts\Deploy-FabricApplication.ps1 -PublishProfileFile PublishProfiles\Local.1Node.xml -ApplicationPackagePath pkg\Debug -SkipPackageValidation
 }
 else{
 	Write-Host "Already up to date"

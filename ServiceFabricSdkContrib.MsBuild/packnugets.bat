@@ -1,2 +1,2 @@
-dotnet pack /p:NuspecFile=ServiceFabricSdkContrib.Application.nuspec
-dotnet pack /p:NuspecFile=ServiceFabricSdkContrib.Service.nuspec
+dotnet pack /p:NuspecFile=ServiceFabricSdkContrib.Applications.nuspec
+dotnet pack /p:NuspecFile=ServiceFabricSdkContrib.Services.nuspec
