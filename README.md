@@ -9,11 +9,11 @@ Powershell:
 
 Nuget	
 
-	Install-Package ServiceFabricSdkContrib.Service -Pre 
+    Install-Package ServiceFabricSdkContrib.Services -Pre 
 
 for services and 
 
-    Install-Package ServiceFabricSdkContrib.Application -Pre 
+    Install-Package ServiceFabricSdkContrib.Applications -Pre 
 
 for application projects
 
