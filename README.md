@@ -1,5 +1,12 @@
 # Service fabric Sdk Contrib
 
+This is a project for adding functionality to the service fabric sdk that is either missing or could be done in a diffrent way. It's not
+ment to replace the standard Sdk and the standard Sdk is ment to take precedence, so features in this project that are made obsolete by
+the standard sdk will be removed. This repo is also ment for experimentation and ideas that might get added to the sdk later. Hopefully 
+the standard sdk will be open sourced at some point, making it easier to move stable features from here (or elsewhere) to it.
+
+If you have an idea for something that would make your work with service fabric eaiser feel free to raise an issue or open a PR!
+
 ## Installation
 Powershell:
     
@@ -17,8 +24,8 @@ Note, The current Visual studio tooling for sf projects is not really set up for
 
     <Import Project="..\packages\ServiceFabricSdkContrib.Applications.0.0.4-beta\build\ServiceFabricSdkContrib.Applications.targets" Condition="Exists('..\packages\ServiceFabricSdkContrib.Applications.0.0.4-beta\build\ServiceFabricSdkContrib.Applications.targets')" />
 
-Also, by default the sfproj projects are not included in the standard build configuration, you need to in the solution configuration to create application packages during build.
-Finally, Creating symlinks in windows requires administrator rights, so you must run visual studio/msbuild with elevated privileges for the packaging to work
+Also, sfproj projects are not included in the standard build configuration, so you need to modify the solution configuration in order to create application packages during build.
+Finally, creating symlinks in windows requires administrator rights, so you must run visual studio/msbuild with elevated privileges for the packaging to work
 
 ## Feature summary
 
