@@ -1,21 +1,17 @@
 # Service fabric Sdk Contrib
-A set of msbuild targets and powershell cmdlets to make working with service fabric easier
-
 
 ## Installation
 Powershell:
     
     Install-Module ServiceFabricSdkContrib
 
-Nuget	
+Nuget for service projects
 
     Install-Package ServiceFabricSdkContrib.Services -Pre 
-
-for services and 
-
-    Install-Package ServiceFabricSdkContrib.Applications -Pre 
-
-for application projects
+    
+and application projects
+	
+	Install-Package ServiceFabricSdkContrib.Applications -Pre 
 
 Note, The current Visual studio tooling for sf projects is not really set up for nuget, so you may need to manually add a reference to the target file inside your sfproj file, something like this:
 
