@@ -19,14 +19,12 @@ for application projects
 
 Note, The current Visual studio tooling for sf projects is not really set up for nuget, so you may need to manually add a reference to the target file inside your sfproj file, something like this:
 
-    <Import Project="..\packages\ServiceFabricSdkContrib.Application.0.0.3-beta\build\ServiceFabricSdkContrib.Application.targets" Condition="Exists('..\packages\ServiceFabricSdkContrib.Application.0.0.3-beta\build\ServiceFabricSdkContrib.Application.targets')" />
+    <Import Project="..\packages\ServiceFabricSdkContrib.Applications.0.0.4-beta\build\ServiceFabricSdkContrib.Applications.targets" Condition="Exists('..\packages\ServiceFabricSdkContrib.Applications.0.0.4-beta\build\ServiceFabricSdkContrib.Applications.targets')" />
 
 Also, by default the sfproj projects are not included in the standard build configuration, you need to in the solution configuration to create application packages during build.
 Finally, Creating symlinks in windows requires administrator rights, so you must run visual studio/msbuild with elevated privileges for the packaging to work
 
 ## Feature summary
-
-More will be added later
 
 ### Service features
 * Generate hashes for all packages during build and update the service manifest
@@ -37,8 +35,6 @@ More will be added later
 
 ### Powershell features
 * Adds the ConvertTo-ServiceFabricApplicationDiffPackage that checks the connected cluster for exsisting packages and removes them from the local package
- 
-The main objective with this project is performance, as opposed to security or safety of use.
 
 ## Feature details
 
@@ -59,7 +55,6 @@ if there are alot of services with alot of references. The new build target crea
 
 Service fabric supports deployment of differential packages that only contain the services and packagaes that have not been previously deployed to the cluster, however the standard
 sdk does not provide a way to create such a package. The service fabric contrib module adds the 
-
 
 ## Future features / improvements
 
