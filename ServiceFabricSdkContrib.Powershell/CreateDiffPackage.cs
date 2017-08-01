@@ -1,6 +1,7 @@
 ﻿using ServiceFabricSdkContrib.Common;
 using System;
 using System.Fabric;
+using System.Fabric.Description;
 using System.Fabric.Management.ServiceModel;
 using System.IO;
 using System.Linq;
@@ -13,18 +14,15 @@ namespace ServiceFabricSdkContrib.Powershell
     [Cmdlet("ConvertTo", "ServiceFabricApplicationDiffPackage")]
     public class CreateDiffPackage : PSCmdlet
     {
-
-
         [Parameter(ValueFromPipeline = true, Position = 0)]
         public string PackagePath { get; set; }
 
-        [Parameter()]
-        public bool NeedsUpgrade { get; set; }
 
         protected override void ProcessRecord()
         {
             dynamic connection = GetVariableValue("ClusterConnection");
             FabricClient client = connection.FabricClient;
+            
             if (string.IsNullOrWhiteSpace(PackagePath))
                 PackagePath = SessionState.Path.CurrentFileSystemLocation.Path;
 
