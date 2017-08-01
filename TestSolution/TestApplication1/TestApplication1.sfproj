@@ -32,6 +32,7 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ActorCore\ActorCore.csproj" />
     <ProjectReference Include="..\Actor\Actor.csproj" />
     <ProjectReference Include="..\StatefulCore\StatefulCore.csproj" />
     <ProjectReference Include="..\StatefulWebCore\StatefulWebCore.csproj" />
