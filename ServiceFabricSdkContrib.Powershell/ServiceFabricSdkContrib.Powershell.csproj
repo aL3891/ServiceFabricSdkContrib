@@ -3,9 +3,6 @@
     <TargetFramework>NET462</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="PublishServiceFabricSolution.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Microsoft.ServiceFabric" Version="5.6.220" />
     <PackageReference Include="System.Management.Automation" Version="6.1.7601.17515" />
   </ItemGroup>
