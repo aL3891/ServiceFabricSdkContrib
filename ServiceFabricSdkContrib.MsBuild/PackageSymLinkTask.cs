@@ -70,24 +70,7 @@ namespace ServiceFabricSdkContrib.MsBuild
                 }
             }
 
-            File.Copy(Path.Combine(basePath, "ApplicationPackageRoot", "ApplicationManifest.xml"), Path.Combine(basePath, PackageLocation, "ApplicationManifest.xml"), true);
-            var appManifest = Helper.FromFile(Path.Combine(basePath, "ApplicationPackageRoot", "ApplicationManifest.xml"));
-
-            foreach (var serviceReference in appManifest.ServiceManifestImport)
-            {
-                var servicePath = Path.Combine(basePath, PackageLocation, serviceReference.ServiceManifestRef.ServiceManifestName, "ServiceManifest.xml");
-                if (File.Exists(servicePath))
-                {
-                    var serviceManifest = Helper.serviceFromFile(servicePath);
-                    serviceReference.ServiceManifestRef.ServiceManifestVersion = serviceManifest.Version;
-                }
-            }
-
-            var aggregatedVersion = Uri.EscapeDataString(Convert.ToBase64String(new SHA512Managed().ComputeHash(Encoding.ASCII.GetBytes(string.Join("", appManifest.ServiceManifestImport.Select(ss => ss.ServiceManifestRef.ServiceManifestVersion))))));
-            appManifest.ApplicationTypeVersion = appManifest.ApplicationTypeVersion + "." + aggregatedVersion;
-            Helper.SaveApp(Path.Combine(basePath, PackageLocation, "ApplicationManifest.xml"), appManifest);
-
-            return true;
+			return true;
         }
 
         private IEnumerable<ITaskItem> PatchMetadata(IEnumerable<ITaskItem> projectReferences, IEnumerable<ITaskItem> serviceProjectReferences)
@@ -104,7 +87,7 @@ namespace ServiceFabricSdkContrib.MsBuild
             {
                 var manifestFile = Path.Combine(Path.GetDirectoryName(r.ItemSpec), "PackageRoot", "ServiceManifest.xml");
 
-                r.SetMetadata("ServiceManifestName", Helper.serviceFromFile(manifestFile).Name);
+                r.SetMetadata("ServiceManifestName", FabricSerializers.ServiceManifestFromFile(manifestFile).Name);
                 r.SetMetadata("CodePackageName", "Code");
             }
 

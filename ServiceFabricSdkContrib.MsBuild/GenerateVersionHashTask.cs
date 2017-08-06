@@ -24,70 +24,45 @@ namespace ServiceFabricSdkContrib.MsBuild
 		public override bool Execute()
 		{
 			BaseDir = Path.GetDirectoryName(BasePath);
-			var srv = Helper.serviceFromFile(Path.Combine(BaseDir, "PackageRoot", "ServiceManifest.xml"));
+			var srv = FabricSerializers.ServiceManifestFromFile(Path.Combine(BaseDir, "PackageRoot", "ServiceManifest.xml"));
 			srv = GitVersion(srv).Result;
-			Helper.SaveService(Path.Combine(BaseDir, IntermediateOutputPath, "ServiceManifest.xml"), srv);
+			FabricSerializers.SaveServiceManifest(Path.Combine(BaseDir, IntermediateOutputPath, "ServiceManifest.xml"), srv);
 			return true;
 		}
 
-		public async Task<DateTime> GetGitDate(string path)
+		public async Task<GitVersion> GitCommit(string path)
 		{
-			var version = (await RunGitCommand("log -n 1 --pretty=format:\"%cI\" " + path));
+			var res = new GitVersion { };
 
-			if (!string.IsNullOrWhiteSpace(version))
-				return DateTime.Parse(version);
-			else
-				return DateTime.MinValue;
-		}
-
-		public async Task<(string, DateTime)> GetCommit(string path)
-		{
-			var version = (await RunGitCommand("log -n 1 --pretty=format:\"%h\" " + path)).Split(' ').Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
-
-			var commit = version[0];
-			var date = DateTime.Parse(version[1]);
-
-			return (commit, date);
-		}
-
-		public async Task<(string, DateTime)> GetGitVersion(string path)
-		{
 			var version = (await RunGitCommand("log -n 1 --pretty=format:\"%h %cI\" " + path)).Split(' ').Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
-
-			var commit = version[0];
-			var date = DateTime.Parse(version[1]);
-
-			return (commit, date);
-		}
-
-		public async Task<string> GetGitDiffHash(string path)
-		{
-			var changes = await RunGitCommand("status --porcelain " + path);
-
-			if (changes != "")
+			if (version.Any())
 			{
-				changes = await RunGitCommand("status -v -v " + path);
-				var date = DateTime.UtcNow;
-				changes = Convert.ToBase64String(Encoding.ASCII.GetBytes(changes));
-				return changes;
-			}
-			return "";
-		}
-
-		public async Task<(string, DateTime)> GetGitVersionWithHash(string path)
-		{
-			var res = await GetGitVersion(path);
-
-			var changes = await RunGitCommand("status --porcelain " + path);
-
-			if (changes != "")
-			{
-				changes = await RunGitCommand("status -v -v " + path);
-				var date = DateTime.UtcNow;
-				changes = Convert.ToBase64String(Encoding.ASCII.GetBytes(changes));
-				return (res.Item1 + "." + changes, res.Item2);
+				res.Version = version[0];
+				res.Date = DateTime.Parse(version[1]);
 			}
 			return res;
+		}
+
+		public async Task<string> GitDiff(string path)
+		{
+			return await RunGitCommand("status --porcelain " + path);
+		}
+
+		public async Task<string> GitDiffHash(string path)
+		{
+			var v = await GitDiff(path);
+			if (v != "")
+				return "."+ Convert.ToBase64String(Encoding.ASCII.GetBytes(v));
+			else
+				return "";
+		}
+
+		public string Hash(string data)
+		{
+			if (data != "")
+				return "." + Convert.ToBase64String(Encoding.ASCII.GetBytes(data));
+			else
+				return "";
 		}
 
 		private Task<string> RunGitCommand(string command)
@@ -104,50 +79,56 @@ namespace ServiceFabricSdkContrib.MsBuild
 			return p.StandardOutput.ReadToEndAsync();
 		}
 
+
+
 		private async Task<ServiceManifestType> GitVersion(ServiceManifestType srv)
 		{
-			srv.Version = (await GetGitVersion(BaseDir)).Item1;
-			var latest = (version: "", date: DateTime.MinValue);
+			var latest = await GitCommit(BaseDir);
+			var code = new GitVersion { Version = latest.Version, Date = latest.Date };
+
+			srv.Version = latest.Version + await GitDiffHash(BaseDir);
 
 			if (srv.CodePackage != null)
-				foreach (var cv in srv.CodePackage)
-				{
-					var path = cv.Name == "Code" ? BaseDir : Path.Combine(BaseDir, "PackageRoot", cv.Name);
-					(var v, var date) = await GetGitVersionWithHash(Path.Combine(BaseDir, "PackageRoot", cv.Name));
-					cv.Version = v;
-
-					if (latest.date < date)
-						latest = (v, date);
-				}
+				foreach (var cv in srv.CodePackage.Where(p => p.Name != "Code"))
+					cv.Version = await GetPackageVersion(latest, cv.Name);
 
 			if (srv.ConfigPackage != null)
 				foreach (var cv in srv.ConfigPackage)
-				{
-					(var v, var date) = await GetGitVersionWithHash(Path.Combine(BaseDir, "PackageRoot", cv.Name));
-					cv.Version = v;
-
-					if (latest.date < date)
-						latest = (v, date);
-				}
+					cv.Version = await GetPackageVersion(latest, cv.Name);
 
 			if (srv.DataPackage != null)
 				foreach (var cv in srv.DataPackage)
-				{
-					(var v, var date) = await GetGitVersionWithHash(Path.Combine(BaseDir, "PackageRoot", cv.Name));
-					cv.Version = v;
+					cv.Version = await GetPackageVersion(latest, cv.Name);
 
-					if (latest.date < date)
-						latest = (v, date);
-				}
 
-			if (srv.CodePackage.FirstOrDefault(c => c.Name == "Code").Version != latest.version)
+			var codepackage = srv.CodePackage.FirstOrDefault(c => c.Name == "Code");
+
+			if (codepackage != null)
 			{
-				var vers = await Task.WhenAll(Directory.GetFileSystemEntries(TargetDir).Where(p => !p.EndsWith("PackageRoot")).Concat(Directory.GetFiles(Path.Combine(BaseDir, "PackageRoot", "ServiceManifest.xml"))).Select(p => GetGitVersion(p)));
+				if (latest.Date > code.Date)
+				{
+					var codeFiles = Directory.GetFileSystemEntries(TargetDir).Where(p => !p.EndsWith("PackageRoot")).Concat(Directory.GetFiles(Path.Combine(BaseDir, "PackageRoot")));
+					var vers = await Task.WhenAll(codeFiles.Select(p => GitCommit(p)));
+					codepackage.Version = vers.OrderBy(v => v.Date).First().Version + Hash(string.Join("", codeFiles.Select(cf => GitDiff(cf))));
+				}
+				else
+					codepackage.Version = srv.Version;
+			}
+			return srv;
+		}
 
-				srv.CodePackage.FirstOrDefault(c => c.Name == "Code").Version = vers.OrderBy(v => v.Item2).First().Item1 + GetGitDiffHash(BaseDir);
+		private async Task<string> GetPackageVersion(GitVersion latest, string name)
+		{
+			var path = Path.Combine(BaseDir, "PackageRoot", name);
+			var v = await GitCommit(path);
+
+			if (latest.Date < v.Date)
+			{
+				latest.Date = v.Date;
+				latest.Version = v.Version;
 			}
 
-			return srv;
+			return v.Version + await GitDiffHash(path);
 		}
 
 		private ServiceManifestType ShaHashVersion(ServiceManifestType srv)
@@ -212,5 +193,11 @@ namespace ServiceFabricSdkContrib.MsBuild
 			srv.Version += "." + Uri.EscapeDataString(Convert.ToBase64String(new SHA512Managed().ComputeHash(configHash.ToArray())));
 			return srv;
 		}
+	}
+
+	public class GitVersion
+	{
+		public string Version { get; set; }
+		public DateTime Date { get; set; }
 	}
 }

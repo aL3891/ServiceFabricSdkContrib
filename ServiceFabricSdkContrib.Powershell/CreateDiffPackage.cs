@@ -34,11 +34,11 @@ namespace ServiceFabricSdkContrib.Powershell
 
         public async Task<bool> Diff(FabricClient client)
         {
-            var localAppManifest = Helper.FromFile(Path.Combine(PackagePath, "ApplicationManifest.xml"));
+            var localAppManifest = FabricSerializers.AppManifestFromFile(Path.Combine(PackagePath, "ApplicationManifest.xml"));
             var appTypes = await client.QueryManager.GetApplicationTypeListAsync();
             var appManifestTasks = appTypes.Where(type => type.ApplicationTypeName == localAppManifest.ApplicationTypeName).Select(type => client.ApplicationManager.GetApplicationManifestAsync(type.ApplicationTypeName, type.ApplicationTypeVersion));
             await Task.WhenAll(appManifestTasks);
-            var serverAppManifests = appManifestTasks.Select(task => Helper.FromString(task.Result)).ToList();
+            var serverAppManifests = appManifestTasks.Select(task => FabricSerializers.AppManifestFromString(task.Result)).ToList();
 
             foreach (var serverAppManifest in serverAppManifests)
             {
@@ -55,8 +55,8 @@ namespace ServiceFabricSdkContrib.Powershell
                             DeleteIfEx(dir);
                     else
                     {
-                        var serverServiceManifest = Helper.serviceFromString(await client.ServiceManager.GetServiceManifestAsync(serverAppManifest.ApplicationTypeName, serverAppManifest.ApplicationTypeVersion, serviceImport.ServiceManifestRef.ServiceManifestName));
-                        var localServiceManifest = Helper.serviceFromFile(Path.Combine(PackagePath, serviceImport.ServiceManifestRef.ServiceManifestName, "ServiceManifest.xml"));
+                        var serverServiceManifest = FabricSerializers.ServiceManifestFromString(await client.ServiceManager.GetServiceManifestAsync(serverAppManifest.ApplicationTypeName, serverAppManifest.ApplicationTypeVersion, serviceImport.ServiceManifestRef.ServiceManifestName));
+                        var localServiceManifest = FabricSerializers.ServiceManifestFromFile(Path.Combine(PackagePath, serviceImport.ServiceManifestRef.ServiceManifestName, "ServiceManifest.xml"));
 
                         if (serverServiceManifest.CodePackage != null && localServiceManifest.CodePackage != null)
                             foreach (var package in serverServiceManifest.CodePackage?.Select(sp => localServiceManifest.CodePackage.FirstOrDefault(lp => lp.Name == sp.Name && lp.Version == sp.Version)).Where(x => x != null))

@@ -59,7 +59,7 @@ namespace ServiceFabricSdkContrib.Powershell
 
             foreach (var p in PackagePath)
             {
-                var localAppManifest = Helper.FromFile(Path.Combine(p, "ApplicationManifest.xml"));
+                var localAppManifest = FabricSerializers.AppManifestFromFile(Path.Combine(p, "ApplicationManifest.xml"));
                 var n = localAppManifest.ApplicationTypeName + localAppManifest.ApplicationTypeVersion;
                 client.ApplicationManager.CopyApplicationPackage("fabric:imageStore", n, n);
 
