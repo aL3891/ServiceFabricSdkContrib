@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="TestApplication1Type" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
+  <Parameters>
+    <Parameter Name="StatefulCore_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="StatefulCore_PartitionCount" DefaultValue="1" />
+    <Parameter Name="StatefulCore_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="StatelessCore_InstanceCount" DefaultValue="-1" />
+    <Parameter Name="StatefulWebCore_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="StatefulWebCore_PartitionCount" DefaultValue="1" />
+    <Parameter Name="StatefulWebCore_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="StatelessWebCore_InstanceCount" DefaultValue="-1" />
+    <Parameter Name="Stateful_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="Stateful_PartitionCount" DefaultValue="1" />
+    <Parameter Name="Stateful_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="Stateless_InstanceCount" DefaultValue="-1" />
+    <Parameter Name="Actor2ActorService_PartitionCount" DefaultValue="10" />
+    <Parameter Name="Actor2ActorService_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="Actor2ActorService_TargetReplicaSetSize" DefaultValue="3" />
+  </Parameters>
+  <!-- Import the ServiceManifest from the ServicePackage. The ServiceManifestName and ServiceManifestVersion 
+       should match the Name and Version attributes of the ServiceManifest element defined in the 
+       ServiceManifest.xml file. -->
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="StatefulCorePkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="StatelessCorePkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="StatefulWebCorePkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="StatelessWebCorePkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="ActorPkg" ServiceManifestVersion="1.0.0" />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="StatefulPkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="StatelessPkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <DefaultServices>
+    <!-- The section below creates instances of service types, when an instance of this 
+         application type is created. You can also create one or more instances of service type using the 
+         ServiceFabric PowerShell module.
+         
+         The attribute ServiceTypeName below must match the name defined in the imported ServiceManifest.xml file. -->
+    <Service Name="StatefulCore">
+      <StatefulService ServiceTypeName="StatefulCoreType" TargetReplicaSetSize="[StatefulCore_TargetReplicaSetSize]" MinReplicaSetSize="[StatefulCore_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[StatefulCore_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+    <Service Name="StatelessCore">
+      <StatelessService ServiceTypeName="StatelessCoreType" InstanceCount="[StatelessCore_InstanceCount]">
+        <SingletonPartition />
+      </StatelessService>
+    </Service>
+    <Service Name="StatefulWebCore">
+      <StatefulService ServiceTypeName="StatefulWebCoreType" TargetReplicaSetSize="[StatefulWebCore_TargetReplicaSetSize]" MinReplicaSetSize="[StatefulWebCore_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[StatefulWebCore_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+    <Service Name="StatelessWebCore" ServicePackageActivationMode="ExclusiveProcess">
+      <StatelessService ServiceTypeName="StatelessWebCoreType" InstanceCount="[StatelessWebCore_InstanceCount]">
+        <SingletonPartition />
+      </StatelessService>
+    </Service>
+    <Service Name="Stateful">
+      <StatefulService ServiceTypeName="StatefulType" TargetReplicaSetSize="[Stateful_TargetReplicaSetSize]" MinReplicaSetSize="[Stateful_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[Stateful_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+    <Service Name="Stateless">
+      <StatelessService ServiceTypeName="StatelessType" InstanceCount="[Stateless_InstanceCount]">
+        <SingletonPartition />
+      </StatelessService>
+    </Service>
+    <Service Name="Actor2ActorService" GeneratedIdRef="2a0bff15-e142-448a-8ec3-38f07d6761ba|Persisted">
+      <StatefulService ServiceTypeName="Actor2ActorServiceType" TargetReplicaSetSize="[Actor2ActorService_TargetReplicaSetSize]" MinReplicaSetSize="[Actor2ActorService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[Actor2ActorService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+  </DefaultServices>
+</ApplicationManifest>

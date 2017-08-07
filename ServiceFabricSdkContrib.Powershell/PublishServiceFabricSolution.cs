@@ -16,32 +16,25 @@ namespace ServiceFabricSdkContrib.Powershell
 	[Cmdlet("Publish", "ServiceFabricSolution")]
 	public class PublishServiceFabricSolution : PSCmdlet
 	{
-
 		[Parameter(ValueFromPipeline = true, Position = 0)]
 		public Hashtable AppsHash { get; set; }
-
 		public ServiceFabricApplicationSpec[] Apps { get; set; }
 
 		protected override void ProcessRecord()
 		{
-
-
 			dynamic connection = GetVariableValue("ClusterConnection");
 			if (connection == null)
 				throw new NullReferenceException();
 
-			Apps = Parse(AppsHash);
-			Apps = Fixup(Apps);
+			Apps = Validate(Parse(AppsHash));
 			FabricClient client = connection.FabricClient;
-			WriteObject(Doit(client).Result);
+			WriteObject(ProcessAsync(client).Result);
 		}
 
-		public async Task<bool> Doit(FabricClient client)
+		public async Task<bool> ProcessAsync(FabricClient client)
 		{
 			var appTypes = await client.QueryManager.GetApplicationTypeListAsync();
-
 			var appsToUpload = Apps.Select(a => a.PackagePath).Distinct().Where(a => File.Exists(a)).Select(a => new { path = a, manifest = FabricSerializers.AppManifestFromFile(a) }).Where(a => !appTypes.Any(ap => ap.ApplicationTypeName == a.manifest.ApplicationTypeName && ap.ApplicationTypeVersion == a.manifest.ApplicationTypeVersion));
-
 
 			foreach (var item in appsToUpload)
 			{
@@ -54,39 +47,43 @@ namespace ServiceFabricSdkContrib.Powershell
 
 			}
 
-
 			var upgradepolicy = new MonitoredRollingApplicationUpgradePolicyDescription();
 
-			await client.ApplicationManager.UpgradeApplicationAsync(new ApplicationUpgradeDescription
+			await Task.WhenAll(Apps.Select(a => client.ApplicationManager.UpgradeApplicationAsync(new ApplicationUpgradeDescription
 			{
-				ApplicationName = new Uri(""),
-				TargetApplicationTypeVersion = "",
+				ApplicationName = new Uri("fabric:/" + a.Name),
+				TargetApplicationTypeVersion = a.Version,
 				UpgradePolicyDescription = upgradepolicy
-			});
+			})));
+
 			return true;
 		}
 
-		public ServiceFabricApplicationSpec[] Fixup(ServiceFabricApplicationSpec[] apps)
+		public ServiceFabricApplicationSpec[] Validate(ServiceFabricApplicationSpec[] apps)
 		{
-			foreach (var item in apps)
+			foreach (var app in apps)
 			{
-				if (string.IsNullOrWhiteSpace(item.PackagePath))
-					continue; //					item.PackagePath = SessionState.Path.CurrentFileSystemLocation.Path;
+				if (string.IsNullOrWhiteSpace(app.PackagePath))
+					continue;
 
-				if (!Path.IsPathRooted(item.PackagePath))
-					item.PackagePath = Path.Combine(SessionState.Path.CurrentFileSystemLocation.Path, item.PackagePath);
+				if (!Path.IsPathRooted(app.PackagePath))
+					app.PackagePath = Path.Combine(SessionState.Path.CurrentFileSystemLocation.Path, app.PackagePath);
 
-				item.Manifest = FabricSerializers.AppManifestFromFile(item.PackagePath);
+				app.Manifest = FabricSerializers.AppManifestFromFile(Path.Combine(app.PackagePath, "ApplicationManifest.xml"));
+				app.Version = app.Manifest.ApplicationTypeVersion;
 			}
-
 
 			return apps;
 		}
 
-		public ServiceFabricApplicationSpec[] Parse(Hashtable apps)
+		public ServiceFabricApplicationSpec[] Parse(Hashtable appHash)
 		{
-
-			return new ServiceFabricApplicationSpec[0];
+			return appHash.Keys.OfType<string>().Select(app => new ServiceFabricApplicationSpec
+			{
+				Name = app,
+				Version = ((Hashtable)appHash[app]).ContainsKey("Version") ? ((Hashtable)appHash[app])["Version"].ToString() : null,
+				PackagePath = ((Hashtable)appHash[app]).ContainsKey("PackagePath") ? ((Hashtable)appHash[app])["PackagePath"].ToString() : null
+			}).ToArray();
 		}
 	}
 

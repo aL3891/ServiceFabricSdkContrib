@@ -1,109 +1,93 @@
-﻿using Microsoft.Build.Construction;
-using Microsoft.Build.Evaluation;
+﻿using Microsoft.Build.Evaluation;
 using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
 using ServiceFabricSdkContrib.Common;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 
 namespace ServiceFabricSdkContrib.MsBuild
 {
-    public class PackageSymLinkTask : Microsoft.Build.Utilities.Task
-    {
+	public class PackageSymLinkTask : Microsoft.Build.Utilities.Task
+	{
+		public ITaskItem[] ProjectReferences { get; set; }
+		public ITaskItem[] ServiceProjectReferences { get; set; }
+		public string Configuration { get; set; }
+		public string Platform { get; set; }
+		public string ServicePackageRootFolder { get; set; }
+		public string ApplicationManifestPath { get; set; }
+		public string PackageBehavior { get; set; }
+		public string PackageLocation { get; set; }
+		public string ProjectPath { get; set; }
 
-        [DllImport("kernel32.dll")]
-        static extern bool CreateSymbolicLink(string lpSymlinkFileName, string lpTargetFileName, SymbolicLink dwFlags);
+		public ITaskItem[] IncludeInPackagePaths { get; set; }
 
-        public ITaskItem[] ProjectReferences { get; set; }
-        public ITaskItem[] ServiceProjectReferences { get; set; }
-        public string Configuration { get; set; }
-        public string Platform { get; set; }
-        public string ServicePackageRootFolder { get; set; }
-        public string ApplicationManifestPath { get; set; }
-        public string PackageBehavior { get; set; }
-        public string PackageLocation { get; set; }
-        public string ProjectPath { get; set; }
+		public override bool Execute()
+		{
+			var basePath = Path.GetDirectoryName(ProjectPath);
 
-        public ITaskItem[] IncludeInPackagePaths { get; set; }
+			foreach (var spr in PatchMetadata(ProjectReferences, ServiceProjectReferences))
+			{
+				var serviceProjectPath = Path.GetFullPath(Path.Combine(basePath, spr.ItemSpec));
+				var project = GetProject(serviceProjectPath);
 
-        public override bool Execute()
-        {
-            var basePath = Path.GetDirectoryName(ProjectPath);
+				var codePath = project.GetPropertyValue("TargetDir");
 
-            foreach (var spr in PatchMetadata(ProjectReferences, ServiceProjectReferences))
-            {
-                var serviceProjectPath = Path.GetFullPath(Path.Combine(basePath, spr.ItemSpec));
-                var project = GetProject(serviceProjectPath);
+				string servicePath = Path.Combine(basePath, PackageLocation, spr.GetMetadata("ServiceManifestName"));
+				if (!Directory.Exists(servicePath))
+					Directory.CreateDirectory(servicePath);
 
-                var codePath = project.GetPropertyValue("TargetDir");
+				if (!Directory.Exists(Path.Combine(servicePath, spr.GetMetadata("CodePackageName"))))
+					Symlink.CreateSymbolicLink(Path.Combine(servicePath, spr.GetMetadata("CodePackageName")), codePath, SymbolicLink.Directory);
 
-                string servicePath = Path.Combine(basePath, PackageLocation, spr.GetMetadata("ServiceManifestName"));
-                if (!Directory.Exists(servicePath))
-                    Directory.CreateDirectory(servicePath);
+				if (!Directory.Exists(Path.Combine(servicePath, "Config")))
+					Symlink.CreateSymbolicLink(Path.Combine(servicePath, "Config"), Path.Combine(Path.GetDirectoryName(serviceProjectPath), "PackageRoot", "Config"), SymbolicLink.Directory);
 
-                if (!Directory.Exists(Path.Combine(servicePath, spr.GetMetadata("CodePackageName"))))
-                    CreateSymbolicLink(Path.Combine(servicePath, spr.GetMetadata("CodePackageName")), codePath, SymbolicLink.Directory);
-
-                if (!Directory.Exists(Path.Combine(servicePath, "Config")))
-                    CreateSymbolicLink(Path.Combine(servicePath, "Config"), Path.Combine(Path.GetDirectoryName(serviceProjectPath), "PackageRoot", "Config"), SymbolicLink.Directory);
-
-                if (!File.Exists(Path.Combine(servicePath, "ServiceManifest.xml")))
-                {
-                    var manifestFile = Path.Combine(Path.GetDirectoryName(serviceProjectPath), project.GetPropertyValue("IntermediateOutputPath"), "ServiceManifest.xml");
-                    if (File.Exists(manifestFile))
-                    {
-                        CreateSymbolicLink(Path.Combine(servicePath, "ServiceManifest.xml"), manifestFile, SymbolicLink.File);
-                    }
-                    else
-                    {
-                        manifestFile = Path.Combine(Path.GetDirectoryName(serviceProjectPath), "PackageRoot", "ServiceManifest.xml");
-                        File.Copy(manifestFile, Path.Combine(servicePath, "ServiceManifest.xml"));
-                    }
-                }
-            }
+				if (!File.Exists(Path.Combine(servicePath, "ServiceManifest.xml")))
+				{
+					var manifestFile = Path.Combine(Path.GetDirectoryName(serviceProjectPath), project.GetPropertyValue("IntermediateOutputPath"), "ServiceManifest.xml");
+					if (File.Exists(manifestFile))
+					{
+						Symlink.CreateSymbolicLink(Path.Combine(servicePath, "ServiceManifest.xml"), manifestFile, SymbolicLink.File);
+					}
+					else
+					{
+						manifestFile = Path.Combine(Path.GetDirectoryName(serviceProjectPath), "PackageRoot", "ServiceManifest.xml");
+						File.Copy(manifestFile, Path.Combine(servicePath, "ServiceManifest.xml"));
+					}
+				}
+			}
 
 			return true;
-        }
+		}
 
-        private IEnumerable<ITaskItem> PatchMetadata(IEnumerable<ITaskItem> projectReferences, IEnumerable<ITaskItem> serviceProjectReferences)
-        {
-            if (serviceProjectReferences == null)
-                serviceProjectReferences = Enumerable.Empty<ITaskItem>();
+		private IEnumerable<ITaskItem> PatchMetadata(IEnumerable<ITaskItem> projectReferences, IEnumerable<ITaskItem> serviceProjectReferences)
+		{
+			if (serviceProjectReferences == null)
+				serviceProjectReferences = Enumerable.Empty<ITaskItem>();
 
-            if (projectReferences == null)
-                projectReferences = Enumerable.Empty<ITaskItem>();
+			if (projectReferences == null)
+				projectReferences = Enumerable.Empty<ITaskItem>();
 
-            var res = projectReferences.Where(p => !serviceProjectReferences.Any(spr => spr.ItemSpec == p.ItemSpec)).ToList();
+			var res = projectReferences.Where(p => !serviceProjectReferences.Any(spr => spr.ItemSpec == p.ItemSpec)).ToList();
 
-            foreach (var r in res)
-            {
-                var manifestFile = Path.Combine(Path.GetDirectoryName(r.ItemSpec), "PackageRoot", "ServiceManifest.xml");
+			foreach (var r in res)
+			{
+				var manifestFile = Path.Combine(Path.GetDirectoryName(r.ItemSpec), "PackageRoot", "ServiceManifest.xml");
 
-                r.SetMetadata("ServiceManifestName", FabricSerializers.ServiceManifestFromFile(manifestFile).Name);
-                r.SetMetadata("CodePackageName", "Code");
-            }
+				r.SetMetadata("ServiceManifestName", FabricSerializers.ServiceManifestFromFile(manifestFile).Name);
+				r.SetMetadata("CodePackageName", "Code");
+			}
 
-            return serviceProjectReferences.Concat(res).ToList();
-        }
+			return serviceProjectReferences.Concat(res).ToList();
+		}
 
-        public Project GetProject(string projectfile)
-        {
-            return ProjectCollection.GlobalProjectCollection.LoadedProjects.FirstOrDefault(p => p.FullPath.ToLower() == projectfile.ToLower()) ?? new Project(projectfile);
-        }
-    }
+		public Project GetProject(string projectfile)
+		{
+			return ProjectCollection.GlobalProjectCollection.LoadedProjects.FirstOrDefault(p => p.FullPath.ToLower() == projectfile.ToLower()) ?? new Project(projectfile);
+		}
+	}
 
-    enum SymbolicLink
-    {
-        File = 0,
-        Directory = 1
-    }
 }
 
