@@ -1,10 +1,10 @@
 ﻿using ServiceFabricSdkContrib.Common;
+using ServiceFabricSdkContrib.ServiceFabric.ServiceModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Fabric;
 using System.Fabric.Description;
-using System.Fabric.Management.ServiceModel;
 using System.IO;
 using System.Linq;
 using System.Management.Automation;
@@ -13,69 +13,89 @@ using System.Xml.Serialization;
 
 namespace ServiceFabricSdkContrib.Powershell
 {
-    [Cmdlet("Publish", "ServiceFabricSolution")]
-    public class PublishServiceFabricSolution : PSCmdlet
-    {
-        public string[] PackagePath { get; set; }
+	[Cmdlet("Publish", "ServiceFabricSolution")]
+	public class PublishServiceFabricSolution : PSCmdlet
+	{
 
-        [Parameter(ValueFromPipeline = true, Position = 0)]
-        public Hashtable apps { get; set; }
+		[Parameter(ValueFromPipeline = true, Position = 0)]
+		public Hashtable AppsHash { get; set; }
 
-        protected override void ProcessRecord()
-        {
+		public ServiceFabricApplicationSpec[] Apps { get; set; }
 
-            foreach (var apa in apps.OfType<DictionaryEntry>())
-            {
-                WriteDebug(apa.Key.ToString() + " " + apa.Value);
-            }
-
-            return;
-
-            dynamic connection = GetVariableValue("ClusterConnection");
-            if (connection == null)
-                throw new NullReferenceException();
+		protected override void ProcessRecord()
+		{
 
 
-            FabricClient client = connection.FabricClient;
+			dynamic connection = GetVariableValue("ClusterConnection");
+			if (connection == null)
+				throw new NullReferenceException();
+
+			Apps = Parse(AppsHash);
+			Apps = Fixup(Apps);
+			FabricClient client = connection.FabricClient;
+			WriteObject(Doit(client).Result);
+		}
+
+		public async Task<bool> Doit(FabricClient client)
+		{
+			var appTypes = await client.QueryManager.GetApplicationTypeListAsync();
+
+			var appsToUpload = Apps.Select(a => a.PackagePath).Distinct().Where(a => File.Exists(a)).Select(a => new { path = a, manifest = FabricSerializers.AppManifestFromFile(a) }).Where(a => !appTypes.Any(ap => ap.ApplicationTypeName == a.manifest.ApplicationTypeName && ap.ApplicationTypeVersion == a.manifest.ApplicationTypeVersion));
 
 
+			foreach (var item in appsToUpload)
+			{
+				var localAppManifest = FabricSerializers.AppManifestFromFile(Path.Combine(item.path, "ApplicationManifest.xml"));
+				var n = localAppManifest.ApplicationTypeName + localAppManifest.ApplicationTypeVersion;
+				client.ApplicationManager.CopyApplicationPackage("fabric:imageStore", n, n);
 
-            for (int i = 0; i < PackagePath.Length; i++)
-            {
-                if (string.IsNullOrWhiteSpace(PackagePath[i]))
-                    PackagePath[i] = SessionState.Path.CurrentFileSystemLocation.Path;
+				await client.ApplicationManager.ProvisionApplicationAsync(n);
+				client.ApplicationManager.RemoveApplicationPackage("fabric:imageStore", n);
 
-                if (!Path.IsPathRooted(PackagePath[i]))
-                    PackagePath[i] = Path.Combine(SessionState.Path.CurrentFileSystemLocation.Path, PackagePath[i]);
-            }
-
-            WriteObject(Doit(client).Result);
-        }
-
-        public async Task<bool> Doit(FabricClient client)
-        {
-
-            var upgradepolicy = new MonitoredRollingApplicationUpgradePolicyDescription();
-
-            foreach (var p in PackagePath)
-            {
-                var localAppManifest = FabricSerializers.AppManifestFromFile(Path.Combine(p, "ApplicationManifest.xml"));
-                var n = localAppManifest.ApplicationTypeName + localAppManifest.ApplicationTypeVersion;
-                client.ApplicationManager.CopyApplicationPackage("fabric:imageStore", n, n);
-
-                await client.ApplicationManager.ProvisionApplicationAsync(n);
-                client.ApplicationManager.RemoveApplicationPackage("fabric:imageStore", n);
-            }
+			}
 
 
-            await client.ApplicationManager.UpgradeApplicationAsync(new ApplicationUpgradeDescription
-            {
-                ApplicationName = new Uri(""),
-                TargetApplicationTypeVersion = "",
-                UpgradePolicyDescription = upgradepolicy
-            });
-            return true;
-        }
-    }
+			var upgradepolicy = new MonitoredRollingApplicationUpgradePolicyDescription();
+
+			await client.ApplicationManager.UpgradeApplicationAsync(new ApplicationUpgradeDescription
+			{
+				ApplicationName = new Uri(""),
+				TargetApplicationTypeVersion = "",
+				UpgradePolicyDescription = upgradepolicy
+			});
+			return true;
+		}
+
+		public ServiceFabricApplicationSpec[] Fixup(ServiceFabricApplicationSpec[] apps)
+		{
+			foreach (var item in apps)
+			{
+				if (string.IsNullOrWhiteSpace(item.PackagePath))
+					continue; //					item.PackagePath = SessionState.Path.CurrentFileSystemLocation.Path;
+
+				if (!Path.IsPathRooted(item.PackagePath))
+					item.PackagePath = Path.Combine(SessionState.Path.CurrentFileSystemLocation.Path, item.PackagePath);
+
+				item.Manifest = FabricSerializers.AppManifestFromFile(item.PackagePath);
+			}
+
+
+			return apps;
+		}
+
+		public ServiceFabricApplicationSpec[] Parse(Hashtable apps)
+		{
+
+			return new ServiceFabricApplicationSpec[0];
+		}
+	}
+
+	public class ServiceFabricApplicationSpec
+	{
+		public string Name { get; set; }
+		public string Version { get; set; }
+		public string PackagePath { get; set; }
+		public ApplicationManifestType Manifest { get; internal set; }
+	}
 }
 

@@ -1,6 +1,6 @@
-﻿using System;
+﻿using ServiceFabricSdkContrib.ServiceFabric.ServiceModel;
+using System;
 using System.Collections.Generic;
-using System.Fabric.Management.ServiceModel;
 using System.IO;
 using System.Linq;
 using System.Text;

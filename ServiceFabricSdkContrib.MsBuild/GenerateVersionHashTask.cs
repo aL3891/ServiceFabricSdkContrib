@@ -1,9 +1,9 @@
 ﻿using Microsoft.Build.Framework;
 using ServiceFabricSdkContrib.Common;
+using ServiceFabricSdkContrib.ServiceFabric.ServiceModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Fabric.Management.ServiceModel;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
