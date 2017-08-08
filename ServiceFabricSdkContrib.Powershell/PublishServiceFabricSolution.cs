@@ -35,9 +35,9 @@ namespace ServiceFabricSdkContrib.Powershell
 			{
 				WriteObject(ProcessAsync(client).Result);
 			}
-			catch (Exception e)
+			catch (AggregateException e)
 			{
-
+				WriteError(new ErrorRecord(e.InnerExceptions.First(), "", ErrorCategory.InvalidData, null));
 
 
 			}

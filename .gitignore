@@ -8,3 +8,6 @@
 /TestSolution/TestSolution/pkg/Debug
 TestSolution/.vs/
 TestSolution/packages/
+TestSolution/TestApplication1/pkg/
+TestSolution/TestApplication2/pkg/
+TestSolution/TestApplication3/pkg/
