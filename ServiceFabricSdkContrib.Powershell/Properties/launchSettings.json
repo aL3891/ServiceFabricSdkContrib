@@ -3,7 +3,7 @@
     "ServiceFabricSdkContrib.Powershell": {
       "commandName": "Executable",
       "executablePath": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
-      "commandLineArgs": "-NoExit -file ..\\..\\..\\test.ps1",
+      "commandLineArgs": "-file ..\\..\\..\\test.ps1",
       "workingDirectory": "$(TargetDir)"
     }
   }

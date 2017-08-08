@@ -13,6 +13,19 @@ namespace ServiceFabricSdkContrib.Common
 	{
 		static XmlSerializer appManifestSerializer = new XmlSerializer(typeof(ApplicationManifestType));
 		static XmlSerializer serviceManifestSerializer = new XmlSerializer(typeof(ServiceManifestType));
+		static XmlSerializer clusterManifestSerializer = new XmlSerializer(typeof(ClusterManifestType));
+
+		public static ClusterManifestType ClusterManifestFromFile(string path)
+		{
+			using (var stream = new StreamReader(path))
+				return (ClusterManifestType)clusterManifestSerializer.Deserialize(stream);
+		}
+
+		public static ClusterManifestType ClusterManifestFromString(string g)
+		{
+			using (var stream = new StringReader(g))
+				return (ClusterManifestType)clusterManifestSerializer.Deserialize(stream);
+		}
 
 		public static ApplicationManifestType AppManifestFromFile(string path)
 		{
