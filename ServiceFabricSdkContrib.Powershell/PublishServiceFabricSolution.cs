@@ -1,17 +1,13 @@
 ﻿using ServiceFabricSdkContrib.Common;
-using ServiceFabricSdkContrib.ServiceFabric.ServiceModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Fabric;
 using System.Fabric.Description;
-using System.Fabric.Health;
-using System.IO;
 using System.Linq;
 using System.Management.Automation;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using System.Xml.Serialization;
 
 namespace ServiceFabricSdkContrib.Powershell
@@ -21,7 +17,6 @@ namespace ServiceFabricSdkContrib.Powershell
 	{
 		[Parameter(ValueFromPipeline = true, Position = 0)]
 		public Hashtable AppsHash { get; set; }
-		public ServiceFabricApplicationSpec[] Apps { get; set; }
 
 		protected override void ProcessRecord()
 		{
@@ -29,22 +24,20 @@ namespace ServiceFabricSdkContrib.Powershell
 			if (connection == null)
 				throw new NullReferenceException();
 
-			Apps = Validate(Parse(AppsHash));
+			var apps = ServiceFabricApplicationSpec.Validate(ServiceFabricApplicationSpec.Parse(AppsHash, SessionState.Path.CurrentFileSystemLocation.Path), SessionState.Path.CurrentFileSystemLocation.Path);
 			FabricClient client = connection.FabricClient;
+
 			try
 			{
-				WriteObject(ProcessAsync(client).Result);
+				WriteObject(DeployServiceFabricSolution(client, apps).Result);
 			}
 			catch (AggregateException e)
 			{
 				WriteError(new ErrorRecord(e.InnerExceptions.First(), "", ErrorCategory.InvalidData, null));
-
-
 			}
-
 		}
 
-		public async Task<bool> ProcessAsync(FabricClient client)
+		public async Task<bool> DeployServiceFabricSolution(FabricClient client, ServiceFabricApplicationSpec[] Apps)
 		{
 			var cluster = FabricSerializers.ClusterManifestFromString(await client.ClusterManager.GetClusterManifestAsync());
 
@@ -114,75 +107,6 @@ namespace ServiceFabricSdkContrib.Powershell
 
 			return true;
 		}
-
-		public ServiceFabricApplicationSpec[] Validate(ServiceFabricApplicationSpec[] apps)
-		{
-			foreach (var app in apps)
-			{
-				if (string.IsNullOrWhiteSpace(app.PackagePath))
-					continue;
-
-				if (!Path.IsPathRooted(app.PackagePath))
-					app.PackagePath = Path.Combine(SessionState.Path.CurrentFileSystemLocation.Path, app.PackagePath);
-
-				app.Manifest = FabricSerializers.AppManifestFromFile(Path.Combine(app.PackagePath, "ApplicationManifest.xml"));
-				app.Version = app.Manifest.ApplicationTypeVersion;
-			}
-
-			return apps;
-		}
-
-		public ServiceFabricApplicationSpec[] Parse(Hashtable appHash)
-		{
-
-			return appHash.Keys.OfType<string>().Select(app => new ServiceFabricApplicationSpec
-			{
-				Name = app,
-				Version = ((Hashtable)appHash[app]).ContainsKey("Version") ? ((Hashtable)appHash[app])["Version"].ToString() : null,
-				PackagePath = ((Hashtable)appHash[app]).ContainsKey("PackagePath") ? ((Hashtable)appHash[app])["PackagePath"].ToString() : null,
-				Parameters = ParseParameters((Hashtable)appHash[app])
-			}).ToArray();
-		}
-
-		private Dictionary<string, string> ParseParameters(Hashtable hashtable)
-		{
-			var res = new Dictionary<string, string>();
-
-			if (hashtable.ContainsKey("ParameterFilePath"))
-			{
-				var pp = hashtable["ParameterFilePath"].ToString();
-				if (!Path.IsPathRooted(pp))
-					pp = Path.Combine(SessionState.Path.CurrentFileSystemLocation.Path, pp);
-
-				var x = XElement.Load(pp);
-				foreach (var p in x.Element(x.Name.Namespace + "Parameters").Elements(x.Name.Namespace + "Parameter"))
-				{
-					res[p.Attribute("Name").Value] = p.Attribute("Value").Value;
-				}
-			}
-
-			if (hashtable.ContainsKey("Parameters"))
-			{
-				var inline = (Hashtable)hashtable["Parameters"];
-				foreach (var item in inline.Keys)
-				{
-					res[item.ToString()] = inline[item].ToString();
-				}
-			}
-
-			return res;
-		}
-	}
-
-	public class ServiceFabricApplicationSpec
-	{
-		public string Name { get; set; }
-		public string Version { get; set; }
-		public string PackagePath { get; set; }
-		public string ParameterFilePath { get; set; }
-		public Dictionary<string, string> Parameters { get; set; }
-
-		public ApplicationManifestType Manifest { get; internal set; }
 	}
 }
 
