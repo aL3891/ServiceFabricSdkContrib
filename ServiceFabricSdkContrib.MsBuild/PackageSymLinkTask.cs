@@ -88,6 +88,4 @@ namespace ServiceFabricSdkContrib.MsBuild
 			return ProjectCollection.GlobalProjectCollection.LoadedProjects.FirstOrDefault(p => p.FullPath.ToLower() == projectfile.ToLower()) ?? new Project(projectfile);
 		}
 	}
-
 }
-

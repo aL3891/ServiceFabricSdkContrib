@@ -17,6 +17,5 @@
     <file src="bin\Debug\net462\ServiceFabricSdkContrib.Applications.targets"                      target="build\ServiceFabricSdkContrib.Applications.targets"/>
     <file src="bin\Debug\net462\ServiceFabricSdkContrib.Common.dll"                                target="build\ServiceFabricSdkContrib.Common.dll"/>
     <file src="bin\Debug\net462\ServiceFabricSdkContrib.MsBuild.dll"                               target="build\ServiceFabricSdkContrib.MsBuild.dll"/>
-    <file src="bin\Debug\net462\ServiceFabricSdkContrib.ServiceFabric.ServiceModel.dll"            target="build\ServiceFabricSdkContrib.ServiceFabric.ServiceModel.dll"/>
   </files>
 </package>

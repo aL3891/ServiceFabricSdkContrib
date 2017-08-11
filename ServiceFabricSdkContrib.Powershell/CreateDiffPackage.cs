@@ -24,19 +24,17 @@ namespace ServiceFabricSdkContrib.Powershell
 			FabricClient client = connection.FabricClient;
 
 			var cc = new ContribFabricClient(client);
-			
+
 			if (string.IsNullOrWhiteSpace(PackagePath))
 				PackagePath = SessionState.Path.CurrentFileSystemLocation.Path;
 
 
-			WriteObject(cc.CreateDiffPackage(PackagePath, SessionState.Path.CurrentFileSystemLocation.Path));
+			if (!Path.IsPathRooted(PackagePath))
+				PackagePath = Path.Combine(SessionState.Path.CurrentFileSystemLocation.Path, PackagePath);
+
+
+			WriteObject(cc.CreateDiffPackage(PackagePath));
 		}
-
-
-
-
-
-
 	}
 }
 

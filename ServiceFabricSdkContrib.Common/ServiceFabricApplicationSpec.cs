@@ -8,12 +8,19 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace ServiceFabricSdkContrib.Powershell
+namespace ServiceFabricSdkContrib.Common
 {
-	public class ServiceFabricApplicationSpec
-	{
 
-		public static ServiceFabricApplicationSpec[] Validate(ServiceFabricApplicationSpec[] apps, string basePath)
+	public class ServiceFabricSolution
+	{
+		public List<ServiceFabricApplicationSpec> Applications { get; set; }
+
+		public ServiceFabricSolution()
+		{
+
+		}
+
+		public ServiceFabricApplicationSpec[] Validate(ServiceFabricApplicationSpec[] apps, string basePath)
 		{
 			foreach (var app in apps)
 			{
@@ -30,19 +37,19 @@ namespace ServiceFabricSdkContrib.Powershell
 			return apps;
 		}
 
-		public static ServiceFabricApplicationSpec[] Parse(Hashtable appHash, string basePath)
+		public ServiceFabricSolution(Hashtable appHash, string basePath)
 		{
 
-			return appHash.Keys.OfType<string>().Select(app => new ServiceFabricApplicationSpec
+			Applications = appHash.Keys.OfType<string>().Select(app => new ServiceFabricApplicationSpec
 			{
 				Name = app,
 				Version = ((Hashtable)appHash[app]).ContainsKey("Version") ? ((Hashtable)appHash[app])["Version"].ToString() : null,
 				PackagePath = ((Hashtable)appHash[app]).ContainsKey("PackagePath") ? ((Hashtable)appHash[app])["PackagePath"].ToString() : null,
 				Parameters = ParseParameters((Hashtable)appHash[app], basePath)
-			}).ToArray();
+			}).ToList();
 		}
 
-		private static Dictionary<string, string> ParseParameters(Hashtable hashtable, string basePath)
+		private Dictionary<string, string> ParseParameters(Hashtable hashtable, string basePath)
 		{
 			var res = new Dictionary<string, string>();
 
@@ -70,13 +77,15 @@ namespace ServiceFabricSdkContrib.Powershell
 
 			return res;
 		}
+	}
 
+	public class ServiceFabricApplicationSpec
+	{
 		public string Name { get; set; }
 		public string Version { get; set; }
 		public string PackagePath { get; set; }
 		public string ParameterFilePath { get; set; }
 		public Dictionary<string, string> Parameters { get; set; }
-
 		public ApplicationManifestType Manifest { get; internal set; }
 	}
 }
