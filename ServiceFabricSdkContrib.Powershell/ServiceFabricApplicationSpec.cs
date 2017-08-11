@@ -1,8 +1,9 @@
 ﻿using ServiceFabricSdkContrib.Common;
-using ServiceFabricSdkContrib.ServiceFabric.ServiceModel;
+
 using System.Collections;
 using System.Collections.Generic;
 using System.Fabric.Health;
+using System.Fabric.Management.ServiceModel;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;

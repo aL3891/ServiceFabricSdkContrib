@@ -3,6 +3,6 @@
     <TargetFramework>NET462</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ServiceFabricSdkContrib.ServiceFabric.ServiceModel\ServiceFabricSdkContrib.ServiceFabric.ServiceModel.csproj" />
+    <PackageReference Include="Microsoft.ServiceFabric" Version="5.7.198" />
   </ItemGroup>
 </Project>

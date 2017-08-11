@@ -1,12 +1,12 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
- <UsingTask TaskName="ServiceFabricSdkContrib.MsBuild.GenerateVersionHashTask" AssemblyFile="ServiceFabricSdkContrib.MsBuild.dll" />
-  
-  <Target Name="GenerateVersionHash" AfterTargets="CoreCompile">
-    <GenerateVersionHashTask 
+	<UsingTask TaskName="ServiceFabricSdkContrib.MsBuild.GenerateVersionHashTask" Architecture="x64" AssemblyFile="ServiceFabricSdkContrib.MsBuild.dll" />
+
+	<Target Name="GenerateVersionHash" AfterTargets="CoreCompile">
+		<GenerateVersionHashTask
       BasePath="$(MSBuildProjectFullPath)"
       TargetDir="$(TargetDir)"
       IntermediateOutputPath="$(IntermediateOutputPath)"
       >
-    </GenerateVersionHashTask>
-  </Target>
+		</GenerateVersionHashTask>
+	</Target>
 </Project>

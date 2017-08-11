@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.ServiceFabric" version="5.6.220" />
-    <PackageReference Include="Microsoft.ServiceFabric.Data" version="2.6.220" />
-    <PackageReference Include="Microsoft.ServiceFabric.Services" version="2.6.220" />
+    <PackageReference Include="Microsoft.ServiceFabric" version="5.7.198" />
+    <PackageReference Include="Microsoft.ServiceFabric.Data" version="2.7.198" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" version="2.7.198" />
   </ItemGroup>
   <Import Project="..\..\ServiceFabricSdkContrib.MsBuild\bin\Debug\net462\ServiceFabricSdkContrib.Services.targets" />
 </Project>

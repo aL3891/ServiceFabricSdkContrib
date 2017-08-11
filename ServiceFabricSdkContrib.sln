@@ -1,15 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26724.1
+VisualStudioVersion = 15.0.26730.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceFabricSdkContrib.MsBuild", "ServiceFabricSdkContrib.MsBuild\ServiceFabricSdkContrib.MsBuild.csproj", "{663C2990-8A0A-44C5-8647-68FB26FC4A64}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceFabricSdkContrib.Powershell", "ServiceFabricSdkContrib.Powershell\ServiceFabricSdkContrib.Powershell.csproj", "{722A0BBE-3AA5-4D31-8335-8E2D82441C5D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceFabricSdkContrib.Common", "ServiceFabricSdkContrib.Common\ServiceFabricSdkContrib.Common.csproj", "{C2FB5EF6-D823-4081-92FC-16DF330DF3EC}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceFabricSdkContrib.ServiceFabric.ServiceModel", "ServiceFabricSdkContrib.ServiceFabric.ServiceModel\ServiceFabricSdkContrib.ServiceFabric.ServiceModel.csproj", "{74544DCB-BD43-4791-8AB3-2F6CD4CF7D24}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +27,6 @@ Global
 		{C2FB5EF6-D823-4081-92FC-16DF330DF3EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2FB5EF6-D823-4081-92FC-16DF330DF3EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2FB5EF6-D823-4081-92FC-16DF330DF3EC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{74544DCB-BD43-4791-8AB3-2F6CD4CF7D24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{74544DCB-BD43-4791-8AB3-2F6CD4CF7D24}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{74544DCB-BD43-4791-8AB3-2F6CD4CF7D24}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{74544DCB-BD43-4791-8AB3-2F6CD4CF7D24}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
