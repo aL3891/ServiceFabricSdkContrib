@@ -11,16 +11,24 @@ namespace ServiceFabricSdkContrib.Common
 {
 	public static class FabricClientExtensions
 	{
-		public static async Task<ServiceManifestType> GitVersion(this ServiceManifestType srv, string BaseDir, string TargetDir)
+		public static async Task<ServiceManifestType> GitVersion(this ServiceManifestType srv, string BaseDir, string TargetDir, IEnumerable<string> additionalPaths)
 		{
 			var latest = await Git.GitCommit(BaseDir);
+			var diff = await Git.GitDiff(BaseDir);
+			var addDiff = "";
+			foreach (var item in additionalPaths)
+			{
+				var v = await Git.GitCommit(item);
+				addDiff += await Git.GitDiff(item);
+				if (latest.Date < v.Date)
+				{
+					latest.Date = v.Date;
+					latest.Version = v.Version;
+				}
+			}
+
 			var code = new GitVersion { Version = latest.Version, Date = latest.Date };
-
-			srv.Version = latest.Version + await Git.GitDiffHash(BaseDir);
-
-			if (srv.CodePackage != null)
-				foreach (var cv in srv.CodePackage.Where(p => p.Name != "Code"))
-					cv.Version = await GetPackageVersion(latest, cv.Name, BaseDir);
+			srv.Version = latest.Version + Git.Hash(diff + addDiff);
 
 			if (srv.ConfigPackage != null)
 				foreach (var cv in srv.ConfigPackage)
@@ -30,7 +38,7 @@ namespace ServiceFabricSdkContrib.Common
 				foreach (var cv in srv.DataPackage)
 					cv.Version = await GetPackageVersion(latest, cv.Name, BaseDir);
 
-			if (srv.DataPackage != null)
+			if (srv.CodePackage != null)
 			{
 				var codepackage = srv.CodePackage.FirstOrDefault(c => c.Name == "Code");
 
@@ -40,7 +48,7 @@ namespace ServiceFabricSdkContrib.Common
 					{
 						var codeFiles = Directory.GetFileSystemEntries(TargetDir).Where(p => !p.EndsWith("PackageRoot")).Concat(Directory.GetFiles(Path.Combine(BaseDir, "PackageRoot")));
 						var vers = await Task.WhenAll(codeFiles.Select(p => Git.GitCommit(p)));
-						codepackage.Version = vers.OrderBy(v => v.Date).First().Version + Git.Hash(string.Join("", codeFiles.Select(cf => Git.GitDiff(cf))));
+						codepackage.Version = vers.OrderBy(v => v.Date).First().Version + Git.Hash(string.Join("", codeFiles.Select(cf => Git.GitDiff(cf))) + addDiff);
 					}
 					else
 						codepackage.Version = srv.Version;
@@ -125,6 +133,5 @@ namespace ServiceFabricSdkContrib.Common
 			srv.Version += "." + Uri.EscapeDataString(Convert.ToBase64String(new SHA512Managed().ComputeHash(configHash.ToArray())));
 			return srv;
 		}
-
 	}
 }

@@ -6,6 +6,7 @@
       BasePath="$(MSBuildProjectFullPath)"
       TargetDir="$(TargetDir)"
       IntermediateOutputPath="$(IntermediateOutputPath)"
+			ProjectReferences="@(_ResolvedProjectReferencePaths)"
       >
 		</GenerateVersionHashTask>
 	</Target>

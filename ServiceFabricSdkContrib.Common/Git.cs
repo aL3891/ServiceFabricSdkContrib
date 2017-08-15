@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace ServiceFabricSdkContrib.Common
 {
-    public class Git
-    {
+	public class Git
+	{
 
 		public static async Task<GitVersion> GitCommit(string path)
 		{
@@ -25,7 +25,7 @@ namespace ServiceFabricSdkContrib.Common
 
 		public static async Task<string> GitDiff(string path)
 		{
-			return await RunGitCommand("status --porcelain " + path);
+			return await RunGitCommand("status diff " + path);
 		}
 
 		public static async Task<string> GitDiffHash(string path)

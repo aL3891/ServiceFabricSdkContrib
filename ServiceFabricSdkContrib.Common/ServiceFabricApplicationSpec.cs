@@ -17,7 +17,7 @@ namespace ServiceFabricSdkContrib.Common
 
 		public ServiceFabricSolution()
 		{
-
+			Applications = new List<ServiceFabricApplicationSpec>();
 		}
 
 		public void Validate(string basePath)
@@ -33,12 +33,10 @@ namespace ServiceFabricSdkContrib.Common
 				app.Manifest = FabricSerializers.AppManifestFromFile(Path.Combine(app.PackagePath, "ApplicationManifest.xml"));
 				app.Version = app.Manifest.ApplicationTypeVersion;
 			}
-
 		}
 
 		public ServiceFabricSolution(Hashtable appHash, string basePath)
 		{
-
 			Applications = appHash.Keys.OfType<string>().Select(app => new ServiceFabricApplicationSpec
 			{
 				Name = app,

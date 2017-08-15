@@ -1,5 +1,6 @@
 ﻿using ServiceFabricSdkContrib.Common;
 using System;
+using System.Collections.Generic;
 using System.Fabric;
 using System.Fabric.Description;
 using System.Fabric.Management.ServiceModel;
@@ -15,25 +16,24 @@ namespace ServiceFabricSdkContrib.Powershell
 	public class CreateDiffPackage : PSCmdlet
 	{
 		[Parameter(ValueFromPipeline = true, Position = 0)]
-		public string PackagePath { get; set; }
-
-
+		public string[] PackagePaths { get; set; }
+		
 		protected override void ProcessRecord()
 		{
 			dynamic connection = GetVariableValue("ClusterConnection");
-			FabricClient client = connection.FabricClient;
+			if (connection == null)
+				throw new ArgumentNullException("Service fabric connection not found");
 
-			var cc = new ContribFabricClient(client);
+			var client = new ContribFabricClient(connection.FabricClient);
 
-			if (string.IsNullOrWhiteSpace(PackagePath))
-				PackagePath = SessionState.Path.CurrentFileSystemLocation.Path;
+			var tasks = PackagePaths
+				.Select(p => string.IsNullOrWhiteSpace(p) ? SessionState.Path.CurrentFileSystemLocation.Path : p)
+				.Select(p => Path.IsPathRooted(p) ? p : Path.Combine(SessionState.Path.CurrentFileSystemLocation.Path, p))
+				.Select(p => client.CreateDiffPackage(p))
+				.ToList();
 
-
-			if (!Path.IsPathRooted(PackagePath))
-				PackagePath = Path.Combine(SessionState.Path.CurrentFileSystemLocation.Path, PackagePath);
-
-
-			WriteObject(cc.CreateDiffPackage(PackagePath).Result);
+			foreach (var t in tasks)
+				WriteObject(t.Result);
 		}
 	}
 }

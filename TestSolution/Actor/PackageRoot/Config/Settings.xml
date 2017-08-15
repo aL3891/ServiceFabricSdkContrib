@@ -7,5 +7,4 @@
   <Section Name="Actor2ActorServiceReplicatorSecurityConfig">
     <Parameter Name="CredentialType" Value="None" />
   </Section>
-  <!-- The content will be generated during buildsd -->
 </Settings>

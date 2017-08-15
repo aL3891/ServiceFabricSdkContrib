@@ -22,15 +22,15 @@ namespace ServiceFabricSdkContrib.Powershell
 		{
 			dynamic connection = GetVariableValue("ClusterConnection");
 			if (connection == null)
-				throw new NullReferenceException();
+				throw new ArgumentNullException("Service fabric connection not found");
+
+			var client = new ContribFabricClient(connection.FabricClient);
 
 			var apps = new ServiceFabricSolution(AppsHash, SessionState.Path.CurrentFileSystemLocation.Path);
-			FabricClient client = connection.FabricClient;
-			var cc = new ContribFabricClient(client);
-			
+
 			try
 			{
-				WriteObject(cc.DeployServiceFabricSolution(client, apps).Result);
+				WriteObject(client.DeployServiceFabricSolution(apps).Result);
 			}
 			catch (AggregateException e)
 			{
