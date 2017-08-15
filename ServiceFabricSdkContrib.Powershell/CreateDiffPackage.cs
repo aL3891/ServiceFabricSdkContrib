@@ -33,7 +33,7 @@ namespace ServiceFabricSdkContrib.Powershell
 				PackagePath = Path.Combine(SessionState.Path.CurrentFileSystemLocation.Path, PackagePath);
 
 
-			WriteObject(cc.CreateDiffPackage(PackagePath));
+			WriteObject(cc.CreateDiffPackage(PackagePath).Result);
 		}
 	}
 }

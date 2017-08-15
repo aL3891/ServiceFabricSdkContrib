@@ -26,7 +26,6 @@ namespace ServiceFabricSdkContrib.Powershell
 
 			var apps = new ServiceFabricSolution(AppsHash, SessionState.Path.CurrentFileSystemLocation.Path);
 			FabricClient client = connection.FabricClient;
-
 			var cc = new ContribFabricClient(client);
 			
 			try

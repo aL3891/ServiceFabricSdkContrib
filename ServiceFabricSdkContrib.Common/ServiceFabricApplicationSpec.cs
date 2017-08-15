@@ -20,9 +20,9 @@ namespace ServiceFabricSdkContrib.Common
 
 		}
 
-		public ServiceFabricApplicationSpec[] Validate(ServiceFabricApplicationSpec[] apps, string basePath)
+		public void Validate(string basePath)
 		{
-			foreach (var app in apps)
+			foreach (var app in Applications)
 			{
 				if (string.IsNullOrWhiteSpace(app.PackagePath))
 					continue;
@@ -34,7 +34,6 @@ namespace ServiceFabricSdkContrib.Common
 				app.Version = app.Manifest.ApplicationTypeVersion;
 			}
 
-			return apps;
 		}
 
 		public ServiceFabricSolution(Hashtable appHash, string basePath)
@@ -47,6 +46,8 @@ namespace ServiceFabricSdkContrib.Common
 				PackagePath = ((Hashtable)appHash[app]).ContainsKey("PackagePath") ? ((Hashtable)appHash[app])["PackagePath"].ToString() : null,
 				Parameters = ParseParameters((Hashtable)appHash[app], basePath)
 			}).ToList();
+
+			Validate(basePath);
 		}
 
 		private Dictionary<string, string> ParseParameters(Hashtable hashtable, string basePath)

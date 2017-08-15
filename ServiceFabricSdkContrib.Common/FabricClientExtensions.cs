@@ -30,19 +30,21 @@ namespace ServiceFabricSdkContrib.Common
 				foreach (var cv in srv.DataPackage)
 					cv.Version = await GetPackageVersion(latest, cv.Name, BaseDir);
 
-
-			var codepackage = srv.CodePackage.FirstOrDefault(c => c.Name == "Code");
-
-			if (codepackage != null)
+			if (srv.DataPackage != null)
 			{
-				if (latest.Date > code.Date)
+				var codepackage = srv.CodePackage.FirstOrDefault(c => c.Name == "Code");
+
+				if (codepackage != null)
 				{
-					var codeFiles = Directory.GetFileSystemEntries(TargetDir).Where(p => !p.EndsWith("PackageRoot")).Concat(Directory.GetFiles(Path.Combine(BaseDir, "PackageRoot")));
-					var vers = await Task.WhenAll(codeFiles.Select(p => Git.GitCommit(p)));
-					codepackage.Version = vers.OrderBy(v => v.Date).First().Version + Git.Hash(string.Join("", codeFiles.Select(cf => Git.GitDiff(cf))));
+					if (latest.Date > code.Date)
+					{
+						var codeFiles = Directory.GetFileSystemEntries(TargetDir).Where(p => !p.EndsWith("PackageRoot")).Concat(Directory.GetFiles(Path.Combine(BaseDir, "PackageRoot")));
+						var vers = await Task.WhenAll(codeFiles.Select(p => Git.GitCommit(p)));
+						codepackage.Version = vers.OrderBy(v => v.Date).First().Version + Git.Hash(string.Join("", codeFiles.Select(cf => Git.GitDiff(cf))));
+					}
+					else
+						codepackage.Version = srv.Version;
 				}
-				else
-					codepackage.Version = srv.Version;
 			}
 			return srv;
 		}
@@ -61,7 +63,7 @@ namespace ServiceFabricSdkContrib.Common
 			return v.Version + await Git.GitDiffHash(path);
 		}
 
-		public static ServiceManifestType ShaHashVersion(this ServiceManifestType srv,string BaseDir, string TargetDir)
+		public static ServiceManifestType ShaHashVersion(this ServiceManifestType srv, string BaseDir, string TargetDir)
 		{
 			SHA512Managed sha;
 			List<byte> configHash = new List<byte>();
