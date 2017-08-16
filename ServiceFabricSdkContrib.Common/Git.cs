@@ -25,7 +25,7 @@ namespace ServiceFabricSdkContrib.Common
 
 		public static async Task<string> GitDiff(string path)
 		{
-			return await RunGitCommand("status diff " + path);
+			return await RunGitCommand("diff " + path);
 		}
 
 		public static async Task<string> GitDiffHash(string path)
