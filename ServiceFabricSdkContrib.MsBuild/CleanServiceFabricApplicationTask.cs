@@ -32,10 +32,13 @@ namespace ServiceFabricSdkContrib.MsBuild
 
 		public bool IsUnderSymbolicLink(string path)
 		{
+			if (path.Contains("*"))
+				return false;
+
 			var fullPath = Path.Combine(BasePath, path);
 			if (symPaths.Any(s => path.StartsWith(fullPath)))
 				return true;
-			
+
 			var symPath = Symlink.IsUnderSymbolicLink(path, BasePath);
 
 			if (symPath != null)
