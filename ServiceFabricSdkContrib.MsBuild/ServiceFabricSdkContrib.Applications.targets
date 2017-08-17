@@ -1,11 +1,12 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <UsingTask TaskName="ServiceFabricSdkContrib.MsBuild.PackageSymLinkTask" Architecture="x64" AssemblyFile="ServiceFabricSdkContrib.MsBuild.dll" />
-	<UsingTask TaskName="ServiceFabricSdkContrib.MsBuild.RollupAppVersionsTask" Architecture="x64" AssemblyFile="ServiceFabricSdkContrib.MsBuild.dll" />
+	<UsingTask TaskName="ServiceFabricSdkContrib.MsBuild.PackageSymLinkTask" Architecture="x64" AssemblyFile="ServiceFabricSdkContrib.MsBuild.dll" />
+	<UsingTask TaskName="ServiceFabricSdkContrib.MsBuild.UpdateApplicationVersionGitTask" Architecture="x64" AssemblyFile="ServiceFabricSdkContrib.MsBuild.dll" />
+	<UsingTask TaskName="ServiceFabricSdkContrib.MsBuild.CleanServiceFabricApplicationTask" Architecture="x64" AssemblyFile="ServiceFabricSdkContrib.MsBuild.dll" />
 
 
 	<Target Name="PackageSymLink" AfterTargets="CoreCompile" DependsOnTargets="ValidatePackageSettings;GetServiceProjectReferences">
-    <PackageSymLinkTask
+		<PackageSymLinkTask
       ProjectReferences="@(ProjectReference)"
       ServiceProjectReferences="@(ServiceProjectReference)"
       ServicePackageRootFolder="$(ServicePackageRootFolder)"
@@ -15,18 +16,31 @@
       ProjectPath="$(MSBuildProjectFullPath)"
       PackageLocation="$(PackageLocation)"
       Configuration="$(Configuration)"
-      Platform="$(Platform)">
-    </PackageSymLinkTask>
-  </Target>
+      Platform="$(Platform)"
+	    BasePath="$(MSBuildProjectFullPath)"
+	    IntermediateOutputPath="$(IntermediateOutputPath)">
+		</PackageSymLinkTask>
+	</Target>
 
-	<Target Name="RollupAppVersions" AfterTargets="PackageSymLink">
-		<RollupAppVersionsTask
+	<Target Name="UpdateApplicationVersionGit" Condition="$(UpdateApplicationVersionGit) == 'true'" AfterTargets="PackageSymLink">
+		<UpdateApplicationVersionGitTask
       ProjectReferences="@(ProjectReference)"
       ServiceProjectReferences="@(ServiceProjectReference)"
       ApplicationManifestPath="$(ApplicationManifestFilePath)"
       ProjectPath="$(MSBuildProjectFullPath)"
       PackageLocation="$(PackageLocation)">
-		</RollupAppVersionsTask>
+		</UpdateApplicationVersionGitTask>
 	</Target>
 
+	<Target Name="CleanServiceFabricApp" AfterTargets="IncludePackageLocationOnClean" >
+		<CleanServiceFabricApplicationTask
+			ProjectPath="$(MSBuildProjectFullPath)"
+			CleanItems="@(Clean)">
+			<Output TaskParameter="SymlinkItems" ItemName="SymlinkItems"/>
+		</CleanServiceFabricApplicationTask>
+
+		<ItemGroup>
+			<Clean Remove="@(SymlinkItems)"/>
+		</ItemGroup>
+	</Target>
 </Project>

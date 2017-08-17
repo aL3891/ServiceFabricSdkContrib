@@ -1,13 +1,13 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-	<UsingTask TaskName="ServiceFabricSdkContrib.MsBuild.GenerateVersionHashTask" Architecture="x64" AssemblyFile="ServiceFabricSdkContrib.MsBuild.dll" />
+	<UsingTask TaskName="ServiceFabricSdkContrib.MsBuild.UpdateServiceVersionGitTask" Architecture="x64" AssemblyFile="ServiceFabricSdkContrib.MsBuild.dll" />
 
-	<Target Name="GenerateVersionHash" AfterTargets="CoreCompile">
-		<GenerateVersionHashTask
+	<Target Name="UpdateServiceVersionGit" Condition="$(UpdateServiceVersionGit) == 'true'" AfterTargets="CoreCompile">
+		<UpdateServiceVersionGitTask
       BasePath="$(MSBuildProjectFullPath)"
       TargetDir="$(TargetDir)"
       IntermediateOutputPath="$(IntermediateOutputPath)"
 			ProjectReferences="@(_ResolvedProjectReferencePaths)"
       >
-		</GenerateVersionHashTask>
+		</UpdateServiceVersionGitTask>
 	</Target>
 </Project>

@@ -13,7 +13,7 @@ using System.Xml.Serialization;
 namespace ServiceFabricSdkContrib.Powershell
 {
 	[Cmdlet("ConvertTo", "ServiceFabricApplicationDiffPackage")]
-	public class CreateDiffPackage : PSCmdlet
+	public class ConvertToServiceFabricApplicationDiffPackage : PSCmdlet
 	{
 		[Parameter(ValueFromPipeline = true, Position = 0)]
 		public string[] PackagePaths { get; set; }

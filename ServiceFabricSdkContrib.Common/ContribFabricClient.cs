@@ -39,7 +39,7 @@ namespace ServiceFabricSdkContrib.Common
 					var localService = localAppManifest.ServiceManifestImport.FirstOrDefault(s => s.ServiceManifestRef.ServiceManifestName == serviceImport.ServiceManifestRef.ServiceManifestName);
 					if (localService != null && localService.ServiceManifestRef.ServiceManifestVersion == serviceImport.ServiceManifestRef.ServiceManifestVersion)
 						foreach (var dir in Directory.GetDirectories(Path.Combine(packagePath, serviceImport.ServiceManifestRef.ServiceManifestName)))
-							DeleteIfExists(dir);
+							Symlink.DeleteIfExists(dir);
 					else
 					{
 						var serverServiceManifest = FabricSerializers.ServiceManifestFromString(await Client.ServiceManager.GetServiceManifestAsync(serverAppManifest.ApplicationTypeName, serverAppManifest.ApplicationTypeVersion, serviceImport.ServiceManifestRef.ServiceManifestName));
@@ -47,28 +47,22 @@ namespace ServiceFabricSdkContrib.Common
 
 						if (serverServiceManifest.CodePackage != null && localServiceManifest.CodePackage != null)
 							foreach (var package in serverServiceManifest.CodePackage?.Select(sp => localServiceManifest.CodePackage.FirstOrDefault(lp => lp.Name == sp.Name && lp.Version == sp.Version)).Where(x => x != null))
-								DeleteIfExists(Path.Combine(packagePath, localService.ServiceManifestRef.ServiceManifestName, package.Name));
+								Symlink.DeleteIfExists(Path.Combine(packagePath, localService.ServiceManifestRef.ServiceManifestName, package.Name));
 
 						if (serverServiceManifest.ConfigPackage != null && localServiceManifest.ConfigPackage != null)
 							foreach (var package in serverServiceManifest.ConfigPackage?.Select(sp => localServiceManifest.ConfigPackage.FirstOrDefault(lp => lp.Name == sp.Name && lp.Version == sp.Version)).Where(x => x != null))
-								DeleteIfExists(Path.Combine(packagePath, localService.ServiceManifestRef.ServiceManifestName, package.Name));
+								Symlink.DeleteIfExists(Path.Combine(packagePath, localService.ServiceManifestRef.ServiceManifestName, package.Name));
 
 						if (serverServiceManifest.DataPackage != null && localServiceManifest.DataPackage != null)
 							foreach (var package in serverServiceManifest.DataPackage?.Select(sp => localServiceManifest.DataPackage.FirstOrDefault(lp => lp.Name == sp.Name && lp.Version == sp.Version)).Where(x => x != null))
-								DeleteIfExists(Path.Combine(packagePath, localService.ServiceManifestRef.ServiceManifestName, package.Name));
+								Symlink.DeleteIfExists(Path.Combine(packagePath, localService.ServiceManifestRef.ServiceManifestName, package.Name));
 					}
 				}
 			}
 
 			return true;
 		}
-
-		private void DeleteIfExists(string path)
-		{
-			if (Directory.Exists(path))
-				Directory.Delete(path, !Symlink.IsSymbolic(path));
-		}
-
+		
 		public async Task<bool> DeployServiceFabricSolution(ServiceFabricSolution Apps)
 		{
 			var cluster = FabricSerializers.ClusterManifestFromString(await Client.ClusterManager.GetClusterManifestAsync());

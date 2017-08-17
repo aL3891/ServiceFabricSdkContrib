@@ -20,6 +20,9 @@ namespace ServiceFabricSdkContrib.MsBuild
 		public string PackageBehavior { get; set; }
 		public string PackageLocation { get; set; }
 		public string ProjectPath { get; set; }
+		public string IntermediateOutputPath { get; set; }
+		public string BasePath { get; set; }
+		public string BaseDir { get; set; }
 
 		public ITaskItem[] IncludeInPackagePaths { get; set; }
 
@@ -56,6 +59,20 @@ namespace ServiceFabricSdkContrib.MsBuild
 						manifestFile = Path.Combine(Path.GetDirectoryName(serviceProjectPath), "PackageRoot", "ServiceManifest.xml");
 						File.Copy(manifestFile, Path.Combine(servicePath, "ServiceManifest.xml"));
 					}
+				}
+			}
+
+			var appmanifestPath = Path.Combine(basePath, PackageLocation, "ApplicationManifest.xml");
+
+			if (!File.Exists(appmanifestPath))
+			{
+				if (File.Exists(Path.Combine(IntermediateOutputPath, "ApplicationManifest.xml")))
+				{
+					Symlink.CreateSymbolicLink(appmanifestPath, Path.Combine(IntermediateOutputPath, "ApplicationManifest.xml"), SymbolicLink.File);
+				}
+				else
+				{
+					Symlink.CreateSymbolicLink(appmanifestPath, Path.Combine(basePath, "ApplicationPackageRoot", "ApplicationManifest.xml"), SymbolicLink.File);
 				}
 			}
 

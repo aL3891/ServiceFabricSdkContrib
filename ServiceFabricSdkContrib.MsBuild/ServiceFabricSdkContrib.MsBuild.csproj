@@ -16,10 +16,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Update="ServiceFabricSdkContrib.Services.targets">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="ServiceFabricSdkContrib.Applications.targets">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 </Project>

@@ -14,7 +14,7 @@ using System.Xml.Serialization;
 
 namespace ServiceFabricSdkContrib.MsBuild
 {
-	public class GenerateVersionHashTask : Microsoft.Build.Utilities.Task
+	public class UpdateServiceVersionGitTask : Microsoft.Build.Utilities.Task
 	{
 		public string TargetDir { get; set; }
 		public string IntermediateOutputPath { get; set; }

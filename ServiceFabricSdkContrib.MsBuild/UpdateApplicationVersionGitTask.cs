@@ -16,7 +16,7 @@ using System.Xml.Linq;
 
 namespace ServiceFabricSdkContrib.MsBuild
 {
-    public class RollupAppVersionsTask : Microsoft.Build.Utilities.Task
+    public class UpdateApplicationVersionGitTask : Microsoft.Build.Utilities.Task
     {
         public ITaskItem[] ProjectReferences { get; set; }
         public ITaskItem[] ServiceProjectReferences { get; set; }
