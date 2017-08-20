@@ -62,8 +62,8 @@ namespace ServiceFabricSdkContrib.Common
 
 			return true;
 		}
-		
-		public async Task<bool> DeployServiceFabricSolution(ServiceFabricSolution Apps)
+
+		public async Task<bool> DeployServiceFabricSolution(ServiceFabricSolution Apps, bool serial = false)
 		{
 			var cluster = FabricSerializers.ClusterManifestFromString(await Client.ClusterManager.GetClusterManifestAsync());
 			var imageStore = cluster.FabricSettings.First(s => s.Name == "Management").Parameter.First(s => s.Name == "ImageStoreConnectionString").Value;
@@ -83,7 +83,11 @@ namespace ServiceFabricSdkContrib.Common
 				UpgradeReplicaSetCheckTimeout = TimeSpan.FromSeconds(1)
 			};
 
-			await Task.WhenAll(Apps.Applications.Select(app => DeployServiceFabricApp(app, upgradepolicy)));
+			if (serial)
+				foreach (var item in Apps.Applications.Select(app => DeployServiceFabricApp(app, upgradepolicy)))
+					await item;
+			else
+				await Task.WhenAll(Apps.Applications.Select(app => DeployServiceFabricApp(app, upgradepolicy)));
 
 			return true;
 		}
