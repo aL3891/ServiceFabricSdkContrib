@@ -5,9 +5,9 @@
 	<UsingTask TaskName="ServiceFabricSdkContrib.MsBuild.CleanServiceFabricApplicationTask" Architecture="x64" AssemblyFile="ServiceFabricSdkContrib.MsBuild.dll" />
 
 
-	<Target Name="PackageSymLink" AfterTargets="CoreCompile" DependsOnTargets="ValidatePackageSettings;GetServiceProjectReferences">
+	<Target Name="PackageSymLink" AfterTargets="ResolveProjectReferences" DependsOnTargets="ValidatePackageSettings;GetServiceProjectReferences">
 		<PackageSymLinkTask
-      ProjectReferences="@(ProjectReference)"
+      ProjectReferences="@(_ResolvedProjectReferencePaths)"
       ServiceProjectReferences="@(ServiceProjectReference)"
       ServicePackageRootFolder="$(ServicePackageRootFolder)"
       ApplicationManifestPath="$(ApplicationManifestFilePath)"

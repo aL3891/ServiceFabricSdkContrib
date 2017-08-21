@@ -28,21 +28,24 @@ namespace ServiceFabricSdkContrib.MsBuild
 
 		public override bool Execute()
 		{
+
+
+
 			var basePath = Path.GetDirectoryName(ProjectPath);
 
 			foreach (var spr in PatchMetadata(ProjectReferences, ServiceProjectReferences))
 			{
-				var serviceProjectPath = Path.GetFullPath(Path.Combine(basePath, spr.ItemSpec));
+				var serviceProjectPath = Path.GetFullPath(Path.Combine(basePath, spr.Targetpath));
 				var project = GetProject(serviceProjectPath);
 
-				var codePath = project.GetPropertyValue("TargetDir");
+				var codePath =spr.Targetpath;
 
-				string servicePath = Path.Combine(basePath, PackageLocation, spr.GetMetadata("ServiceManifestName"));
+				string servicePath = Path.Combine(basePath, PackageLocation, spr.ServiceManifestName);
 				if (!Directory.Exists(servicePath))
 					Directory.CreateDirectory(servicePath);
 
-				if (!Directory.Exists(Path.Combine(servicePath, spr.GetMetadata("CodePackageName"))))
-					Symlink.CreateSymbolicLink(Path.Combine(servicePath, spr.GetMetadata("CodePackageName")), codePath, SymbolicLink.Directory);
+				if (!Directory.Exists(Path.Combine(servicePath, spr.CodePackageName)))
+					Symlink.CreateSymbolicLink(Path.Combine(servicePath, spr.CodePackageName), codePath, SymbolicLink.Directory);
 
 				if (!Directory.Exists(Path.Combine(servicePath, "Config")))
 					Symlink.CreateSymbolicLink(Path.Combine(servicePath, "Config"), Path.Combine(Path.GetDirectoryName(serviceProjectPath), "PackageRoot", "Config"), SymbolicLink.Directory);
@@ -79,7 +82,7 @@ namespace ServiceFabricSdkContrib.MsBuild
 			return true;
 		}
 
-		private IEnumerable<ITaskItem> PatchMetadata(IEnumerable<ITaskItem> projectReferences, IEnumerable<ITaskItem> serviceProjectReferences)
+		private IEnumerable<FabricServiceReference> PatchMetadata(IEnumerable<ITaskItem> projectReferences, IEnumerable<ITaskItem> serviceProjectReferences)
 		{
 			if (serviceProjectReferences == null)
 				serviceProjectReferences = Enumerable.Empty<ITaskItem>();
@@ -87,17 +90,14 @@ namespace ServiceFabricSdkContrib.MsBuild
 			if (projectReferences == null)
 				projectReferences = Enumerable.Empty<ITaskItem>();
 
-			var res = projectReferences.Where(p => !serviceProjectReferences.Any(spr => spr.ItemSpec == p.ItemSpec)).ToList();
-
-			foreach (var r in res)
+			return ProjectReferences.Select(p => new { p, r = serviceProjectReferences.FirstOrDefault(rr => rr.ItemSpec == p.GetMetadata("OriginalProjectReferenceItemSpec")) }).Select(p => new FabricServiceReference
 			{
-				var manifestFile = Path.Combine(Path.GetDirectoryName(r.ItemSpec), "PackageRoot", "ServiceManifest.xml");
-
-				r.SetMetadata("ServiceManifestName", FabricSerializers.ServiceManifestFromFile(manifestFile).Name);
-				r.SetMetadata("CodePackageName", "Code");
-			}
-
-			return serviceProjectReferences.Concat(res).ToList();
+				Targetpath = p.p.ItemSpec,
+				ProjectPath = p.p.GetMetadata("MSBuildSourceProjectFile"),
+				Refpath = p.p.GetMetadata("OriginalProjectReferenceItemSpec"),
+				ServiceManifestName = p.r.GetMetadata("ServiceManifestName") ?? FabricSerializers.ServiceManifestFromFile(Path.Combine(Path.GetDirectoryName(p.r.ItemSpec), "PackageRoot", "ServiceManifest.xml")).Name,
+				CodePackageName = p?.r?.GetMetadata("CodePackageName") ?? "Code"
+			});
 		}
 
 		public Project GetProject(string projectfile)
@@ -105,4 +105,14 @@ namespace ServiceFabricSdkContrib.MsBuild
 			return ProjectCollection.GlobalProjectCollection.LoadedProjects.FirstOrDefault(p => p.FullPath.ToLower() == projectfile.ToLower()) ?? new Project(projectfile);
 		}
 	}
+
+	public class FabricServiceReference
+	{
+		public string Targetpath { get; internal set; }
+		public string ProjectPath { get; internal set; }
+		public string Refpath { get; internal set; }
+		public string ServiceManifestName { get; internal set; }
+		public string CodePackageName { get; internal set; }
+	}
+
 }
