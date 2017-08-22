@@ -60,7 +60,10 @@ namespace ServiceFabricSdkContrib.Common
 			}
 
 			var code = new GitVersion { Version = latest.Version, Date = latest.Date };
-			srv.Version = latest.Version + Git.Hash(latest.Diff + addDiff);
+			if (!string.IsNullOrEmpty(srv.Version))
+				srv.Version += ".";
+
+			srv.Version += latest.Version + Git.Hash(latest.Diff + addDiff);
 
 			if (srv.ConfigPackage != null)
 				foreach (var cv in srv.ConfigPackage)

@@ -21,8 +21,6 @@ namespace ServiceFabricSdkContrib.MsBuild
 		public override bool Execute()
 		{
 			var basePath = Path.GetDirectoryName(ProjectPath);
-
-			File.Copy(Path.Combine(basePath, "ApplicationPackageRoot", "ApplicationManifest.xml"), Path.Combine(basePath, PackageLocation, "ApplicationManifest.xml"), true);
 			var appManifest = FabricSerializers.AppManifestFromFile(Path.Combine(basePath, "ApplicationPackageRoot", "ApplicationManifest.xml"));
 
 			foreach (var serviceReference in appManifest.ServiceManifestImport)
@@ -45,15 +43,19 @@ namespace ServiceFabricSdkContrib.MsBuild
 					version.Version = commit[0];
 					version.Date = d;
 				}
-				
+
 				version.Diff += File.ReadAllText(Path.Combine(intermediete, "diff.txt"));
 			}
 
-			appManifest.ApplicationTypeVersion = appManifest.ApplicationTypeVersion + "." + version.Version;
+			if (!string.IsNullOrEmpty(appManifest.ApplicationTypeVersion))
+				appManifest.ApplicationTypeVersion += ".";
+
+			appManifest.ApplicationTypeVersion += version.Version;
+
 			if (version.Diff != "")
 				appManifest.ApplicationTypeVersion += "." + Uri.EscapeDataString(Convert.ToBase64String(new SHA512Managed().ComputeHash(Encoding.ASCII.GetBytes(version.Diff))));
 
-			FabricSerializers.SaveAppManifest(Path.Combine(basePath, PackageLocation, "ApplicationManifest.xml"), appManifest);
+			FabricSerializers.SaveAppManifest(Path.Combine(basePath, "obj", "ApplicationManifest.xml"), appManifest);
 
 			return true;
 		}

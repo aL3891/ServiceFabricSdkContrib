@@ -64,9 +64,9 @@ namespace ServiceFabricSdkContrib.MsBuild
 
 			if (!File.Exists(appmanifestPath))
 			{
-				if (File.Exists(Path.Combine(IntermediateOutputPath, "ApplicationManifest.xml")))
+				if (File.Exists(Path.Combine(basePath, "obj", "ApplicationManifest.xml")))
 				{
-					Symlink.CreateSymbolicLink(appmanifestPath, Path.Combine(IntermediateOutputPath, "ApplicationManifest.xml"), SymbolicLink.File);
+					Symlink.CreateSymbolicLink(appmanifestPath, Path.Combine(basePath, "obj", "ApplicationManifest.xml"), SymbolicLink.File);
 				}
 				else
 				{

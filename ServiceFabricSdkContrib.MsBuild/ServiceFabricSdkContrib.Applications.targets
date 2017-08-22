@@ -22,7 +22,7 @@
 		</PackageSymLinkTask>
 	</Target>
 
-	<Target Name="UpdateApplicationVersionGit" Condition="$(UpdateApplicationVersionGit) == 'true'" AfterTargets="PackageSymLink">
+	<Target Name="UpdateApplicationVersionGit" Condition="$(UpdateApplicationVersionGit) == 'true'" BeforeTargets="PackageSymLink">
 		<UpdateApplicationVersionGitTask
       ProjectReferences="@(_ResolvedProjectReferencePaths)"
       ServiceProjectReferences="@(ServiceProjectReference)"
