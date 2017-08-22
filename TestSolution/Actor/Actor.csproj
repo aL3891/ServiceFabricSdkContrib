@@ -14,6 +14,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+		<UpdateServiceVersionGit>true</UpdateServiceVersionGit>
   </PropertyGroup>
   <PropertyGroup>
     <UpdateServiceFabricManifestEnabled>true</UpdateServiceFabricManifestEnabled>

@@ -66,5 +66,6 @@ namespace ServiceFabricSdkContrib.Common
 	{
 		public string Version { get; set; }
 		public DateTime Date { get; set; }
+		public string Diff { get; set; }
 	}
 }

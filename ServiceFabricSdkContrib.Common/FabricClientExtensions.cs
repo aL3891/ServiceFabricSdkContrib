@@ -43,10 +43,10 @@ namespace ServiceFabricSdkContrib.Common
 			}).ToList().SelectMany(a => a.Result));
 		}
 
-		public static async Task<ServiceManifestType> GitVersion(this ServiceManifestType srv, string BaseDir, string TargetDir, IEnumerable<string> additionalPaths)
+		public static async Task<GitVersion> GitVersion(this ServiceManifestType srv, string BaseDir, string TargetDir, IEnumerable<string> additionalPaths)
 		{
 			var latest = await Git.GitCommit(BaseDir);
-			var diff = await Git.GitDiff(BaseDir);
+			latest.Diff = await Git.GitDiff(BaseDir);
 			var addDiff = "";
 			foreach (var item in additionalPaths)
 			{
@@ -60,7 +60,7 @@ namespace ServiceFabricSdkContrib.Common
 			}
 
 			var code = new GitVersion { Version = latest.Version, Date = latest.Date };
-			srv.Version = latest.Version + Git.Hash(diff + addDiff);
+			srv.Version = latest.Version + Git.Hash(latest.Diff + addDiff);
 
 			if (srv.ConfigPackage != null)
 				foreach (var cv in srv.ConfigPackage)
@@ -86,7 +86,7 @@ namespace ServiceFabricSdkContrib.Common
 						codepackage.Version = srv.Version;
 				}
 			}
-			return srv;
+			return new GitVersion { Diff = latest.Diff + addDiff, Date = latest.Date, Version = latest.Version };
 		}
 
 		private static async Task<string> GetPackageVersion(GitVersion latest, string name, string BaseDir)

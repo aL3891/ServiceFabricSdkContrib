@@ -5,6 +5,7 @@
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
     <IsServiceFabricServiceProject>True</IsServiceFabricServiceProject>
     <UpdateServiceFabricManifestEnabled>false</UpdateServiceFabricManifestEnabled>
+	  <UpdateServiceVersionGit>true</UpdateServiceVersionGit>
   </PropertyGroup>
 
   <ItemGroup>

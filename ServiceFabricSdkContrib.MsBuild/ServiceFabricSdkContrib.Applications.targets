@@ -24,7 +24,7 @@
 
 	<Target Name="UpdateApplicationVersionGit" Condition="$(UpdateApplicationVersionGit) == 'true'" AfterTargets="PackageSymLink">
 		<UpdateApplicationVersionGitTask
-      ProjectReferences="@(ProjectReference)"
+      ProjectReferences="@(_ResolvedProjectReferencePaths)"
       ServiceProjectReferences="@(ServiceProjectReference)"
       ApplicationManifestPath="$(ApplicationManifestFilePath)"
       ProjectPath="$(MSBuildProjectFullPath)"

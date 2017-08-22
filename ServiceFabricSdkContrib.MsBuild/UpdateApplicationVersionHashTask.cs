@@ -10,7 +10,7 @@ using System.Text;
 
 namespace ServiceFabricSdkContrib.MsBuild
 {
-	public class UpdateApplicationVersionGitTask : Microsoft.Build.Utilities.Task
+	public class UpdateApplicationVersionHashTask : Microsoft.Build.Utilities.Task
 	{
 		public ITaskItem[] ProjectReferences { get; set; }
 		public ITaskItem[] ServiceProjectReferences { get; set; }
@@ -35,24 +35,8 @@ namespace ServiceFabricSdkContrib.MsBuild
 				}
 			}
 
-			GitVersion version = new GitVersion { Date = DateTime.MinValue, Diff = "" };
-			foreach (var spr in FabricServiceReference.Get(ProjectReferences, ServiceProjectReferences))
-			{
-				var intermediete = Path.Combine(Path.GetDirectoryName(spr.ProjectPath), "obj");
-				var commit = File.ReadAllText(Path.Combine(intermediete, "version.txt")).Split(' ');
-				if (DateTime.TryParse(commit[1], out var d) && d > version.Date)
-				{
-					version.Version = commit[0];
-					version.Date = d;
-				}
-				
-				version.Diff += File.ReadAllText(Path.Combine(intermediete, "diff.txt"));
-			}
-
-			appManifest.ApplicationTypeVersion = appManifest.ApplicationTypeVersion + "." + version.Version;
-			if (version.Diff != "")
-				appManifest.ApplicationTypeVersion += "." + Uri.EscapeDataString(Convert.ToBase64String(new SHA512Managed().ComputeHash(Encoding.ASCII.GetBytes(version.Diff))));
-
+			var aggregatedVersion = Uri.EscapeDataString(Convert.ToBase64String(new SHA512Managed().ComputeHash(Encoding.ASCII.GetBytes(string.Join("", appManifest.ServiceManifestImport.Select(ss => ss.ServiceManifestRef.ServiceManifestVersion))))));
+			appManifest.ApplicationTypeVersion = appManifest.ApplicationTypeVersion + "." + aggregatedVersion;
 			FabricSerializers.SaveAppManifest(Path.Combine(basePath, PackageLocation, "ApplicationManifest.xml"), appManifest);
 
 			return true;
@@ -64,3 +48,4 @@ namespace ServiceFabricSdkContrib.MsBuild
 		}
 	}
 }
+
