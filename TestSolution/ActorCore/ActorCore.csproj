@@ -19,7 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ActorCore.Interfaces\ActorCore.Interfaces.csproj" />
-  </ItemGroup>
+  </ItemGroup>              
 
   <Import Project="..\..\ServiceFabricSdkContrib.MsBuild\bin\Debug\net462\ServiceFabricSdkContrib.Services.targets" />
 </Project>

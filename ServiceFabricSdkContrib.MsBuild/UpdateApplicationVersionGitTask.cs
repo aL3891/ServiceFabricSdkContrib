@@ -22,22 +22,18 @@ namespace ServiceFabricSdkContrib.MsBuild
 		{
 			var basePath = Path.GetDirectoryName(ProjectPath);
 			var appManifest = FabricSerializers.AppManifestFromFile(Path.Combine(basePath, "ApplicationPackageRoot", "ApplicationManifest.xml"));
-
-			foreach (var serviceReference in appManifest.ServiceManifestImport)
-			{
-				var servicePath = Path.Combine(basePath, PackageLocation, serviceReference.ServiceManifestRef.ServiceManifestName, "ServiceManifest.xml");
-				if (File.Exists(servicePath))
-				{
-					var serviceManifest = FabricSerializers.ServiceManifestFromFile(servicePath);
-					serviceReference.ServiceManifestRef.ServiceManifestVersion = serviceManifest.Version;
-				}
-			}
-
+			
 			GitVersion version = new GitVersion { Date = DateTime.MinValue, Diff = "" };
 			foreach (var spr in FabricServiceReference.Get(ProjectReferences, ServiceProjectReferences))
 			{
 				var intermediete = Path.Combine(Path.GetDirectoryName(spr.ProjectPath), "obj");
 				var commit = File.ReadAllText(Path.Combine(intermediete, "version.txt")).Split(' ');
+
+				var serviceManifest = FabricSerializers.ServiceManifestFromFile(Path.Combine(intermediete, "ServiceManifest.xml"));
+				appManifest.ServiceManifestImport
+					.First(smi => smi.ServiceManifestRef.ServiceManifestName == spr.ServiceManifestName).ServiceManifestRef
+					.ServiceManifestVersion = serviceManifest.Version;
+
 				if (DateTime.TryParse(commit[1], out var d) && d > version.Date)
 				{
 					version.Version = commit[0];
