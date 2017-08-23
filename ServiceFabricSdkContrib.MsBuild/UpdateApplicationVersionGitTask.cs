@@ -49,7 +49,7 @@ namespace ServiceFabricSdkContrib.MsBuild
 			appManifest.ApplicationTypeVersion += version.Version;
 
 			if (version.Diff != "")
-				appManifest.ApplicationTypeVersion += "." + Uri.EscapeDataString(Convert.ToBase64String(new SHA512Managed().ComputeHash(Encoding.ASCII.GetBytes(version.Diff))));
+				appManifest.ApplicationTypeVersion += "." + Uri.EscapeDataString(Convert.ToBase64String(new SHA256Managed().ComputeHash(Encoding.ASCII.GetBytes(version.Diff))));
 
 			FabricSerializers.SaveAppManifest(Path.Combine(basePath, "obj", "ApplicationManifest.xml"), appManifest);
 

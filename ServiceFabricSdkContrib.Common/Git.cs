@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -32,7 +33,7 @@ namespace ServiceFabricSdkContrib.Common
 		{
 			var v = await GitDiff(path);
 			if (v != "")
-				return "." + Convert.ToBase64String(Encoding.ASCII.GetBytes(v));
+				return "." + Uri.EscapeDataString(Convert.ToBase64String(new SHA256Managed().ComputeHash(Encoding.ASCII.GetBytes(v))));
 			else
 				return "";
 		}
@@ -40,7 +41,7 @@ namespace ServiceFabricSdkContrib.Common
 		public static string Hash(string data)
 		{
 			if (data != "")
-				return "." + Convert.ToBase64String(Encoding.ASCII.GetBytes(data));
+				return "." + Uri.EscapeDataString(Convert.ToBase64String(new SHA256Managed().ComputeHash(Encoding.ASCII.GetBytes(data))));
 			else
 				return "";
 		}
