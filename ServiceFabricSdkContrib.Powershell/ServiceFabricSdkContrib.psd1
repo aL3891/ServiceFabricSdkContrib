@@ -4,7 +4,7 @@
 # RootModule = ''
 
 # Version number of this module.
-ModuleVersion = '0.1.2'
+ModuleVersion = '0.1.3'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -64,7 +64,7 @@ NestedModules = @('ServiceFabricSdkContrib.Powershell.dll')
 FunctionsToExport = @()
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-CmdletsToExport = @('ConvertTo-ServiceFabricApplicationDiffPackage')
+CmdletsToExport = @('ConvertTo-ServiceFabricApplicationDiffPackage','Publish-ServiceFabricSolution')
 
 # Variables to export from this module
 VariablesToExport = @()

@@ -18,7 +18,6 @@ namespace ServiceFabricSdkContrib.MsBuild
 		public ITaskItem[] CleanItems { get; set; }
 		[Output]
 		public ITaskItem[] SymlinkItems { get; set; }
-
 		private HashSet<string> symPaths = new HashSet<string>();
 
 		public override bool Execute()

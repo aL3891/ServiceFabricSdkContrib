@@ -10,7 +10,6 @@ namespace ServiceFabricSdkContrib.Common
 {
 	public class Git
 	{
-
 		public static async Task<GitVersion> GitCommit(string path)
 		{
 			var res = new GitVersion { };
@@ -27,15 +26,6 @@ namespace ServiceFabricSdkContrib.Common
 		public static async Task<string> GitDiff(string path)
 		{
 			return await RunGitCommand("diff " + path);
-		}
-
-		public static async Task<string> GitDiffHash(string path)
-		{
-			var v = await GitDiff(path);
-			if (v != "")
-				return "." + Uri.EscapeDataString(Convert.ToBase64String(new SHA256Managed().ComputeHash(Encoding.ASCII.GetBytes(v))));
-			else
-				return "";
 		}
 
 		public static string Hash(string data)
@@ -59,7 +49,6 @@ namespace ServiceFabricSdkContrib.Common
 			});
 			return p.StandardOutput.ReadToEndAsync();
 		}
-
 	}
 
 

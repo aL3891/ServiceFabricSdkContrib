@@ -30,7 +30,7 @@ namespace ServiceFabricSdkContrib.MsBuild
 		{
 			var basePath = Path.GetDirectoryName(ProjectPath);
 
-			foreach (var spr in FabricServiceReference.Get(ProjectReferences, ServiceProjectReferences))
+			foreach (var spr in FabricServiceReferenceFactory.Get(ProjectReferences, ServiceProjectReferences))
 			{
 				var serviceProjectPath = spr.ProjectPath;
 				var codePath = Path.GetDirectoryName(spr.Targetpath);

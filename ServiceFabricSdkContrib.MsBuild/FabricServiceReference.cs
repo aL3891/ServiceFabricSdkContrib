@@ -6,15 +6,8 @@ using ServiceFabricSdkContrib.Common;
 
 namespace ServiceFabricSdkContrib.MsBuild
 {
-	public class FabricServiceReference
+	public class FabricServiceReferenceFactory
 	{
-		public string Targetpath { get; internal set; }
-		public string ProjectPath { get; internal set; }
-		public string Refpath { get; internal set; }
-		public string ServiceManifestName { get; internal set; }
-		public string CodePackageName { get; internal set; }
-
-
 		public static IEnumerable<FabricServiceReference> Get(IEnumerable<ITaskItem> projectReferences, IEnumerable<ITaskItem> serviceProjectReferences)
 		{
 			if (serviceProjectReferences == null)
