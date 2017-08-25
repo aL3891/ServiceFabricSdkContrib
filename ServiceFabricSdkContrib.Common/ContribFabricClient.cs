@@ -48,7 +48,7 @@ namespace ServiceFabricSdkContrib.Common
 					var localService = localAppManifest.ServiceManifestImport.FirstOrDefault(s => s.ServiceManifestRef.ServiceManifestName == serviceImport.ServiceManifestRef.ServiceManifestName);
 					if (localService != null && localService.ServiceManifestRef.ServiceManifestVersion == serviceImport.ServiceManifestRef.ServiceManifestVersion)
 					{
-						Logger?.LogInfo($"Service {localService.ServiceManifestRef.ServiceManifestName} version {localService.ServiceManifestRef.ServiceManifestVersion} found on server, deleting packages");
+						Logger?.LogInfo($"Service {localService.ServiceManifestRef.ServiceManifestName} version {localService.ServiceManifestRef.ServiceManifestVersion} already is provisioned");
 						foreach (var dir in Directory.GetDirectories(Path.Combine(packagePath, serviceImport.ServiceManifestRef.ServiceManifestName)))
 						{
 							Symlink.DeleteIfExists(dir);
@@ -58,6 +58,8 @@ namespace ServiceFabricSdkContrib.Common
 					{
 						var serverServiceManifest = FabricSerializers.ServiceManifestFromString(await Client.ServiceManager.GetServiceManifestAsync(serverAppManifest.ApplicationTypeName, serverAppManifest.ApplicationTypeVersion, serviceImport.ServiceManifestRef.ServiceManifestName));
 						var localServiceManifest = FabricSerializers.ServiceManifestFromFile(Path.Combine(packagePath, serviceImport.ServiceManifestRef.ServiceManifestName, "ServiceManifest.xml"));
+
+						Logger?.LogInfo($"Service {localService.ServiceManifestRef.ServiceManifestName} version {localService.ServiceManifestRef.ServiceManifestVersion} not found on server, checking packages");
 
 						if (serverServiceManifest.CodePackage != null && localServiceManifest.CodePackage != null)
 							foreach (var package in serverServiceManifest.CodePackage?.Select(sp => localServiceManifest.CodePackage.FirstOrDefault(lp => lp.Name == sp.Name && lp.Version == sp.Version)).Where(x => x != null))
@@ -83,7 +85,7 @@ namespace ServiceFabricSdkContrib.Common
 				}
 			}
 
-			Logger?.LogInfo($"Package {localAppManifest.ApplicationTypeName} version {localAppManifest.ApplicationTypeVersion} not found on server, existing package removed");
+			
 			return true;
 		}
 
@@ -173,7 +175,7 @@ namespace ServiceFabricSdkContrib.Common
 		private async Task UploadAppToLocalPath(string imageStore, ServiceFabricApplicationSpec app)
 		{
 			var name = app.Manifest.ApplicationTypeName + app.Manifest.ApplicationTypeVersion;
-			await Task.Run(() => Client.ApplicationManager.CopyApplicationPackage(imageStore, app.PackagePath, name));
+			await Task.Run(() => Client.ApplicationManager.CopyApplicationPackage(imageStore, app.PackagePath, name, TimeSpan.FromHours(1)));
 			await Client.ApplicationManager.ProvisionApplicationAsync(name);
 			await Task.Run(() => Client.ApplicationManager.RemoveApplicationPackage(imageStore, name));
 		}
@@ -181,7 +183,7 @@ namespace ServiceFabricSdkContrib.Common
 		private async Task UploadApp(string imageStore, ServiceFabricApplicationSpec app)
 		{
 			var name = app.Manifest.ApplicationTypeName + app.Manifest.ApplicationTypeVersion;
-			await Task.Run(() => Client.ApplicationManager.CopyApplicationPackage(imageStore, app.PackagePath, name));
+			await Task.Run(() => Client.ApplicationManager.CopyApplicationPackage(imageStore, app.PackagePath, name, TimeSpan.FromHours(1)));
 			await Client.ApplicationManager.ProvisionApplicationAsync(name);
 			Client.ApplicationManager.RemoveApplicationPackage(imageStore, name);
 		}
