@@ -72,18 +72,23 @@ namespace ServiceFabricSdkContrib.Common
 
 			if (srv.CodePackage != null)
 			{
-				var codepackage = srv.CodePackage.FirstOrDefault(c => c.Name == "Code");
-
-				if (codepackage != null)
+				foreach (var cv in srv.CodePackage)
 				{
-					if (latest.Date > code.Date)
+					if (cv.Name == "Code")
 					{
-						var codeFiles = Directory.GetFileSystemEntries(TargetDir).Where(p => !p.EndsWith("PackageRoot")).Concat(Directory.GetFiles(Path.Combine(BaseDir, "PackageRoot")));
-						var vers = await Task.WhenAll(codeFiles.Select(p => Git.GitCommit(p)));
-						codepackage.Version = vers.OrderBy(v => v.Date).First().Version + Git.Hash(string.Join("", codeFiles.Select(cf => Git.GitDiff(cf))) + addDiff);
+						if (latest.Date > code.Date)
+						{
+							var codeFiles = Directory.GetFileSystemEntries(TargetDir).Where(p => !p.EndsWith("PackageRoot")).Concat(Directory.GetFiles(Path.Combine(BaseDir, "PackageRoot")));
+							var vers = await Task.WhenAll(codeFiles.Select(p => Git.GitCommit(p)));
+							cv.Version = vers.OrderBy(v => v.Date).First().Version + Git.Hash(string.Join("", codeFiles.Select(cf => Git.GitDiff(cf))) + addDiff);
+						}
+						else
+							cv.Version = srv.Version;
 					}
 					else
-						codepackage.Version = srv.Version;
+					{
+						cv.Version = await GetPackageVersion(cv.Version, latest, cv.Name, BaseDir);
+					}
 				}
 			}
 			return new GitVersion { Diff = latest.Diff + addDiff, Date = latest.Date, Version = latest.Version };

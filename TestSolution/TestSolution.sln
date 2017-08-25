@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.3
+VisualStudioVersion = 15.0.26730.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stateless", "Stateless\Stateless.csproj", "{267C7013-1D66-4919-A384-BF7A6F3E6959}"
 EndProject
@@ -29,7 +29,12 @@ Project("{A07B5EB6-E848-4116-A8D0-A826331D98C6}") = "TestApplication2", "TestApp
 EndProject
 Project("{A07B5EB6-E848-4116-A8D0-A826331D98C6}") = "TestApplication3", "TestApplication3\TestApplication3.sfproj", "{E48B6B8A-4DCC-47DC-B021-F24370B3D907}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassLibrary1", "ClassLibrary1\ClassLibrary1.csproj", "{FE56BADE-7120-4EA0-8D5F-1F63A0D5B4CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassLibrary1", "ClassLibrary1\ClassLibrary1.csproj", "{FE56BADE-7120-4EA0-8D5F-1F63A0D5B4CE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0A8245C8-943A-431D-8F34-42D1AA4F2123}"
+	ProjectSection(SolutionItems) = preProject
+		Common.props = Common.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

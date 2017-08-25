@@ -19,7 +19,10 @@
       Platform="$(Platform)"
 	    BasePath="$(MSBuildProjectFullPath)"
 	    IntermediateOutputPath="$(IntermediateOutputPath)">
+			<Output TaskParameter="SourceFiles" ItemName="PkgSourceFiles"/>
+			<Output TaskParameter="DestinationFiles" ItemName="PkgDestinationFiles"/>
 		</PackageSymLinkTask>
+		<Copy SourceFiles="@(PkgSourceFiles)" DestinationFiles="@(PkgDestinationFiles)" SkipUnchangedFiles="$(SkipCopyUnchangedFiles)" UseHardlinksIfPossible="true" />
 	</Target>
 
 	<Target Name="UpdateApplicationVersionGit" Condition="$(UpdateApplicationVersionGit) == 'true'" BeforeTargets="PackageSymLink">

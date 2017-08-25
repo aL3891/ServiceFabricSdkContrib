@@ -5,12 +5,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Microsoft.Build.Utilities;
 
 
 namespace ServiceFabricSdkContrib.MsBuild
 {
 	public class PackageSymLinkTask : Microsoft.Build.Utilities.Task
 	{
+		public ITaskItem[] IncludeInPackagePaths { get; set; }
 		public ITaskItem[] ProjectReferences { get; set; }
 		public ITaskItem[] ServiceProjectReferences { get; set; }
 		public string Configuration { get; set; }
@@ -24,7 +26,30 @@ namespace ServiceFabricSdkContrib.MsBuild
 		public string BasePath { get; set; }
 		public string BaseDir { get; set; }
 
-		public ITaskItem[] IncludeInPackagePaths { get; set; }
+		[Output]
+		public ITaskItem[] SourceFiles { get; set; }
+		[Output]
+		public ITaskItem[] DestinationFiles { get; set; }
+
+		List<string> sourcelist = new List<string>(), destlist = new List<string>();
+
+		public void AddFiles(string source, string destination)
+		{
+			FileAttributes attr = File.GetAttributes(source);
+
+			if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+			{
+				foreach (var d in Directory.GetFileSystemEntries(source))
+				{
+					AddFiles(d, Path.Combine(destination, d.Substring(source.Length).TrimStart('\\')));
+				}
+			}
+			else
+			{
+				sourcelist.Add(source);
+				destlist.Add(destination);
+			}
+		}
 
 		public override bool Execute()
 		{
@@ -32,54 +57,47 @@ namespace ServiceFabricSdkContrib.MsBuild
 
 			foreach (var spr in FabricServiceReferenceFactory.Get(ProjectReferences, ServiceProjectReferences))
 			{
-				var serviceProjectPath = spr.ProjectPath;
-				var codePath = Path.GetDirectoryName(spr.Targetpath);
 
 				string servicePath = Path.Combine(basePath, PackageLocation, spr.ServiceManifestName);
-				if (!Directory.Exists(servicePath))
-					Directory.CreateDirectory(servicePath);
 
-				if (!Directory.Exists(Path.Combine(servicePath, spr.CodePackageName)))
-					Symlink.CreateSymbolicLink(Path.Combine(servicePath, spr.CodePackageName), codePath, SymbolicLink.Directory);
+				if (spr.Manifest.ConfigPackage != null)
+					foreach (var cv in spr.Manifest.ConfigPackage)
+						AddFiles(Path.Combine(spr.ProjectDir, "PackageRoot", cv.Name), Path.Combine(servicePath, cv.Name));
 
-				if (!Directory.Exists(Path.Combine(servicePath, "Config")))
-					Symlink.CreateSymbolicLink(Path.Combine(servicePath, "Config"), Path.Combine(Path.GetDirectoryName(serviceProjectPath), "PackageRoot", "Config"), SymbolicLink.Directory);
+				if (spr.Manifest.DataPackage != null)
+					foreach (var cv in spr.Manifest.DataPackage)
+						AddFiles(Path.Combine(spr.ProjectDir, "PackageRoot", cv.Name), Path.Combine(servicePath, cv.Name));
 
-				if (!File.Exists(Path.Combine(servicePath, "ServiceManifest.xml")))
+				if (spr.Manifest.CodePackage != null)
 				{
-					var manifestFile = Path.Combine(Path.GetDirectoryName(serviceProjectPath), "obj", "ServiceManifest.xml");
-					if (File.Exists(manifestFile))
+					foreach (var cv in spr.Manifest.CodePackage)
 					{
-						Symlink.CreateSymbolicLink(Path.Combine(servicePath, "ServiceManifest.xml"), manifestFile, SymbolicLink.File);
-					}
-					else
-					{
-						manifestFile = Path.Combine(Path.GetDirectoryName(serviceProjectPath), "PackageRoot", "ServiceManifest.xml");
-						File.Copy(manifestFile, Path.Combine(servicePath, "ServiceManifest.xml"));
+						if (cv.Name == "Code")
+							AddFiles(Path.GetDirectoryName(spr.Targetpath), Path.Combine(servicePath, cv.Name));
+						else
+							AddFiles(Path.Combine(spr.ProjectDir, "PackageRoot", cv.Name), Path.Combine(servicePath, cv.Name));
 					}
 				}
+
+				var manifestFile = Path.Combine(spr.ProjectDir, "obj", "ServiceManifest.xml");
+				if (File.Exists(manifestFile))
+					AddFiles(manifestFile, Path.Combine(servicePath, "ServiceManifest.xml"));
+				else
+					AddFiles(Path.Combine(spr.ProjectDir, "PackageRoot", "ServiceManifest.xml"), Path.Combine(servicePath, "ServiceManifest.xml"));
 			}
 
 			var appmanifestPath = Path.Combine(basePath, PackageLocation, "ApplicationManifest.xml");
 
-			if (!File.Exists(appmanifestPath))
-			{
-				if (File.Exists(Path.Combine(basePath, "obj", "ApplicationManifest.xml")))
-				{
-					Symlink.CreateSymbolicLink(appmanifestPath, Path.Combine(basePath, "obj", "ApplicationManifest.xml"), SymbolicLink.File);
-				}
-				else
-				{
-					Symlink.CreateSymbolicLink(appmanifestPath, Path.Combine(basePath, "ApplicationPackageRoot", "ApplicationManifest.xml"), SymbolicLink.File);
-				}
-			}
+			if (File.Exists(Path.Combine(basePath, "obj", "ApplicationManifest.xml")))
+				AddFiles(Path.Combine(basePath, "obj", "ApplicationManifest.xml"), appmanifestPath);
+			else
+				AddFiles(Path.Combine(basePath, "ApplicationPackageRoot", "ApplicationManifest.xml"), appmanifestPath);
+
+
+			SourceFiles = sourcelist.Select(s => new TaskItem(s)).ToArray();
+			DestinationFiles = destlist.Select(s => new TaskItem(s)).ToArray();
 
 			return true;
-		}
-
-		public Project GetProject(string projectfile)
-		{
-			return ProjectCollection.GlobalProjectCollection.LoadedProjects.FirstOrDefault(p => p.FullPath.ToLower() == projectfile.ToLower()) ?? new Project(projectfile);
 		}
 	}
 }

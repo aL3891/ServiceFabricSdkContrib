@@ -20,14 +20,17 @@ namespace ServiceFabricSdkContrib.MsBuild
 				.Select(p => new
 				{
 					projectReference = p,
-					servicereference = serviceProjectReferences.FirstOrDefault(rr => rr.ItemSpec == p.GetMetadata("OriginalProjectReferenceItemSpec"))
+					servicereference = serviceProjectReferences.FirstOrDefault(rr => rr.ItemSpec == p.GetMetadata("OriginalProjectReferenceItemSpec")),
+					Manifest = FabricSerializers.ServiceManifestFromFile(Path.Combine(Path.GetDirectoryName(p.GetMetadata("MSBuildSourceProjectFile")), "PackageRoot", "ServiceManifest.xml"))
 				})
 				.Select(refs => new FabricServiceReference
 				{
 					Targetpath = refs.projectReference.ItemSpec,
 					ProjectPath = refs.projectReference.GetMetadata("MSBuildSourceProjectFile"),
+					ProjectDir = Path.GetDirectoryName(refs.projectReference.GetMetadata("MSBuildSourceProjectFile")),
 					ServiceManifestName = refs.servicereference?.GetMetadata("ServiceManifestName") ?? FabricSerializers.ServiceManifestFromFile(Path.Combine(Path.GetDirectoryName(refs.projectReference.GetMetadata("MSBuildSourceProjectFile")), "PackageRoot", "ServiceManifest.xml")).Name,
-					CodePackageName = refs.servicereference?.GetMetadata("CodePackageName") ?? "Code"
+					CodePackageName = refs.servicereference?.GetMetadata("CodePackageName") ?? "Code",
+					Manifest = refs.Manifest
 				});
 		}
 	}
