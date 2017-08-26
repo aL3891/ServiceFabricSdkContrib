@@ -60,7 +60,7 @@ namespace ServiceFabricSdkContrib.Common
 			}
 
 			var code = new GitVersion { Version = latest.Version, Date = latest.Date };
-			srv.Version = HashHelper.AppendVersion(srv.Version, latest.Version, HashHelper.Hash(latest.Diff + addDiff));
+			srv.Version = VersionHelper.AppendVersion(srv.Version, latest.Version, VersionHelper.Hash(latest.Diff + addDiff));
 
 			if (srv.ConfigPackage != null)
 				foreach (var cv in srv.ConfigPackage)
@@ -105,7 +105,7 @@ namespace ServiceFabricSdkContrib.Common
 				latest.Version = v.Version;
 			}
 
-			return HashHelper.AppendVersion(version, v.Version, HashHelper.Hash(await Git.GitDiff(path)));
+			return VersionHelper.AppendVersion(version, v.Version, VersionHelper.Hash(await Git.GitDiff(path)));
 		}
 
 		public static ServiceManifestType SetHashVersion(this ServiceManifestType srv, string BaseDir, string TargetDir)
@@ -198,7 +198,7 @@ namespace ServiceFabricSdkContrib.Common
 				version.Diff += File.ReadAllText(Path.Combine(intermediete, "diff.txt"));
 			}
 
-			appManifest.ApplicationTypeVersion = HashHelper.AppendVersion(appManifest.ApplicationTypeVersion, version.Version, HashHelper.Hash(version.Diff));
+			appManifest.ApplicationTypeVersion = VersionHelper.AppendVersion(appManifest.ApplicationTypeVersion, version.Version, VersionHelper.Hash(version.Diff));
 			return appManifest;
 		}
 	}

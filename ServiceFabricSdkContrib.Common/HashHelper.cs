@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ServiceFabricSdkContrib.Common
 {
-	public class HashHelper
+	public class VersionHelper
 	{
 		public static string Hash(string data)
 		{

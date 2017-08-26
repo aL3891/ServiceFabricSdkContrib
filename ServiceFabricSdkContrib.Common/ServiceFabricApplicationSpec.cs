@@ -10,7 +10,6 @@ using System.Xml.Linq;
 
 namespace ServiceFabricSdkContrib.Common
 {
-
 	public class ServiceFabricSolution
 	{
 		public List<ServiceFabricApplicationSpec> Applications { get; set; }
