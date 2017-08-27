@@ -39,7 +39,7 @@ namespace ServiceFabricSdkContrib.Common
 
 			if (serverAppManifests.Any(serverAppManifest => serverAppManifest.ApplicationTypeVersion == localAppManifest.ApplicationTypeVersion))
 			{
-				Logger?.LogInfo($"Application {localAppManifest.ApplicationTypeName} {localAppManifest.ApplicationTypeVersion} already is provisioned");
+				Logger?.LogInfo($"Application {localAppManifest.ApplicationTypeName} {localAppManifest.ApplicationTypeVersion} is already provisioned");
 				return false;
 			}
 
@@ -98,7 +98,7 @@ namespace ServiceFabricSdkContrib.Common
 			return true;
 		}
 
-		public async Task<bool> DeployServiceFabricSolution(ServiceFabricSolution Apps)
+		public async Task<bool> DeployServiceFabricSolution(ServiceFabricSolution Apps, bool symlinkProvision)
 		{
 			var cluster = FabricSerializers.ClusterManifestFromString(await Client.ClusterManager.GetClusterManifestAsync());
 			var appTypes = await Client.QueryManager.GetApplicationTypeListAsync();
@@ -110,8 +110,8 @@ namespace ServiceFabricSdkContrib.Common
 				Logger?.LogVerbose($"Using image store {imageStore}");
 				var imageStorePath = new Uri(imageStore).LocalPath;
 
-				if (Directory.Exists(imageStorePath))
-					await Task.WhenAll(appsToUpload.Select(i => UploadAppToLocalPath(imageStorePath, i)).ToList());
+				if ( symlinkProvision && Directory.Exists(imageStorePath))
+					await Task.WhenAll(appsToUpload.Select(i => UploadAppToLocalPath(imageStore,imageStorePath, i)).ToList());
 				else
 					await Task.WhenAll(appsToUpload.Select(i => UploadApp(imageStore, i)).ToList());
 
@@ -176,17 +176,26 @@ namespace ServiceFabricSdkContrib.Common
 			}
 		}
 
-		private async Task UploadAppToLocalPath(string imageStore, ServiceFabricApplicationSpec app)
+		private async Task UploadAppToLocalPath(string imageStore, string imageStorep, ServiceFabricApplicationSpec app)
 		{
-			var name = app.Manifest.ApplicationTypeName + app.Manifest.ApplicationTypeVersion;
-			Symlink.CreateSymbolicLink(Path.Combine(imageStore, name), app.PackagePath, SymbolicLink.Directory);
-			await Client.ApplicationManager.ProvisionApplicationAsync(name, TimeSpan.FromHours(1), CancellationToken.None);
-			Symlink.DeleteIfExists(Path.Combine(imageStore, name));
+			var name = app.Manifest.ApplicationTypeName +"."+ app.Manifest.ApplicationTypeVersion;
+
+			try
+			{
+				Symlink.CreateSymbolicLink(Path.Combine(imageStorep, name), app.PackagePath, SymbolicLink.Directory);
+				await Client.ApplicationManager.ProvisionApplicationAsync(name, TimeSpan.FromHours(1), CancellationToken.None);
+				Symlink.DeleteIfExists(Path.Combine(imageStorep, name));
+			}
+			catch (FileNotFoundException f )
+			{
+				Symlink.DeleteIfExists(Path.Combine(imageStorep, name));
+				await UploadApp(imageStore, app);
+			}
 		}
 
 		private async Task UploadApp(string imageStore, ServiceFabricApplicationSpec app)
 		{
-			var name = app.Manifest.ApplicationTypeName + app.Manifest.ApplicationTypeVersion;
+			var name = app.Manifest.ApplicationTypeName +"."+ app.Manifest.ApplicationTypeVersion;
 			await Task.Run(() => Client.ApplicationManager.CopyApplicationPackage(imageStore, app.PackagePath, name, TimeSpan.FromHours(1)));
 			await Client.ApplicationManager.ProvisionApplicationAsync(name, TimeSpan.FromHours(1), CancellationToken.None);
 			Client.ApplicationManager.RemoveApplicationPackage(imageStore, name);

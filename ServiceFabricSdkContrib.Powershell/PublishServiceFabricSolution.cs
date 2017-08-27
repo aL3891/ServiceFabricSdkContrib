@@ -12,6 +12,9 @@ namespace ServiceFabricSdkContrib.Powershell
 		[Parameter(ValueFromPipeline = true, Position = 0)]
 		public Hashtable AppsHash { get; set; }
 
+		[Parameter]
+		public SwitchParameter UseSymlink { get; set; }
+
 		protected override void ProcessRecord()
 		{
 			dynamic connection = GetVariableValue("ClusterConnection");
@@ -29,7 +32,7 @@ namespace ServiceFabricSdkContrib.Powershell
 			try
 			{
 				var apps = new ServiceFabricSolution(AppsHash, SessionState.Path.CurrentFileSystemLocation.Path);
-				await client.DeployServiceFabricSolution(apps);
+				await client.DeployServiceFabricSolution(apps, UseSymlink.ToBool());
 			}
 			catch (Exception e)
 			{
