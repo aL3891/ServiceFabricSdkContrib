@@ -50,7 +50,7 @@ namespace ServiceFabricSdkContrib.Common
 					var localService = localAppManifest.ServiceManifestImport.FirstOrDefault(s => s.ServiceManifestRef.ServiceManifestName == serviceImport.ServiceManifestRef.ServiceManifestName);
 					if (localService != null && localService.ServiceManifestRef.ServiceManifestVersion == serviceImport.ServiceManifestRef.ServiceManifestVersion)
 					{
-						Logger?.LogVerbose($"Service {localService.ServiceManifestRef.ServiceManifestName} {localService.ServiceManifestRef.ServiceManifestVersion} is already provisioned");
+						Logger?.LogInfo($"Service {localAppManifest.ApplicationTypeName}.{localService.ServiceManifestRef.ServiceManifestName} {localService.ServiceManifestRef.ServiceManifestVersion} is already provisioned");
 						foreach (var dir in Directory.GetDirectories(Path.Combine(packagePath, serviceImport.ServiceManifestRef.ServiceManifestName)))
 							Symlink.DeleteIfExists(dir);
 					}
