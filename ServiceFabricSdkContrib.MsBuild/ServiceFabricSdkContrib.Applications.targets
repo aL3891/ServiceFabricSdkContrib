@@ -14,17 +14,18 @@
 			<Output TaskParameter="DestinationFiles" ItemName="PkgDestinationFiles"/>
 		</PackageFabricAppTask>
 		<PropertyGroup>
-			<UseHardlinksForServiceFabricIfPossible Condition="$(UseHardlinksForServiceFabricIfPossible) == ''">false"</UseHardlinksForServiceFabricIfPossible>
+			<UseHardlinksForServiceFabricIfPossible Condition="$(UseHardlinksForServiceFabricIfPossible) == ''">True</UseHardlinksForServiceFabricIfPossible>
 		</PropertyGroup>
 		<Copy SourceFiles="@(PkgSourceFiles)" DestinationFiles="@(PkgDestinationFiles)" SkipUnchangedFiles="$(SkipCopyUnchangedFiles)" UseHardlinksIfPossible="$(UseHardlinksForServiceFabricIfPossible)" />
 	</Target>
 
-	<Target Name="UpdateApplicationVersionGit" Condition="$(UpdateApplicationVersionGit) == 'true'" AfterTargets="PackageFabricApp">
+	<Target Name="UpdateApplicationVersionGit" Condition="$(UpdateApplicationVersionGit) == 'True'" AfterTargets="PackageFabricApp">
 		<UpdateApplicationVersionGitTask
       ProjectReferences="@(_ResolvedProjectReferencePaths)"
       ServiceProjectReferences="@(ServiceProjectReference)"
       ApplicationManifestPath="$(ApplicationManifestFilePath)"
       ProjectPath="$(MSBuildProjectFullPath)"
+			Configuration="$(Configuration)"
       PackageLocation="$(PackageLocation)">
 		</UpdateApplicationVersionGitTask>
 	</Target>

@@ -178,10 +178,13 @@ namespace ServiceFabricSdkContrib.Common
 			foreach (var spr in fabricServiceReferences)
 			{
 				var serviceReferencePath = Path.Combine(Path.GetDirectoryName(spr.ProjectPath), "pkg", configuration);
-				if (!Directory.Exists(serviceReferencePath))
+				var versionFile = Path.Combine(serviceReferencePath, "Version.txt");
+				var diffFile = Path.Combine(serviceReferencePath, "Diff.txt");
+
+				if (!Directory.Exists(serviceReferencePath) || !File.Exists(versionFile) || !File.Exists(diffFile))
 					continue;
 
-				var commit = File.ReadAllText(Path.Combine(serviceReferencePath, "version.txt")).Split(' ');
+				var commit = File.ReadAllText(versionFile).Split(' ');
 
 				var serviceManifest = FabricSerializers.ServiceManifestFromFile(Path.Combine(serviceReferencePath, "ServiceManifest.xml"));
 				appManifest.ServiceManifestImport
@@ -198,7 +201,7 @@ namespace ServiceFabricSdkContrib.Common
 					}
 				}
 
-				diff += File.ReadAllText(Path.Combine(serviceReferencePath, "diff.txt"));
+				diff += File.ReadAllText(diffFile);
 			}
 
 			appManifest.ApplicationTypeVersion = VersionHelper.AppendVersion(appManifest.ApplicationTypeVersion, version, VersionHelper.Hash(diff));

@@ -21,5 +21,5 @@
     <ProjectReference Include="..\ActorCore.Interfaces\ActorCore.Interfaces.csproj" />
   </ItemGroup>              
 
-  <Import Project="..\..\ServiceFabricSdkContrib.MsBuild\bin\Debug\net462\ServiceFabricSdkContrib.Services.targets" />
+  <Import Project="..\..\ServiceFabricSdkContrib.MsBuild\bin\Debug\net471\ServiceFabricSdkContrib.Services.targets" />
 </Project>

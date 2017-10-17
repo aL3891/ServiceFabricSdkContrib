@@ -10,8 +10,8 @@ namespace ServiceFabricSdkContrib.MsBuild
 	public class PackageFabricServiceTask : Task
 	{
 		public string Configuration { get; set; }	
-		public string BasePath { get; set; }
-		public string TargetPath { get; set; }
+		public string ProjectPath { get; set; }
+		public string TargetDir { get; set; }
 
 		[Output]
 		public ITaskItem[] SourceFiles { get; set; }
@@ -40,29 +40,30 @@ namespace ServiceFabricSdkContrib.MsBuild
 
 		public override bool Execute()
 		{
-			var manifest = FabricSerializers.ServiceManifestFromFile(Path.Combine(BasePath, "PackageRoot", "ServiceManifest.xml"));
-			string servicePath = Path.Combine(BasePath, "pkg", Configuration);
+			var basePath = Path.GetDirectoryName(ProjectPath);
+			var manifest = FabricSerializers.ServiceManifestFromFile(Path.Combine(basePath, "PackageRoot", "ServiceManifest.xml"));
+			string servicePath = Path.Combine(basePath, "pkg", Configuration);
 
 			if (manifest.ConfigPackage != null)
 				foreach (var cv in manifest.ConfigPackage)
-					AddFiles(Path.Combine(BasePath, "PackageRoot", cv.Name), Path.Combine(servicePath, cv.Name));
+					AddFiles(Path.Combine(basePath, "PackageRoot", cv.Name), Path.Combine(servicePath, cv.Name));
 
 			if (manifest.DataPackage != null)
 				foreach (var cv in manifest.DataPackage)
-					AddFiles(Path.Combine(BasePath, "PackageRoot", cv.Name), Path.Combine(servicePath, cv.Name));
+					AddFiles(Path.Combine(basePath, "PackageRoot", cv.Name), Path.Combine(servicePath, cv.Name));
 
 			if (manifest.CodePackage != null)
 			{
 				foreach (var cv in manifest.CodePackage)
 				{
 					if (cv.Name == "Code")
-						AddFiles(Path.GetDirectoryName(TargetPath), Path.Combine(servicePath, cv.Name));
+						AddFiles(TargetDir, Path.Combine(servicePath, cv.Name));
 					else
-						AddFiles(Path.Combine(BasePath, "PackageRoot", cv.Name), Path.Combine(servicePath, cv.Name));
+						AddFiles(Path.Combine(basePath, "PackageRoot", cv.Name), Path.Combine(servicePath, cv.Name));
 				}
 			}
 
-			AddFiles(Path.Combine(BasePath, "PackageRoot", "ServiceManifest.xml"), Path.Combine(servicePath, "ServiceManifest.xml"));
+			AddFiles(Path.Combine(basePath, "PackageRoot", "ServiceManifest.xml"), Path.Combine(servicePath, "ServiceManifest.xml"));
 			SourceFiles = sourcelist.Select(s => new TaskItem(s)).ToArray();
 			DestinationFiles = destlist.Select(s => new TaskItem(s)).ToArray();
 			return true;

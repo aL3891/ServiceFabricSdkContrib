@@ -6,21 +6,21 @@
 		<PackageFabricServiceTask
       Configuration="$(Configuration)"
 			TargetDir="$(TargetDir)"
-	    BasePath="$(MSBuildProjectFullPath)">
+	    ProjectPath="$(MSBuildProjectFullPath)">
 			<Output TaskParameter="SourceFiles" ItemName="PkgSourceFiles"/>
 			<Output TaskParameter="DestinationFiles" ItemName="PkgDestinationFiles"/>
 		</PackageFabricServiceTask>
 		<PropertyGroup>
-			<UseHardlinksForServiceFabricIfPossible Condition="$(UseHardlinksForServiceFabricIfPossible) == ''">false"</UseHardlinksForServiceFabricIfPossible>
+			<UseHardlinksForServiceFabricIfPossible Condition="$(UseHardlinksForServiceFabricIfPossible) == ''">True</UseHardlinksForServiceFabricIfPossible>
 		</PropertyGroup>
 		<Copy SourceFiles="@(PkgSourceFiles)" DestinationFiles="@(PkgDestinationFiles)" SkipUnchangedFiles="$(SkipCopyUnchangedFiles)" UseHardlinksIfPossible="$(UseHardlinksForServiceFabricIfPossible)" />
 	</Target>
 
-	<Target Name="UpdateServiceVersionGit" Condition="$(UpdateServiceVersionGit) == 'true'" AfterTargets="PackageFabricService">
+	<Target Name="UpdateServiceVersionGit" Condition="$(UpdateServiceVersionGit) == 'True'" AfterTargets="PackageFabricService">
 		<UpdateServiceVersionGitTask
       BasePath="$(MSBuildProjectFullPath)"
+			Configuration="$(Configuration)"
       TargetDir="$(TargetDir)"
-      IntermediateOutputPath="$(IntermediateOutputPath)"
 			ProjectReferences="@(_ResolvedProjectReferencePaths)">
 		</UpdateServiceVersionGitTask>
 	</Target>

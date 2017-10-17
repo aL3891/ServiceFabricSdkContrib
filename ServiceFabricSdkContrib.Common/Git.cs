@@ -1,6 +1,7 @@
 ﻿using LibGit2Sharp;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -10,19 +11,35 @@ namespace ServiceFabricSdkContrib.Common
 {
 	public class Git
 	{
+
+		public static string RepoPath(string path)
+		{
+			if (Directory.Exists(Path.Combine(path, ".git")))
+				return path;
+			else if (path.TrimEnd('\\').Where(c => c == '\\').Count() == 1)
+				throw new ArgumentException();
+			else
+				return RepoPath(Path.GetDirectoryName(path));
+		}
+
 		public static (string sha, DateTimeOffset date) GitCommit(string baseDir)
 		{
-			using (var repo = new Repository(baseDir))
+			var repoPath = RepoPath(baseDir);
+			var filedir = baseDir.Substring(repoPath.Length + 1);
+			using (var repo = new Repository(repoPath))
 			{
-				return (repo.Head.Tip.Sha, repo.Head.Tip.Author.When);
+				var c = repo.Commits.QueryBy(filedir).First();
+				return (c.Commit.Sha, c.Commit.Author.When);
 			}
 		}
 
 		internal static string GitDiff(string baseDir)
 		{
-			using (var repo = new Repository(baseDir))
+			var repoPath = RepoPath(baseDir);
+			var filedir = baseDir.Substring(repoPath.Length + 1);
+			using (var repo = new Repository(repoPath))
 			{
-				return string.Join("", repo.Diff.Compare<Patch>().Select(tc => tc.Patch));
+				return string.Join("", repo.Diff.Compare<Patch>().Where(p => p.Path.StartsWith(filedir)).Select(tc => tc.Patch));
 			}
 		}
 
