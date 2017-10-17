@@ -43,32 +43,31 @@ namespace ServiceFabricSdkContrib.Common
 			}).ToList().SelectMany(a => a.Result));
 		}
 
-		public static async Task<GitVersion> SetGitVersion(this ServiceManifestType srv, string BaseDir, string TargetDir, IEnumerable<string> additionalPaths)
+		public static (string diff, DateTimeOffset date, string version) SetGitVersion(this ServiceManifestType srv, string BaseDir, string TargetDir, IEnumerable<string> additionalPaths)
 		{
-			var latest = await Git.GitCommit(BaseDir);
-			latest.Diff = await Git.GitDiff(BaseDir);
+			(var latest, var date) = Git.GitCommit(BaseDir);
+			var diff = Git.GitDiff(BaseDir);
 			var addDiff = new StringBuilder();
 			foreach (var item in additionalPaths)
 			{
-				var v = await Git.GitCommit(item);
-				addDiff.Append(await Git.GitDiff(item));
-				if (latest.Date < v.Date)
+				(var v, var d) = Git.GitCommit(item);
+				addDiff.Append(Git.GitDiff(item));
+				if (date < d)
 				{
-					latest.Date = v.Date;
-					latest.Version = v.Version;
+					date = d;
+					latest = v;
 				}
 			}
 
-			var code = new GitVersion { Version = latest.Version, Date = latest.Date };
-			srv.Version = VersionHelper.AppendVersion(srv.Version, latest.Version, VersionHelper.Hash(latest.Diff + addDiff));
-
+			DateTimeOffset codeDate = date;
+			srv.Version = VersionHelper.AppendVersion(srv.Version, latest, VersionHelper.Hash(diff + addDiff));
 			if (srv.ConfigPackage != null)
 				foreach (var cv in srv.ConfigPackage)
-					cv.Version = await GetPackageVersion(cv.Version, latest, cv.Name, BaseDir);
+					cv.Version = VersionHelper.AppendVersion(cv.Version, GetPackageVersion(cv.Name, BaseDir, ref date, ref latest));
 
 			if (srv.DataPackage != null)
 				foreach (var cv in srv.DataPackage)
-					cv.Version = await GetPackageVersion(cv.Version, latest, cv.Name, BaseDir);
+					cv.Version = VersionHelper.AppendVersion(cv.Version, GetPackageVersion(cv.Name, BaseDir, ref date, ref latest));
 
 			if (srv.CodePackage != null)
 			{
@@ -76,36 +75,36 @@ namespace ServiceFabricSdkContrib.Common
 				{
 					if (cv.Name == "Code")
 					{
-						if (latest.Date > code.Date)
+						if (date > codeDate)
 						{
 							var codeFiles = Directory.GetFileSystemEntries(TargetDir).Where(p => !p.EndsWith("PackageRoot")).Concat(Directory.GetFiles(Path.Combine(BaseDir, "PackageRoot")));
-							var vers = await Task.WhenAll(codeFiles.Select(p => Git.GitCommit(p)));
-							cv.Version = vers.OrderBy(v => v.Date).First().Version + Git.Hash(string.Join("", codeFiles.Select(cf => Git.GitDiff(cf))) + addDiff);
+							var vers = codeFiles.Select(p => Git.GitCommit(p));
+							cv.Version = vers.OrderBy(v => v.date).First().sha + VersionHelper.Hash(string.Join("", codeFiles.Select(cf => Git.GitDiff(cf))) + addDiff);
 						}
 						else
 							cv.Version = srv.Version;
 					}
 					else
 					{
-						cv.Version = await GetPackageVersion(cv.Version, latest, cv.Name, BaseDir);
+						cv.Version = VersionHelper.AppendVersion(cv.Version, GetPackageVersion(cv.Name, BaseDir, ref date, ref latest));
 					}
 				}
 			}
-			return new GitVersion { Diff = latest.Diff + addDiff, Date = latest.Date, Version = latest.Version };
+			return (diff + addDiff, date, latest);
 		}
 
-		private static async Task<string> GetPackageVersion(string version, GitVersion latest, string name, string BaseDir)
+		private static string[] GetPackageVersion(string name, string BaseDir, ref DateTimeOffset date, ref string version)
 		{
 			var path = Path.Combine(BaseDir, "PackageRoot", name);
-			var v = await Git.GitCommit(path);
+			var v = Git.GitCommit(path);
 
-			if (latest.Date < v.Date)
+			if (date < v.date)
 			{
-				latest.Date = v.Date;
-				latest.Version = v.Version;
+				date = v.date;
+				version = v.sha;
 			}
 
-			return VersionHelper.AppendVersion(version, v.Version, VersionHelper.Hash(await Git.GitDiff(path)));
+			return new[] { v.sha, VersionHelper.Hash(Git.GitDiff(path)) };
 		}
 
 		public static ServiceManifestType SetHashVersion(this ServiceManifestType srv, string BaseDir, string TargetDir)
@@ -171,16 +170,20 @@ namespace ServiceFabricSdkContrib.Common
 			return srv;
 		}
 
-		public static ApplicationManifestType SetGitVersion(this ApplicationManifestType appManifest, IEnumerable<FabricServiceReference> fabricServiceReferences)
+		public static ApplicationManifestType SetGitVersion(this ApplicationManifestType appManifest, IEnumerable<FabricServiceReference> fabricServiceReferences, string configuration)
 		{
-			GitVersion version = new GitVersion { Date = DateTime.MinValue, Diff = "" };
+			DateTime latest = DateTime.MinValue;
+			string version = "", diff = "";
 
 			foreach (var spr in fabricServiceReferences)
 			{
-				var intermediete = Path.Combine(Path.GetDirectoryName(spr.ProjectPath), "obj");
-				var commit = File.ReadAllText(Path.Combine(intermediete, "version.txt")).Split(' ');
+				var serviceReferencePath = Path.Combine(Path.GetDirectoryName(spr.ProjectPath), "pkg", configuration);
+				if (!Directory.Exists(serviceReferencePath))
+					continue;
 
-				var serviceManifest = FabricSerializers.ServiceManifestFromFile(Path.Combine(intermediete, "ServiceManifest.xml"));
+				var commit = File.ReadAllText(Path.Combine(serviceReferencePath, "version.txt")).Split(' ');
+
+				var serviceManifest = FabricSerializers.ServiceManifestFromFile(Path.Combine(serviceReferencePath, "ServiceManifest.xml"));
 				appManifest.ServiceManifestImport
 					.First(smi => smi.ServiceManifestRef.ServiceManifestName == spr.ServiceManifestName).ServiceManifestRef
 					.ServiceManifestVersion = serviceManifest.Version;
@@ -188,17 +191,17 @@ namespace ServiceFabricSdkContrib.Common
 				if (long.TryParse(commit[1], out var d))
 				{
 					var date = new DateTime(d);
-					if (new DateTime(d) > version.Date)
+					if (new DateTime(d) > latest)
 					{
-						version.Version = commit[0];
-						version.Date = new DateTime(d);
+						version = commit[0];
+						latest = new DateTime(d);
 					}
 				}
 
-				version.Diff += File.ReadAllText(Path.Combine(intermediete, "diff.txt"));
+				diff += File.ReadAllText(Path.Combine(serviceReferencePath, "diff.txt"));
 			}
 
-			appManifest.ApplicationTypeVersion = VersionHelper.AppendVersion(appManifest.ApplicationTypeVersion, version.Version, VersionHelper.Hash(version.Diff));
+			appManifest.ApplicationTypeVersion = VersionHelper.AppendVersion(appManifest.ApplicationTypeVersion, version, VersionHelper.Hash(diff));
 			return appManifest;
 		}
 	}

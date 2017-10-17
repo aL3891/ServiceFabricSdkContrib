@@ -14,16 +14,17 @@ namespace ServiceFabricSdkContrib.MsBuild
 		public string BasePath { get; set; }
 		public string BaseDir { get; set; }
 		public ITaskItem[] ProjectReferences { get; set; }
+		public string Configuration { get; set; }
 
 		public override bool Execute()
 		{
 			var projectrefs = ProjectReferences?.Select(p => Path.GetDirectoryName(p.GetMetadata("MSBuildSourceProjectFile"))).ToList() ?? new List<string>();
 			BaseDir = Path.GetDirectoryName(BasePath);
 			var srv = FabricSerializers.ServiceManifestFromFile(Path.Combine(BaseDir, "PackageRoot", "ServiceManifest.xml"));
-			var ver = srv.SetGitVersion(BaseDir, TargetDir, projectrefs).Result;
-			File.WriteAllText(Path.Combine(BaseDir, "obj", "version.txt"), ver.Version + " " + ver.Date.Ticks);
-			File.WriteAllText(Path.Combine(BaseDir, "obj", "diff.txt"), ver.Diff);
-			FabricSerializers.SaveServiceManifest(Path.Combine(BaseDir, "obj", "ServiceManifest.xml"), srv);
+			var ver = srv.SetGitVersion(BaseDir, TargetDir, projectrefs);
+			File.WriteAllText(Path.Combine(BaseDir, "pkg", Configuration, "version.txt"), ver.version + " " + ver.date.Ticks);
+			File.WriteAllText(Path.Combine(BaseDir, "pkg", Configuration, "diff.txt"), ver.diff);
+			FabricSerializers.SaveServiceManifest(Path.Combine(BaseDir, "pkg", Configuration, "ServiceManifest.xml"), srv);
 			return true;
 		}
 	}

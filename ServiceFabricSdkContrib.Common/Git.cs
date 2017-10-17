@@ -1,6 +1,6 @@
-﻿using System;
+﻿using LibGit2Sharp;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -10,52 +10,21 @@ namespace ServiceFabricSdkContrib.Common
 {
 	public class Git
 	{
-		public static async Task<GitVersion> GitCommit(string path)
+		public static (string sha, DateTimeOffset date) GitCommit(string baseDir)
 		{
-			var res = new GitVersion { };
-
-			var version = (await RunGitCommand("log -n 1 --pretty=format:\"%h %cI\" " + path)).Split(' ').Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
-			if (version.Any())
+			using (var repo = new Repository(baseDir))
 			{
-				res.Version = version[0];
-				res.Date = DateTime.Parse(version[1]);
+				return (repo.Head.Tip.Sha, repo.Head.Tip.Author.When);
 			}
-			return res;
 		}
 
-		public static async Task<string> GitDiff(string path)
+		internal static string GitDiff(string baseDir)
 		{
-			return await RunGitCommand("diff " + path);
-		}
-
-		public static string Hash(string data)
-		{
-			if (data != "")
-				return "." + Uri.EscapeDataString(Convert.ToBase64String(new SHA256Managed().ComputeHash(Encoding.ASCII.GetBytes(data))));
-			else
-				return "";
-		}
-
-		private static Task<string> RunGitCommand(string command)
-		{
-			var p = Process.Start(new ProcessStartInfo
+			using (var repo = new Repository(baseDir))
 			{
-				FileName = "git",
-				Arguments = command,
-				CreateNoWindow = true,
-				UseShellExecute = false,
-				WindowStyle = ProcessWindowStyle.Hidden,
-				RedirectStandardOutput = true
-			});
-			return p.StandardOutput.ReadToEndAsync();
+				return string.Join("", repo.Diff.Compare<Patch>().Select(tc => tc.Patch));
+			}
 		}
-	}
 
-
-	public class GitVersion
-	{
-		public string Version { get; set; }
-		public DateTime Date { get; set; }
-		public string Diff { get; set; }
 	}
 }

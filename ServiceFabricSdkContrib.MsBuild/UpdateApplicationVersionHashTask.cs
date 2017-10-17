@@ -17,13 +17,13 @@ namespace ServiceFabricSdkContrib.MsBuild
 		public string ApplicationManifestPath { get; set; }
 		public string PackageLocation { get; set; }
 		public string ProjectPath { get; set; }
+		public string Configuration { get; set; }
 
 		public override bool Execute()
 		{
 			var basePath = Path.GetDirectoryName(ProjectPath);
-
-			File.Copy(Path.Combine(basePath, "ApplicationPackageRoot", "ApplicationManifest.xml"), Path.Combine(basePath, PackageLocation, "ApplicationManifest.xml"), true);
-			var appManifest = FabricSerializers.AppManifestFromFile(Path.Combine(basePath, "ApplicationPackageRoot", "ApplicationManifest.xml"));
+			var path = Path.Combine(basePath, "pkg", Configuration, "ApplicationManifest.xml");
+			var appManifest = FabricSerializers.AppManifestFromFile(path);
 
 			foreach (var serviceReference in appManifest.ServiceManifestImport)
 			{
@@ -35,9 +35,9 @@ namespace ServiceFabricSdkContrib.MsBuild
 				}
 			}
 
-			var aggregatedVersion = Uri.EscapeDataString(Convert.ToBase64String(new SHA512Managed().ComputeHash(Encoding.ASCII.GetBytes(string.Join("", appManifest.ServiceManifestImport.Select(ss => ss.ServiceManifestRef.ServiceManifestVersion))))));
+			var aggregatedVersion = VersionHelper.Hash(string.Join("", appManifest.ServiceManifestImport.Select(ss => ss.ServiceManifestRef.ServiceManifestVersion)));
 			appManifest.ApplicationTypeVersion = appManifest.ApplicationTypeVersion + "." + aggregatedVersion;
-			FabricSerializers.SaveAppManifest(Path.Combine(basePath, PackageLocation, "ApplicationManifest.xml"), appManifest);
+			FabricSerializers.SaveAppManifest(path, appManifest);
 
 			return true;
 		}

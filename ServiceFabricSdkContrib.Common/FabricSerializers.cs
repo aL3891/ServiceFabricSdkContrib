@@ -65,6 +65,11 @@ namespace ServiceFabricSdkContrib.Common
 			if (File.Exists(v))
 				File.Delete(v);
 
+			var dir = Path.GetDirectoryName(v);
+
+			if (!Directory.Exists(dir))
+				Directory.CreateDirectory(dir);
+
 			using (var stream = new StreamWriter(v))
 				appManifestSerializer.Serialize(stream, appManifest);
 		}
