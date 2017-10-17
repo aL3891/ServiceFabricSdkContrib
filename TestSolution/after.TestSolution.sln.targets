@@ -1,0 +1,5 @@
+<Project>
+  <Target Name="CustomAfterSlnBuild" AfterTargets="Build">
+    <Message Importance="high" Text="Done building $(MSBuildProjectFile)" />
+  </Target>
+</Project>

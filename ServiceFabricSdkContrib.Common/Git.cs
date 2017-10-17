@@ -29,8 +29,28 @@ namespace ServiceFabricSdkContrib.Common
 			using (var repo = new Repository(repoPath))
 			{
 				var c = repo.Commits.QueryBy(filedir).First();
-				return (c.Commit.Sha, c.Commit.Author.When);
+				return (GetShortSha(repo,c.Commit.Id.Sha,7), c.Commit.Author.When);
 			}
+		}
+
+		public static string GetShortSha(Repository repo , string sha, int length)
+		{
+			try
+			{
+				var shortSha = sha.Substring(0, length);
+				var c = repo.Lookup<Commit>(shortSha);
+				return shortSha;
+			}
+			catch (AmbiguousSpecificationException e)
+			{
+
+				if (sha.Length >= length+1)
+					GetShortSha(repo,sha,length+1);
+				else
+					throw;
+					
+			}
+			throw new ArgumentException();
 		}
 
 		internal static string GitDiff(string baseDir)
