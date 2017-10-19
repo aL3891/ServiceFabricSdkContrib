@@ -1,5 +1,6 @@
 ﻿using LibGit2Sharp;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,6 +12,10 @@ namespace ServiceFabricSdkContrib.Common
 {
 	public class Git
 	{
+		static ConcurrentDictionary<string, Repository> repos = new ConcurrentDictionary<string, Repository>();
+
+
+
 
 		public static string RepoPath(string path)
 		{
@@ -26,14 +31,14 @@ namespace ServiceFabricSdkContrib.Common
 		{
 			var repoPath = RepoPath(baseDir);
 			var filedir = baseDir.Substring(repoPath.Length + 1);
-			using (var repo = new Repository(repoPath))
-			{
-				var c = repo.Commits.QueryBy(filedir).First();
-				return (GetShortSha(repo,c.Commit.Id.Sha,7), c.Commit.Author.When);
-			}
+			var repo = repos.GetOrAdd(repoPath, r => new Repository(repoPath));
+
+			var c = repo.Commits.QueryBy(filedir).First();
+			return (GetShortSha(repo, c.Commit.Id.Sha, 7), c.Commit.Author.When);
+
 		}
 
-		public static string GetShortSha(Repository repo , string sha, int length)
+		public static string GetShortSha(Repository repo, string sha, int length)
 		{
 			try
 			{
@@ -44,11 +49,11 @@ namespace ServiceFabricSdkContrib.Common
 			catch (AmbiguousSpecificationException e)
 			{
 
-				if (sha.Length >= length+1)
-					GetShortSha(repo,sha,length+1);
+				if (sha.Length >= length + 1)
+					GetShortSha(repo, sha, length + 1);
 				else
 					throw;
-					
+
 			}
 			throw new ArgumentException();
 		}
@@ -57,11 +62,8 @@ namespace ServiceFabricSdkContrib.Common
 		{
 			var repoPath = RepoPath(baseDir);
 			var filedir = baseDir.Substring(repoPath.Length + 1);
-			using (var repo = new Repository(repoPath))
-			{
-				return string.Join("", repo.Diff.Compare<Patch>().Where(p => p.Path.StartsWith(filedir)).Select(tc => tc.Patch));
-			}
+			var repo = repos.GetOrAdd(repoPath, r => new Repository(repoPath));
+			return string.Join("", repo.Diff.Compare<Patch>().Where(p => p.Path.StartsWith(filedir)).Select(tc => tc.Patch));
 		}
-
 	}
 }
