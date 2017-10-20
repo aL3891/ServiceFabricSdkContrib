@@ -116,7 +116,7 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\..\ServiceFabricSdkContrib.MsBuild\bin\Debug\net471\ServiceFabricSdkContrib.Services.targets" />
+  <Import Project="..\..\ServiceFabricSdkContrib.MsBuild\bin\Debug\net46\ServiceFabricSdkContrib.Services.targets" />
   <Import Project="..\packages\Microsoft.ServiceFabric.Actors.2.8.219\build\Microsoft.ServiceFabric.Actors.targets" Condition="Exists('..\packages\Microsoft.ServiceFabric.Actors.2.8.219\build\Microsoft.ServiceFabric.Actors.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

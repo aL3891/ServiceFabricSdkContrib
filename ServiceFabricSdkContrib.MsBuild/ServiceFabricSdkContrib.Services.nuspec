@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>ServiceFabricSdkContrib.Services</id>
-    <version>0.0.9-beta</version>
+    <version>0.1.0-beta</version>
     <title>ServiceFabric community Sdk for services</title>
     <authors>Allan Lindqvist</authors>
     <owners>Allan Lindqvist</owners>
@@ -14,13 +14,16 @@
     <tags>msbuild ServiceFabric</tags>
   </metadata>
   <files>
-    <file src="bin\Debug\net462\ServiceFabricSdkContrib.Services.targets"                          target="build\ServiceFabricSdkContrib.Services.targets"/>
-    <file src="bin\Debug\net462\ServiceFabricSdkContrib.Common.dll"                                target="build\ServiceFabricSdkContrib.Common.dll"/>
-    <file src="bin\Debug\net462\ServiceFabricSdkContrib.MsBuild.dll"                               target="build\ServiceFabricSdkContrib.MsBuild.dll"/>
+    <file src="bin\Debug\net46\ServiceFabricSdkContrib.Services.targets"                          target="build\ServiceFabricSdkContrib.Services.targets"/>
+    <file src="bin\Debug\net46\ServiceFabricSdkContrib.Common.dll"                                target="build\ServiceFabricSdkContrib.Common.dll"/>
+    <file src="bin\Debug\net46\ServiceFabricSdkContrib.MsBuild.dll"                               target="build\ServiceFabricSdkContrib.MsBuild.dll"/>
 
-		<file src="bin\Debug\net462\System.Fabric.dll"                                                 target="build\System.Fabric.dll"/>
-	  <file src="bin\Debug\net462\System.Fabric.Management.ServiceModel.dll"                         target="build\System.Fabric.Management.ServiceModel.dll"/>
-	  <file src="bin\Debug\net462\System.Fabric.Management.ServiceModel.XmlSerializers.dll"          target="build\System.Fabric.Management.ServiceModel.XmlSerializers.dll"/>
-	  <file src="bin\Debug\net462\System.Fabric.Strings.dll"                                         target="build\System.Fabric.Strings.dll"/>
+		<file src="bin\Debug\net46\System.Fabric.dll"                                                 target="build\System.Fabric.dll"/>
+	  <file src="bin\Debug\net46\System.Fabric.Management.ServiceModel.dll"                         target="build\System.Fabric.Management.ServiceModel.dll"/>
+	  <file src="bin\Debug\net46\System.Fabric.Management.ServiceModel.XmlSerializers.dll"          target="build\System.Fabric.Management.ServiceModel.XmlSerializers.dll"/>
+	  <file src="bin\Debug\net46\System.Fabric.Strings.dll"                                         target="build\System.Fabric.Strings.dll"/>
+
+		<file src="bin\Debug\net46\LibGit2Sharp.dll"                                                  target="build\LibGit2Sharp.dll"/>
+		<file src="bin\Debug\net46\LibGit2Sharp.dll.config"                                           target="build\LibGit2Sharp.dll.config"/>
   </files>
 </package>

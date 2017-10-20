@@ -14,7 +14,7 @@ namespace ServiceFabricSdkContrib.Common
 	public class Git
 	{
 		static ConcurrentDictionary<string, Repository> repos = new ConcurrentDictionary<string, Repository>();
-		static ConcurrentDictionary<string, Commit> logs = new ConcurrentDictionary<string, Commit>();
+		static ConcurrentDictionary<string, (string, string, DateTimeOffset)> logs = new ConcurrentDictionary<string, (string, string, DateTimeOffset)>();
 		static ConcurrentDictionary<string, string> head = new ConcurrentDictionary<string, string>();
 
 		public static string RepoPath(string path)
@@ -27,7 +27,7 @@ namespace ServiceFabricSdkContrib.Common
 				return RepoPath(Path.GetDirectoryName(path));
 		}
 
-		public static (string sha, DateTimeOffset date) GitCommit(string baseDir)
+		public static (string sha, string fullSha, DateTimeOffset date) GitCommit(string baseDir, string latestSha = "")
 		{
 			var repoPath = RepoPath(baseDir);
 			var filedir = baseDir.Substring(repoPath.Length + 1);
@@ -38,37 +38,34 @@ namespace ServiceFabricSdkContrib.Common
 				logs.Clear();
 			}
 
-			Commit c = null;
-			c = logs.GetOrAdd(filedir, f =>
+			return logs.GetOrAdd(filedir, f =>
 			{
-				try
-				{
-					var res = repo.Head.Commits.Take(150).Where(cc => repo.Diff.Compare<TreeChanges>(cc.Parents.First().Tree, cc.Tree).Any(tc => tc.OldPath.Contains(filedir))).FirstOrDefault();
-					if (res == null)
-						res = repo.Lookup<Commit>(GitExeCommit(baseDir, repoPath).Result);
+				Commit commit = null;
+				//cache latest checked commit and the latest changed commit at that time and use that to limit the lookup
 
-					return res;
-				}
-				catch (KeyNotFoundException)
-				{
-					return null;
-				}
+				IEnumerable<Commit> commits = repo.Head.Commits.Take(75);
+				if (latestSha != "")
+					commits = commits.TakeWhile(c => c.Parents.Any(p => p.Sha != latestSha));
+
+				commit = commits.Where(cc => repo.Diff.Compare<TreeChanges>(cc.Parents.First().Tree, cc.Tree).Any(tc => tc.OldPath.Contains(filedir))).FirstOrDefault();
+
+				if (commit == null && latestSha == "")
+					commit = repo.Lookup<Commit>(GitExeCommit(baseDir).Result);
+
+				if (commit != null)
+					return (GetShortSha(repo, commit.Id.Sha, 7), commit.Id.Sha, commit.Author.When);
+				else
+					return ("", "", DateTimeOffset.MinValue);
 			});
-
-			if (c != null)
-				return (GetShortSha(repo, c.Id.Sha, 7), c.Author.When);
-			else
-				return ("", DateTimeOffset.MinValue);
-
 		}
 
 
-		public static async Task<string> GitExeCommit(string path, string repoPath)
+		public static async Task<string> GitExeCommit(string path)
 		{
-			return await RunGitCommand("log -n 1 --pretty=format:\"%h\" " + path, repoPath);
+			return await RunGitCommand("log -n 1 --pretty=format:%H " + path);
 		}
 
-		private static Task<string> RunGitCommand(string command, string repoPath)
+		private static Task<string> RunGitCommand(string command)
 		{
 			var p = Process.Start(new ProcessStartInfo
 			{
@@ -77,8 +74,7 @@ namespace ServiceFabricSdkContrib.Common
 				CreateNoWindow = true,
 				UseShellExecute = false,
 				WindowStyle = ProcessWindowStyle.Hidden,
-				RedirectStandardOutput = true,
-				WorkingDirectory = repoPath
+				RedirectStandardOutput = true
 			});
 			return p.StandardOutput.ReadToEndAsync();
 		}
@@ -105,7 +101,6 @@ namespace ServiceFabricSdkContrib.Common
 
 		internal static string GitDiff(string baseDir)
 		{
-			return "";
 			var repoPath = RepoPath(baseDir);
 			var filedir = baseDir.Substring(repoPath.Length + 1);
 			var repo = repos.GetOrAdd(repoPath, r => new Repository(repoPath));

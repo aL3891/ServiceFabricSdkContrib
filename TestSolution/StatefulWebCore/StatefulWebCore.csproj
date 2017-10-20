@@ -20,5 +20,5 @@
     <PackageReference Include="Microsoft.ServiceFabric.Services" Version="2.8.219" />
   </ItemGroup>
 
-  <Import Project="..\..\ServiceFabricSdkContrib.MsBuild\bin\Debug\net471\ServiceFabricSdkContrib.Services.targets" />
+  <Import Project="..\..\ServiceFabricSdkContrib.MsBuild\bin\Debug\net46\ServiceFabricSdkContrib.Services.targets" />
 </Project>

@@ -43,19 +43,20 @@ namespace ServiceFabricSdkContrib.Common
 			}).ToList().SelectMany(a => a.Result));
 		}
 
-		public static (string diff, DateTimeOffset date, string version) SetGitVersion(this ServiceManifestType srv, string BaseDir, string TargetDir, IEnumerable<string> additionalPaths)
+		public static (string diff, DateTimeOffset date, string version) SetGitVersion(this ServiceManifestType srv, string BaseDir, string TargetDir, bool checkPackages, IEnumerable<string> additionalPaths)
 		{
-			(var latest, var date) = Git.GitCommit(BaseDir);
+			(var latest, string latestFull, var date) = Git.GitCommit(BaseDir);
 			var diff = Git.GitDiff(BaseDir);
 			var addDiff = new StringBuilder();
 			foreach (var item in additionalPaths)
 			{
-				(var v, var d) = Git.GitCommit(item);
+				(var v, var s, var d) = Git.GitCommit(item, latestFull);
 				addDiff.Append(Git.GitDiff(item));
 				if (date < d)
 				{
 					date = d;
 					latest = v;
+					latestFull = s;
 				}
 			}
 
@@ -63,45 +64,56 @@ namespace ServiceFabricSdkContrib.Common
 			srv.Version = VersionHelper.AppendVersion(srv.Version, latest, VersionHelper.Hash(diff + addDiff));
 			if (srv.ConfigPackage != null)
 				foreach (var cv in srv.ConfigPackage)
-					cv.Version = VersionHelper.AppendVersion(cv.Version, GetPackageVersion(cv.Name, BaseDir, ref date, ref latest));
+					cv.Version = checkPackages ? VersionHelper.AppendVersion(cv.Version, GetPackageVersion(cv.Name, BaseDir, ref date, ref latest, ref latestFull)) : srv.Version;
 
 			if (srv.DataPackage != null)
 				foreach (var cv in srv.DataPackage)
-					cv.Version = VersionHelper.AppendVersion(cv.Version, GetPackageVersion(cv.Name, BaseDir, ref date, ref latest));
+					cv.Version = checkPackages ? VersionHelper.AppendVersion(cv.Version, GetPackageVersion(cv.Name, BaseDir, ref date, ref latest, ref latestFull)) : srv.Version;
 
 			if (srv.CodePackage != null)
 			{
 				foreach (var cv in srv.CodePackage)
 				{
-					if (cv.Name == "Code")
+					if (cv.Name == "Code" && checkPackages)
 					{
 						if (date > codeDate)
 						{
 							var codeFiles = Directory.GetFileSystemEntries(TargetDir).Where(p => !p.EndsWith("PackageRoot")).Concat(Directory.GetFiles(Path.Combine(BaseDir, "PackageRoot")));
-							var vers = codeFiles.Select(p => Git.GitCommit(p));
-							cv.Version = vers.OrderBy(v => v.date).First().sha + VersionHelper.Hash(string.Join("", codeFiles.Select(cf => Git.GitDiff(cf))) + addDiff);
+
+							foreach (var cf in codeFiles)
+							{
+								(var v, var s, var d) = Git.GitCommit(cf, latestFull);
+								if (date < d)
+								{
+									date = d;
+									latest = v;
+									latestFull = s;
+								}
+							}
+							cv.Version = latest + VersionHelper.Hash(string.Join("", codeFiles.Select(cf => Git.GitDiff(cf))) + addDiff);
 						}
 						else
 							cv.Version = srv.Version;
 					}
 					else
 					{
-						cv.Version = VersionHelper.AppendVersion(cv.Version, GetPackageVersion(cv.Name, BaseDir, ref date, ref latest));
+						cv.Version = checkPackages ? VersionHelper.AppendVersion(cv.Version, GetPackageVersion(cv.Name, BaseDir, ref date, ref latest, ref latestFull)) : srv.Version;
 					}
 				}
 			}
 			return (diff + addDiff, date, latest);
 		}
 
-		private static string[] GetPackageVersion(string name, string BaseDir, ref DateTimeOffset date, ref string version)
+		private static string[] GetPackageVersion(string name, string BaseDir, ref DateTimeOffset date, ref string version, ref string latestFull)
 		{
 			var path = Path.Combine(BaseDir, "PackageRoot", name);
-			var v = Git.GitCommit(path);
+			var v = Git.GitCommit(path, latestFull);
 
 			if (date < v.date)
 			{
 				date = v.date;
 				version = v.sha;
+				latestFull = v.fullSha;
 			}
 
 			return new[] { v.sha, VersionHelper.Hash(Git.GitDiff(path)) };
