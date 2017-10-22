@@ -25,5 +25,6 @@
 
 		<file src="bin\Debug\net46\LibGit2Sharp.dll"                                                  target="build\LibGit2Sharp.dll"/>
 		<file src="bin\Debug\net46\LibGit2Sharp.dll.config"                                           target="build\LibGit2Sharp.dll.config"/>
-  </files>
+		<file src="bin\Debug\net46\lib\win32\x64\git2-15e1193.dll"                                    target="build\lib\win32\x64\git2-15e1193.dll"/>
+	</files>
 </package>
