@@ -2,7 +2,7 @@
 	<UsingTask TaskName="ServiceFabricSdkContrib.MsBuild.UpdateServiceVersionGitTask" Architecture="x64" AssemblyFile="ServiceFabricSdkContrib.MsBuild.dll" />
 	<UsingTask TaskName="ServiceFabricSdkContrib.MsBuild.PackageFabricServiceTask" Architecture="x64" AssemblyFile="ServiceFabricSdkContrib.MsBuild.dll" />
 
-	<Target Name="PackageFabricService" AfterTargets="CoreCompile">
+	<Target Name="PackageFabricService" AfterTargets="Build">
 		<PropertyGroup>
 			<UseHardlinksForServiceFabricIfPossible Condition="$(UseHardlinksForServiceFabricIfPossible) == ''">True</UseHardlinksForServiceFabricIfPossible>
 		</PropertyGroup>
