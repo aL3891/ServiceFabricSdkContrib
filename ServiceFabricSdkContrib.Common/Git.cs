@@ -31,7 +31,7 @@ namespace ServiceFabricSdkContrib.Common
 		{
 			var repoPath = RepoPath(baseDir);
 
-			string filedir = baseDir;
+			string filedir = "";
 			if (baseDir.Length > repoPath.Length)
 				filedir = baseDir.Substring(repoPath.Length + 1);
 
@@ -106,7 +106,7 @@ namespace ServiceFabricSdkContrib.Common
 		internal static string GitDiff(string baseDir)
 		{
 			var repoPath = RepoPath(baseDir);
-			string filedir = baseDir;
+			string filedir = "";
 			if (baseDir.Length > repoPath.Length)
 				filedir = baseDir.Substring(repoPath.Length + 1);
 			var repo = repos.GetOrAdd(repoPath, r => new Repository(repoPath));
