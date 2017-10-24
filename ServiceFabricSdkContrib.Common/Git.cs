@@ -30,7 +30,11 @@ namespace ServiceFabricSdkContrib.Common
 		public static (string sha, string fullSha, DateTimeOffset date) GitCommit(string baseDir, string latestSha = "")
 		{
 			var repoPath = RepoPath(baseDir);
-			var filedir = baseDir.Substring(repoPath.Length + 1);
+
+			string filedir = baseDir;
+			if (baseDir.Length > repoPath.Length)
+				filedir = baseDir.Substring(repoPath.Length + 1);
+
 			var repo = repos.GetOrAdd(repoPath, r => new Repository(repoPath));
 
 			if (repo.Head.Tip.Sha != head.GetOrAdd(repoPath, r => repo.Head.Tip.Sha))
@@ -102,7 +106,9 @@ namespace ServiceFabricSdkContrib.Common
 		internal static string GitDiff(string baseDir)
 		{
 			var repoPath = RepoPath(baseDir);
-			var filedir = baseDir.Substring(repoPath.Length + 1);
+			string filedir = baseDir;
+			if (baseDir.Length > repoPath.Length)
+				filedir = baseDir.Substring(repoPath.Length + 1);
 			var repo = repos.GetOrAdd(repoPath, r => new Repository(repoPath));
 			return string.Join("", repo.Diff.Compare<Patch>().Where(p => p.Path.StartsWith(filedir)).Select(tc => tc.Patch));
 		}
