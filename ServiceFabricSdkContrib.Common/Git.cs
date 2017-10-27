@@ -19,7 +19,7 @@ namespace ServiceFabricSdkContrib.Common
 
 		public static string RepoPath(string path)
 		{
-			if (Directory.Exists(Path.Combine(path, ".git")))
+			if (Directory.Exists(Path.Combine(path, ".git")) || File.Exists(Path.Combine(path, ".git")))
 				return path;
 			else if (path.TrimEnd('\\').Where(c => c == '\\').Count() == 1)
 				throw new ArgumentException();
