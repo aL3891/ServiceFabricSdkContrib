@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>ServiceFabricSdkContrib.Services</id>
-    <version>0.1.4-beta</version>
+    <version>0.1.5-beta</version>
     <title>ServiceFabric community Sdk for services</title>
     <authors>Allan Lindqvist</authors>
     <owners>Allan Lindqvist</owners>
@@ -23,7 +23,6 @@
 	  <file src="bin\Release\net46\System.Fabric.Strings.dll"                                         target="build\System.Fabric.Strings.dll"/>
 		<file src="bin\Release\net46\System.ValueTuple.dll"                                             target="build\System.ValueTuple.dll"/>
 		<file src="bin\Release\net46\LibGit2Sharp.dll"                                                  target="build\LibGit2Sharp.dll"/>
-		<file src="bin\Release\net46\LibGit2Sharp.dll.config"                                           target="build\LibGit2Sharp.dll.config"/>
-		<file src="bin\Release\net46\lib\win32\x64\git2-15e1193.dll"                                    target="build\lib\win32\x64\git2-15e1193.dll"/>
+		<file src="bin\Release\net46\lib\win32\x64\git2-15e1193.dll"                                    target="build\git2-15e1193.dll"/>
 	</files>
 </package>
