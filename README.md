@@ -1,4 +1,4 @@
-1 Service fabric Sdk Contrib
+# Service fabric Sdk Contrib
 
 This is a project for adding functionality to the service fabric sdk that is either missing or could be done in a diffrent way. It's not
 ment to replace the standard Sdk and the standard Sdk is ment to take precedence, so features in this project that are made obsolete by
