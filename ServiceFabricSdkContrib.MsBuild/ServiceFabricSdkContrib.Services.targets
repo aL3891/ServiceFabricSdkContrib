@@ -20,9 +20,13 @@
 	<Target Name="UpdateServiceVersionGit" Condition="$(UpdateServiceVersionGit) == 'True'" AfterTargets="PackageFabricService">
 		<PropertyGroup>
 			<CheckIndividualSFServicePackages Condition="$(CheckIndividualSFServicePackages) == ''">False</CheckIndividualSFServicePackages>
+			<UpdateServiceBaseVersion Condition="$(UpdateServiceBaseVersion) == ''">False</UpdateServiceBaseVersion>
+			<ServiceBaseVersion Condition="$(ServiceBaseVersion) == ''">$(AssemblyVersion)</ServiceBaseVersion>
 		</PropertyGroup>
 		<UpdateServiceVersionGitTask
       BasePath="$(MSBuildProjectFullPath)"
+			BaseVersion="$(ServiceBaseVersion)"
+			UpdateBaseVersion="$(UpdateServiceBaseVersion)"
 			Configuration="$(Configuration)"
       TargetDir="$(TargetDir)"
 			CheckIndividualPackages="$(CheckIndividualSFServicePackages)"

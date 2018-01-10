@@ -43,7 +43,7 @@ namespace ServiceFabricSdkContrib.Common
 			}).ToList().SelectMany(a => a.Result));
 		}
 
-		public static (string diff, DateTimeOffset date, string version) SetGitVersion(this ServiceManifestType srv, string BaseDir, string TargetDir, bool checkPackages, IEnumerable<string> additionalPaths)
+		public static (string diff, DateTimeOffset date, string version) SetGitVersion(this ServiceManifestType srv, string baseVersion, string BaseDir, string TargetDir, bool checkPackages, IEnumerable<string> additionalPaths)
 		{
 			(var latest, string latestFull, var date) = Git.GitCommit(BaseDir);
 			var diff = Git.GitDiff(BaseDir);
@@ -61,7 +61,7 @@ namespace ServiceFabricSdkContrib.Common
 			}
 
 			DateTimeOffset codeDate = date;
-			srv.Version = VersionHelper.AppendVersion(srv.Version, latest, VersionHelper.Hash(diff + addDiff));
+			srv.Version = VersionHelper.AppendVersion(baseVersion, latest, VersionHelper.Hash(diff + addDiff));
 			if (srv.ConfigPackage != null)
 				foreach (var cv in srv.ConfigPackage)
 					cv.Version = checkPackages ? VersionHelper.AppendVersion(cv.Version, GetPackageVersion(cv.Name, BaseDir, ref date, ref latest, ref latestFull)) : srv.Version;
@@ -182,7 +182,7 @@ namespace ServiceFabricSdkContrib.Common
 			return srv;
 		}
 
-		public static ApplicationManifestType SetGitVersion(this ApplicationManifestType appManifest, IEnumerable<FabricServiceReference> fabricServiceReferences, string configuration)
+		public static ApplicationManifestType SetGitVersion(this ApplicationManifestType appManifest,string baseVersion, IEnumerable<FabricServiceReference> fabricServiceReferences, string configuration)
 		{
 			DateTime latest = DateTime.MinValue;
 			string version = "", diff = "";
@@ -216,7 +216,7 @@ namespace ServiceFabricSdkContrib.Common
 				diff += File.ReadAllText(diffFile);
 			}
 
-			appManifest.ApplicationTypeVersion = VersionHelper.AppendVersion(appManifest.ApplicationTypeVersion, version, VersionHelper.Hash(diff));
+			appManifest.ApplicationTypeVersion = VersionHelper.AppendVersion(baseVersion, version, VersionHelper.Hash(diff));
 			return appManifest;
 		}
 	}

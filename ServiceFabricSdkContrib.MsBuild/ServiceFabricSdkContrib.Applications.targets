@@ -20,7 +20,13 @@
 	</Target>
 
 	<Target Name="UpdateApplicationVersionGit" Condition="$(UpdateApplicationVersionGit) == 'True'" AfterTargets="PackageFabricApp">
+		<PropertyGroup>
+			<UpdateApplicationBaseVersion Condition="$(UpdateApplicationBaseVersion) == ''">False</UpdateApplicationBaseVersion>
+			<ApplicationBaseVersion Condition="$(ApplicationBaseVersion) == ''">$(AssemblyVersion)</ApplicationBaseVersion>
+		</PropertyGroup>
 		<UpdateApplicationVersionGitTask
+			BaseVersion="$(ApplicationBaseVersion)"
+			UpdateBaseVersion="$(UpdateApplicationBaseVersion)"
       ProjectReferences="@(_ResolvedProjectReferencePaths)"
       ServiceProjectReferences="@(ServiceProjectReference)"
       ApplicationManifestPath="$(ApplicationManifestFilePath)"
