@@ -64,11 +64,11 @@ namespace ServiceFabricSdkContrib.Common
 			srv.Version = VersionHelper.AppendVersion(baseVersion, latest, VersionHelper.Hash(diff + addDiff));
 			if (srv.ConfigPackage != null)
 				foreach (var cv in srv.ConfigPackage)
-					cv.Version = checkPackages ? VersionHelper.AppendVersion(cv.Version, GetPackageVersion(cv.Name, BaseDir, ref date, ref latest, ref latestFull)) : srv.Version;
+					cv.Version = checkPackages ? VersionHelper.AppendVersion(baseVersion, GetPackageVersion(cv.Name, BaseDir, ref date, ref latest, ref latestFull)) : srv.Version;
 
 			if (srv.DataPackage != null)
 				foreach (var cv in srv.DataPackage)
-					cv.Version = checkPackages ? VersionHelper.AppendVersion(cv.Version, GetPackageVersion(cv.Name, BaseDir, ref date, ref latest, ref latestFull)) : srv.Version;
+					cv.Version = checkPackages ? VersionHelper.AppendVersion(baseVersion, GetPackageVersion(cv.Name, BaseDir, ref date, ref latest, ref latestFull)) : srv.Version;
 
 			if (srv.CodePackage != null)
 			{
@@ -90,14 +90,15 @@ namespace ServiceFabricSdkContrib.Common
 									latestFull = s;
 								}
 							}
-							cv.Version = latest + VersionHelper.Hash(string.Join("", codeFiles.Select(cf => Git.GitDiff(cf))) + addDiff);
+							
+							cv.Version = VersionHelper.AppendVersion(baseVersion, latest + VersionHelper.Hash(string.Join("", codeFiles.Select(cf => Git.GitDiff(cf))) + addDiff));
 						}
 						else
 							cv.Version = srv.Version;
 					}
 					else
 					{
-						cv.Version = checkPackages ? VersionHelper.AppendVersion(cv.Version, GetPackageVersion(cv.Name, BaseDir, ref date, ref latest, ref latestFull)) : srv.Version;
+						cv.Version = checkPackages ? VersionHelper.AppendVersion(baseVersion, GetPackageVersion(cv.Name, BaseDir, ref date, ref latest, ref latestFull)) : srv.Version;
 					}
 				}
 			}
