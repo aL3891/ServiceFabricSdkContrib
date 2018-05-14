@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net46</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -10,8 +10,8 @@
     <None Include="ServiceFabricSdkContrib.Services.nuspec" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build" Version="15.3.409" />
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.3.409" />
+    <PackageReference Include="Microsoft.Build" Version="15.6.85" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.6.85" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ServiceFabricSdkContrib.Common\ServiceFabricSdkContrib.Common.csproj" />

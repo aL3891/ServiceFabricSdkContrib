@@ -110,8 +110,8 @@ namespace ServiceFabricSdkContrib.Common
 				Logger?.LogVerbose($"Using image store {imageStore}");
 				var imageStorePath = new Uri(imageStore).LocalPath;
 
-				if ( symlinkProvision && Directory.Exists(imageStorePath))
-					await Task.WhenAll(appsToUpload.Select(i => UploadAppToLocalPath(imageStore,imageStorePath, i)).ToList());
+				if (symlinkProvision && Directory.Exists(imageStorePath))
+					await Task.WhenAll(appsToUpload.Select(i => UploadAppToLocalPath(imageStore, imageStorePath, i)).ToList());
 				else
 					await Task.WhenAll(appsToUpload.Select(i => UploadApp(imageStore, i)).ToList());
 
@@ -178,7 +178,7 @@ namespace ServiceFabricSdkContrib.Common
 
 		private async Task UploadAppToLocalPath(string imageStore, string imageStorep, ServiceFabricApplicationSpec app)
 		{
-			var name = app.Manifest.ApplicationTypeName +"."+ app.Manifest.ApplicationTypeVersion;
+			var name = app.Manifest.ApplicationTypeName + "." + app.Manifest.ApplicationTypeVersion;
 
 			try
 			{
@@ -186,7 +186,7 @@ namespace ServiceFabricSdkContrib.Common
 				await Client.ApplicationManager.ProvisionApplicationAsync(name, TimeSpan.FromHours(1), CancellationToken.None);
 				Symlink.DeleteIfExists(Path.Combine(imageStorep, name));
 			}
-			catch (FileNotFoundException f )
+			catch (FileNotFoundException f)
 			{
 				Symlink.DeleteIfExists(Path.Combine(imageStorep, name));
 				await UploadApp(imageStore, app);
@@ -195,7 +195,7 @@ namespace ServiceFabricSdkContrib.Common
 
 		private async Task UploadApp(string imageStore, ServiceFabricApplicationSpec app)
 		{
-			var name = app.Manifest.ApplicationTypeName +"."+ app.Manifest.ApplicationTypeVersion;
+			var name = app.Manifest.ApplicationTypeName + "." + app.Manifest.ApplicationTypeVersion;
 			await Task.Run(() => Client.ApplicationManager.CopyApplicationPackage(imageStore, app.PackagePath, name, TimeSpan.FromHours(1)));
 			await Client.ApplicationManager.ProvisionApplicationAsync(name, TimeSpan.FromHours(1), CancellationToken.None);
 			Client.ApplicationManager.RemoveApplicationPackage(imageStore, name);
