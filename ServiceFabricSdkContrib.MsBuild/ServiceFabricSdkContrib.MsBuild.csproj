@@ -2,9 +2,6 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
   <ItemGroup>
     <None Include="ServiceFabricSdkContrib.Applications.nuspec" />
     <None Include="ServiceFabricSdkContrib.Services.nuspec" />
