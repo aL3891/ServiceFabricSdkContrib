@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="LibGit2Sharp" Version="0.25.0" />
-    <PackageReference Include="Microsoft.ServiceFabric" Version="6.2.269" />
-    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="3.1.269" />
+    <PackageReference Include="Microsoft.ServiceFabric" Version="6.2.274" />
+    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="3.1.274" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
 </Project>

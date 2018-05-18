@@ -9,9 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.ServiceFabric" version="6.0.219" />
-    <PackageReference Include="Microsoft.ServiceFabric.Data" version="2.8.219" />
-    <PackageReference Include="Microsoft.ServiceFabric.Services" version="2.8.219" />
+    <PackageReference Include="Microsoft.ServiceFabric" version="6.2.274" />
+    <PackageReference Include="Microsoft.ServiceFabric.Data" version="3.1.274" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" version="3.1.274" />
   </ItemGroup>
   <Import Project="..\..\ServiceFabricSdkContrib.MsBuild\bin\Debug\net46\ServiceFabricSdkContrib.Services.targets" />
 </Project>
