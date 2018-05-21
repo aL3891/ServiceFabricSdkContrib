@@ -4,7 +4,7 @@
 
 	<Target Name="PackageFabricService" AfterTargets="Publish">
 		<PropertyGroup>
-			<UseHardlinksForServiceFabricIfPossible Condition="$(UseHardlinksForServiceFabricIfPossible) == ''">True</UseHardlinksForServiceFabricIfPossible>
+			<UseHardlinksForServiceFabricIfPossible Condition="$(UseHardlinksForServiceFabricIfPossible) == ''">False</UseHardlinksForServiceFabricIfPossible>
 		</PropertyGroup>
 
 		<PackageFabricServiceTask
@@ -32,4 +32,6 @@
 			ProjectReferences="@(_ResolvedProjectReferencePaths)">
 		</UpdateServiceVersionGitTask>
 	</Target>
+	
+	
 </Project>

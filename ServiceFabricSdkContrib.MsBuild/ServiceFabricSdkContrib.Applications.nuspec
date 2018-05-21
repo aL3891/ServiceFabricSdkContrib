@@ -2,7 +2,7 @@
 <package>
 	<metadata>
 		<id>ServiceFabricSdkContrib.Applications</id>
-		<version>0.1.6-beta</version>
+		<version>0.1.7-beta</version>
 		<title>ServiceFabric community Sdk for Applications</title>
 		<authors>Allan Lindqvist</authors>
 		<owners>Allan Lindqvist</owners>
@@ -14,14 +14,13 @@
 		<tags>msbuild ServiceFabric</tags>
 	</metadata>
 	<files>
-		<file src="bin\Release\net46\ServiceFabricSdkContrib.Applications.targets"                      target="build\ServiceFabricSdkContrib.Applications.targets"/>
-		<file src="bin\Release\net46\ServiceFabricSdkContrib.Common.dll"                                target="build\ServiceFabricSdkContrib.Common.dll"/>
-		<file src="bin\Release\net46\ServiceFabricSdkContrib.MsBuild.dll"                               target="build\ServiceFabricSdkContrib.MsBuild.dll"/>
-		<file src="bin\Release\net46\System.Fabric.dll"                                                 target="build\System.Fabric.dll"/>
-		<file src="bin\Release\net46\System.Fabric.Management.ServiceModel.dll"                         target="build\System.Fabric.Management.ServiceModel.dll"/>
-		<file src="bin\Release\net46\System.Fabric.Management.ServiceModel.XmlSerializers.dll"          target="build\System.Fabric.Management.ServiceModel.XmlSerializers.dll"/>
-		<file src="bin\Release\net46\System.Fabric.Strings.dll"                                         target="build\System.Fabric.Strings.dll"/>
-		<file src="bin\Release\net46\LibGit2Sharp.dll"                                                  target="build\LibGit2Sharp.dll"/>
-		<file src="bin\Release\net46\lib\win32\x64\git2-15e1193.dll"                                    target="build\git2-15e1193.dll"/>
+		<file src="bin\Release\netstandard2.0\publish\ServiceFabricSdkContrib.Applications.targets"												   target="build\ServiceFabricSdkContrib.Applications.targets"/>
+		<file src="bin\Release\netstandard2.0\publish\ServiceFabricSdkContrib.Common.dll"																		   target="build\ServiceFabricSdkContrib.Common.dll"/>
+		<file src="bin\Release\netstandard2.0\publish\ServiceFabricSdkContrib.MsBuild.dll"																   target="build\ServiceFabricSdkContrib.MsBuild.dll"/>
+		<file src="bin\Release\netstandard2.0\publish\runtimes\win\lib\netstandard2.0\System.Fabric.dll"								                                   target="build\System.Fabric.dll"/>
+		<file src="bin\Release\netstandard2.0\publish\runtimes\win\lib\netstandard2.0\System.Fabric.Management.ServiceModel.dll"                         target="build\System.Fabric.Management.ServiceModel.dll"/>
+		<file src="bin\Release\netstandard2.0\publish\runtimes\win\lib\netstandard2.0\System.Fabric.Strings.dll"                                         target="build\System.Fabric.Strings.dll"/>
+		<file src="bin\Release\netstandard2.0\publish\LibGit2Sharp.dll"                                                  target="build\LibGit2Sharp.dll"/>
+		<file src="bin\Release\netstandard2.0\publish\runtimes\win7-x64\native\git2-6311e88.dll"                                    target="build\git2-6311e88.dll"/>
 	</files>
 </package>

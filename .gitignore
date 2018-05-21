@@ -11,3 +11,5 @@ TestSolution/packages/
 TestSolution/msbuild.ProjectImports.zip
 /**/pkg
 /**/publish/
+TestSolution2/.vs/
+TestSolution2/packages/

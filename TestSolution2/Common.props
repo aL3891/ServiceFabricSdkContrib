@@ -1,0 +1,8 @@
+﻿<Project>
+	<PropertyGroup>
+		<CreateHardLinksForCopyFilesToOutputDirectoryIfPossible>True</CreateHardLinksForCopyFilesToOutputDirectoryIfPossible>
+		<CreateHardLinksForCopyLocalIfPossible>True</CreateHardLinksForCopyLocalIfPossible>
+		<CreateHardLinksForCopyAdditionalFilesIfPossible>True</CreateHardLinksForCopyAdditionalFilesIfPossible>
+		<SkipCopyUnchangedFiles>True</SkipCopyUnchangedFiles>
+	</PropertyGroup>
+</Project>
