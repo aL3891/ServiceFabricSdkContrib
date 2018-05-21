@@ -8,6 +8,13 @@
 	  <UpdateServiceVersionGit>true</UpdateServiceVersionGit>
   </PropertyGroup>
 
+	<ItemGroup>
+		<Compile Remove="pkg\**" CopyToPublishDirectory="Never" />
+		<Content Remove="pkg\**" CopyToPublishDirectory="Never" />
+		<EmbeddedResource Remove="pkg\**" CopyToPublishDirectory="Never" />
+		<None Remove="pkg\**" CopyToPublishDirectory="Never" />
+	</ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.ServiceFabric" version="6.2.274" />
     <PackageReference Include="Microsoft.ServiceFabric.Data" version="3.1.274" />

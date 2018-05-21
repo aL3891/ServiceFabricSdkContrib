@@ -35,6 +35,8 @@
     <ProjectReference Include="..\StatefulWebCore\StatefulWebCore.csproj" />
     <ProjectReference Include="..\StatelessCore\StatelessCore.csproj" />
     <ProjectReference Include="..\StatelessWebCore\StatelessWebCore.csproj" />
+    <ProjectReference Include="..\Web1\Web1.csproj" />
+    <ProjectReference Include="..\Web2\Web2.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

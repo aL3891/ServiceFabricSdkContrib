@@ -2,6 +2,13 @@
 	<UsingTask TaskName="ServiceFabricSdkContrib.MsBuild.UpdateServiceVersionGitTask" Architecture="x64" AssemblyFile="ServiceFabricSdkContrib.MsBuild.dll" />
 	<UsingTask TaskName="ServiceFabricSdkContrib.MsBuild.PackageFabricServiceTask" Architecture="x64" AssemblyFile="ServiceFabricSdkContrib.MsBuild.dll" />
 
+	<ItemGroup>
+		<Compile Remove="pkg\**" CopyToPublishDirectory="Never" />
+		<Content Remove="pkg\**" CopyToPublishDirectory="Never" />
+		<EmbeddedResource Remove="pkg\**" CopyToPublishDirectory="Never" />
+		<None Remove="pkg\**" CopyToPublishDirectory="Never" />
+	</ItemGroup>
+	
 	<Target Name="PackageFabricService" AfterTargets="Publish">
 		<PropertyGroup>
 			<UseHardlinksForServiceFabricIfPossible Condition="$(UseHardlinksForServiceFabricIfPossible) == ''">False</UseHardlinksForServiceFabricIfPossible>
