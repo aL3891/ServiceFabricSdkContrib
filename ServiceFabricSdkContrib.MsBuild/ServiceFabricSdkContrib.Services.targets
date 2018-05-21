@@ -12,6 +12,7 @@
 	<Target Name="PackageFabricService" AfterTargets="Publish">
 		<PropertyGroup>
 			<UseHardlinksForServiceFabricIfPossible Condition="$(UseHardlinksForServiceFabricIfPossible) == ''">False</UseHardlinksForServiceFabricIfPossible>
+			<SkipUnchangedFiles Condition="$(SkipUnchangedFiles) == ''">True</SkipUnchangedFiles>
 		</PropertyGroup>
 
 		<PackageFabricServiceTask

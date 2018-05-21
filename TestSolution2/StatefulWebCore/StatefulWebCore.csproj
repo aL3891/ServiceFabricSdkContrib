@@ -6,13 +6,6 @@
     <IsServiceFabricServiceProject>True</IsServiceFabricServiceProject>
 	  <UpdateServiceVersionGit>true</UpdateServiceVersionGit>
   </PropertyGroup>
-	
-  <!--<ItemGroup>
-    <Compile Remove="pkg\**" CopyToPublishDirectory="Never" />
-    <Content Remove="pkg\**" CopyToPublishDirectory="Never" />
-    <EmbeddedResource Remove="pkg\**" CopyToPublishDirectory="Never" />
-    <None Remove="pkg\**" CopyToPublishDirectory="Never" />
-  </ItemGroup>-->
 
   <ItemGroup>
     <Folder Include="wwwroot\" />

@@ -3,6 +3,16 @@
 	<UsingTask TaskName="ServiceFabricSdkContrib.MsBuild.UpdateApplicationVersionGitTask" Architecture="x64" AssemblyFile="ServiceFabricSdkContrib.MsBuild.dll" />
 	<UsingTask TaskName="ServiceFabricSdkContrib.MsBuild.CleanServiceFabricApplicationTask" Architecture="x64" AssemblyFile="ServiceFabricSdkContrib.MsBuild.dll" />
 
+
+	<Target Name="PublishRefs" BeforeTargets="PackageFabricApp">
+		<MSBuild
+		Projects="@(ProjectReference)"
+		Targets="Publish"
+		SkipNonexistentTargets="true">
+		</MSBuild>
+	</Target>
+
+
 	<Target Name="PackageFabricApp" AfterTargets="Publish" DependsOnTargets="ValidatePackageSettings;GetServiceProjectReferences">
 		<PackageFabricAppTask
       ProjectReferences="@(_ResolvedProjectReferencePaths)"
