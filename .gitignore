@@ -10,3 +10,4 @@ TestSolution/packages/
 *.binlog
 TestSolution/msbuild.ProjectImports.zip
 /**/pkg
+/**/publish/

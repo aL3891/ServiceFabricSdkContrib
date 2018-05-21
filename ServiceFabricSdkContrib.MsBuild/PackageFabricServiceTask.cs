@@ -10,8 +10,8 @@ namespace ServiceFabricSdkContrib.MsBuild
 	public class PackageFabricServiceTask : Task
 	{
 		public string Configuration { get; set; }	
-		public string ProjectPath { get; set; }
-		public string TargetDir { get; set; }
+		public string ProjectDir { get; set; }
+		public string PublishDir { get; set; }
 
 		[Output]
 		public ITaskItem[] SourceFiles { get; set; }
@@ -40,7 +40,7 @@ namespace ServiceFabricSdkContrib.MsBuild
 
 		public override bool Execute()
 		{
-			var basePath = Path.GetDirectoryName(ProjectPath);
+			var basePath = ProjectDir;
 			var manifest = FabricSerializers.ServiceManifestFromFile(Path.Combine(basePath, "PackageRoot", "ServiceManifest.xml"));
 			string servicePath = Path.Combine(basePath, "pkg", Configuration);
 
@@ -57,7 +57,7 @@ namespace ServiceFabricSdkContrib.MsBuild
 				foreach (var cv in manifest.CodePackage)
 				{
 					if (cv.Name == "Code")
-						AddFiles(TargetDir, Path.Combine(servicePath, cv.Name));
+						AddFiles(Path.Combine(basePath, PublishDir), Path.Combine(servicePath, cv.Name));
 					else
 						AddFiles(Path.Combine(basePath, "PackageRoot", cv.Name), Path.Combine(servicePath, cv.Name));
 				}

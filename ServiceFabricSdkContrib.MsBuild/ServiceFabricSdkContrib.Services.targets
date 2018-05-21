@@ -2,15 +2,15 @@
 	<UsingTask TaskName="ServiceFabricSdkContrib.MsBuild.UpdateServiceVersionGitTask" Architecture="x64" AssemblyFile="ServiceFabricSdkContrib.MsBuild.dll" />
 	<UsingTask TaskName="ServiceFabricSdkContrib.MsBuild.PackageFabricServiceTask" Architecture="x64" AssemblyFile="ServiceFabricSdkContrib.MsBuild.dll" />
 
-	<Target Name="PackageFabricService" AfterTargets="Build">
+	<Target Name="PackageFabricService" AfterTargets="Publish">
 		<PropertyGroup>
 			<UseHardlinksForServiceFabricIfPossible Condition="$(UseHardlinksForServiceFabricIfPossible) == ''">True</UseHardlinksForServiceFabricIfPossible>
 		</PropertyGroup>
-		
+
 		<PackageFabricServiceTask
       Configuration="$(Configuration)"
-			TargetDir="$(TargetDir)"
-	    ProjectPath="$(MSBuildProjectFullPath)">
+			ProjectDir="$(ProjectDir)"
+			PublishDir="$(PublishDir)">
 			<Output TaskParameter="SourceFiles" ItemName="PkgSourceFiles"/>
 			<Output TaskParameter="DestinationFiles" ItemName="PkgDestinationFiles"/>
 		</PackageFabricServiceTask>
@@ -28,7 +28,6 @@
 			BaseVersion="$(ServiceBaseVersion)"
 			UpdateBaseVersion="$(UpdateServiceBaseVersion)"
 			Configuration="$(Configuration)"
-      TargetDir="$(TargetDir)"
 			CheckIndividualPackages="$(CheckIndividualSFServicePackages)"
 			ProjectReferences="@(_ResolvedProjectReferencePaths)">
 		</UpdateServiceVersionGitTask>
