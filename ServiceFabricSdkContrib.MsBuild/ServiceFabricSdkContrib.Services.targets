@@ -8,6 +8,17 @@
 		<EmbeddedResource Remove="pkg\**" CopyToPublishDirectory="Never" />
 		<None Remove="pkg\**" CopyToPublishDirectory="Never" />
 	</ItemGroup>
+
+	<Target
+	Name="GetSFCopyToPublishDirectoryItems"
+	DependsOnTargets="PackageFabricService"
+	Returns="@(AllPublishItemsFullPathWithTargetPath)">
+		<ItemGroup>
+			<AllPublishItemsFullPathWithTargetPath Include="@(PkgDestinationFiles)">
+				<CopyToPublishDirectory>foo</CopyToPublishDirectory>
+			</AllPublishItemsFullPathWithTargetPath>
+		</ItemGroup>
+	</Target>
 	
 	<Target Name="PackageFabricService" AfterTargets="Publish">
 		<PropertyGroup>

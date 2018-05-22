@@ -7,8 +7,9 @@
 	<Target Name="PublishRefs" BeforeTargets="PackageFabricApp">
 		<MSBuild
 		Projects="@(ProjectReference)"
-		Targets="Publish"
+		Targets="GetSFCopyToPublishDirectoryItems"
 		SkipNonexistentTargets="true">
+			<Output TaskParameter="TargetOutputs" ItemName="_AllChildProjectPublishItemsWithTargetPath"/>
 		</MSBuild>
 	</Target>
 
