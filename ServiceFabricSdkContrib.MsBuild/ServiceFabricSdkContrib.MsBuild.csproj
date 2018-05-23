@@ -7,8 +7,7 @@
     <None Include="ServiceFabricSdkContrib.Services.nuspec" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build" Version="15.6.85" />
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.6.85" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.7.179" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ServiceFabricSdkContrib.Common\ServiceFabricSdkContrib.Common.csproj" />

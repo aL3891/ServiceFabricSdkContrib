@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceFabricSdkContrib.Pow
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceFabricSdkContrib.Common", "ServiceFabricSdkContrib.Common\ServiceFabricSdkContrib.Common.csproj", "{C2FB5EF6-D823-4081-92FC-16DF330DF3EC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Fabric.Management.ServiceModel", "System.Fabric.Management.ServiceModel\System.Fabric.Management.ServiceModel.csproj", "{0119BEB6-5240-4F32-A728-8C8D54BD2CB0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{C2FB5EF6-D823-4081-92FC-16DF330DF3EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2FB5EF6-D823-4081-92FC-16DF330DF3EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2FB5EF6-D823-4081-92FC-16DF330DF3EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0119BEB6-5240-4F32-A728-8C8D54BD2CB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0119BEB6-5240-4F32-A728-8C8D54BD2CB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0119BEB6-5240-4F32-A728-8C8D54BD2CB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0119BEB6-5240-4F32-A728-8C8D54BD2CB0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Fabric;
 using System.Fabric.Management.ServiceModel;
 using System.IO;
 using System.Linq;
@@ -8,40 +7,38 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.ServiceFabric.Actors.Client;
-using Microsoft.ServiceFabric.Actors.Query;
 using ServiceFabricSdkContrib.MsBuild;
 
 namespace ServiceFabricSdkContrib.Common
 {
 	public static class FabricClientExtensions
 	{
-		public static async Task ForeachActor(FabricClient fabricClient, Uri uri, Func<IEnumerable<ActorInformation>, Task> func)
-		{
-			var partitions = await fabricClient.QueryManager.GetPartitionListAsync(uri);
-			await Task.WhenAll(partitions.Select(async partition =>
-			{
-				var tasks = new List<Task>();
-				long key = 0;
+		//public static async Task ForeachActor(FabricClient fabricClient, Uri uri, Func<IEnumerable<ActorInformation>, Task> func)
+		//{
+		//	var partitions = await fabricClient.QueryManager.GetPartitionListAsync(uri);
+		//	await Task.WhenAll(partitions.Select(async partition =>
+		//	{
+		//		var tasks = new List<Task>();
+		//		long key = 0;
 
-				if (partition.PartitionInformation is Int64RangePartitionInformation rp)
-					key = rp.LowKey;
-				if (partition.PartitionInformation is SingletonPartitionInformation si) //??
-					key = 0;
-				if (partition.PartitionInformation is NamedPartitionInformation ni)//??
-					key = ni.Name.GetHashCode();
+		//		if (partition.PartitionInformation is Int64RangePartitionInformation rp)
+		//			key = rp.LowKey;
+		//		if (partition.PartitionInformation is SingletonPartitionInformation si) //??
+		//			key = 0;
+		//		if (partition.PartitionInformation is NamedPartitionInformation ni)//??
+		//			key = ni.Name.GetHashCode();
 
-				ContinuationToken continuationToken = null;
-				var actorServiceProxy = ActorServiceProxy.Create(uri, key);
-				do
-				{
-					var queryResult = await actorServiceProxy.GetActorsAsync(continuationToken, CancellationToken.None);
-					tasks.Add(func(queryResult.Items));
-					continuationToken = queryResult.ContinuationToken;
-				} while (continuationToken != null);
-				return tasks;
-			}).ToList().SelectMany(a => a.Result));
-		}
+		//		ContinuationToken continuationToken = null;
+		//		var actorServiceProxy = ActorServiceProxy.Create(uri, key);
+		//		do
+		//		{
+		//			var queryResult = await actorServiceProxy.GetActorsAsync(continuationToken, CancellationToken.None);
+		//			tasks.Add(func(queryResult.Items));
+		//			continuationToken = queryResult.ContinuationToken;
+		//		} while (continuationToken != null);
+		//		return tasks;
+		//	}).ToList().SelectMany(a => a.Result));
+		//}
 
 		public static (string diff, DateTimeOffset date, string version) SetGitVersion(this ServiceManifestType srv, string baseVersion, string BaseDir, string TargetDir, bool checkPackages, IEnumerable<string> additionalPaths)
 		{

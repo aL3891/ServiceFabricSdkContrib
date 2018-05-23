@@ -1,10 +1,11 @@
-﻿using ServiceFabricSdkContrib.Common;
+﻿using Microsoft.ServiceFabric.Client;
+using Microsoft.ServiceFabric.Common;
+using ServiceFabricSdkContrib.Common;
 using System;
 using System.Collections.Generic;
-using System.Fabric;
-using System.Fabric.Description;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,28 +14,29 @@ namespace ServiceFabricSdkContrib.Common
 {
 	public class ContribFabricClient
 	{
-		public ContribFabricClient(FabricClient client)
+		public ContribFabricClient(IServiceFabricClient client)
 		{
 			Client = client;
 		}
 
-		public ContribFabricClient(FabricClient client, ILogger logger)
+		public ContribFabricClient(IServiceFabricClient client, ILogger logger)
 		{
 			Client = client;
 			Logger = logger;
 		}
 
-		public FabricClient Client { get; }
+		public IServiceFabricClient Client { get; }
 
 		public ILogger Logger { get; set; }
 
 		public async Task<bool> CreateDiffPackage(string packagePath)
 		{
 			var localAppManifest = FabricSerializers.AppManifestFromFile(Path.Combine(packagePath, "ApplicationManifest.xml"));
-			var appTypes = await Client.QueryManager.GetApplicationTypeListAsync();
-			var appManifestTasks = appTypes.Where(type => type.ApplicationTypeName == localAppManifest.ApplicationTypeName).Select(type => Client.ApplicationManager.GetApplicationManifestAsync(type.ApplicationTypeName, type.ApplicationTypeVersion));
+			var appTypes = await Client.ApplicationTypes.GetApplicationTypeInfoListAsync();
+
+			var appManifestTasks = appTypes.Data.Where(type => type.Name == localAppManifest.ApplicationTypeName).Select(type => Client.ApplicationTypes.GetApplicationManifestAsync(type.Name, type.Version));
 			await Task.WhenAll(appManifestTasks);
-			var serverAppManifests = appManifestTasks.Select(task => FabricSerializers.AppManifestFromString(task.Result)).ToList();
+			var serverAppManifests = appManifestTasks.Select(task => FabricSerializers.AppManifestFromString(task.Result.Manifest)).ToList();
 			string pkgPAth = null;
 
 			if (serverAppManifests.Any(serverAppManifest => serverAppManifest.ApplicationTypeVersion == localAppManifest.ApplicationTypeVersion))
@@ -56,7 +58,7 @@ namespace ServiceFabricSdkContrib.Common
 					}
 					else
 					{
-						var serverServiceManifest = FabricSerializers.ServiceManifestFromString(await Client.ServiceManager.GetServiceManifestAsync(serverAppManifest.ApplicationTypeName, serverAppManifest.ApplicationTypeVersion, serviceImport.ServiceManifestRef.ServiceManifestName));
+						var serverServiceManifest = FabricSerializers.ServiceManifestFromString((await Client.ServiceTypes.GetServiceManifestAsync(serverAppManifest.ApplicationTypeName, serverAppManifest.ApplicationTypeVersion, serviceImport.ServiceManifestRef.ServiceManifestName)).Manifest);
 						var localServiceManifest = FabricSerializers.ServiceManifestFromFile(Path.Combine(packagePath, serviceImport.ServiceManifestRef.ServiceManifestName, "ServiceManifest.xml"));
 						//Logger?.LogInfo($"{serverAppManifest.ApplicationTypeName}.{localService.ServiceManifestRef.ServiceManifestName} {localService.ServiceManifestRef.ServiceManifestVersion} not found on server, checking packages");
 
@@ -100,9 +102,9 @@ namespace ServiceFabricSdkContrib.Common
 
 		public async Task<bool> DeployServiceFabricSolution(ServiceFabricSolution Apps, bool symlinkProvision)
 		{
-			var cluster = FabricSerializers.ClusterManifestFromString(await Client.ClusterManager.GetClusterManifestAsync());
-			var appTypes = await Client.QueryManager.GetApplicationTypeListAsync();
-			var appsToUpload = Apps.Applications.Where(a => !appTypes.Any(ap => ap.ApplicationTypeName == a.Manifest.ApplicationTypeName && ap.ApplicationTypeVersion == a.Manifest.ApplicationTypeVersion)).ToList();
+			var cluster = FabricSerializers.ClusterManifestFromString((await Client.Cluster.GetClusterManifestAsync()).Manifest);
+			var appTypes = await Client.ApplicationTypes.GetApplicationTypeInfoListAsync();
+			var appsToUpload = Apps.Applications.Where(a => !appTypes.Data.Any(ap => ap.Name == a.Manifest.ApplicationTypeName && ap.Version == a.Manifest.ApplicationTypeVersion)).ToList();
 
 			if (appsToUpload.Any())
 			{
@@ -118,61 +120,40 @@ namespace ServiceFabricSdkContrib.Common
 				Logger?.LogInfo($"Apps uploaded");
 			}
 
-			var upgradepolicy = new MonitoredRollingApplicationUpgradePolicyDescription
-			{
-				MonitoringPolicy = new RollingUpgradeMonitoringPolicy { FailureAction = UpgradeFailureAction.Rollback },
-				UpgradeMode = RollingUpgradeMode.UnmonitoredAuto,
-				UpgradeReplicaSetCheckTimeout = TimeSpan.FromSeconds(1)
-			};
 
-			await Task.WhenAll(Apps.Applications.Select(app => DeployServiceFabricApp(app, upgradepolicy)));
+			await Task.WhenAll(Apps.Applications.Select(app => DeployServiceFabricApp(app)));
 			return true;
 		}
 
-		public async Task DeployServiceFabricApp(ServiceFabricApplicationSpec app, UpgradePolicyDescription upgradePolicy)
+		public async Task DeployServiceFabricApp(ServiceFabricApplicationSpec app)
 		{
-			var serverAppVersions = await Client.QueryManager.GetApplicationListAsync(new Uri("fabric:/" + app.Name));
+			var serverAppVersions = await Client.Applications.GetApplicationInfoListAsync();
 
-			if (serverAppVersions.Any())
+			var deployed = serverAppVersions.Data.FirstOrDefault(sa => sa.Name == "fabric:/" + app.Name);
+
+			if (deployed != null)
 			{
-				if (serverAppVersions.Any(s => s.ApplicationTypeName == app.Manifest.ApplicationTypeName && s.ApplicationTypeVersion == app.Manifest.ApplicationTypeVersion))
+				if (deployed.TypeVersion == app.Version)
 				{
 					Logger?.LogInfo($"{app.Name} version {app.Version} is already deployed");
 					return;
 				}
 
-				var upgradeDescription = new ApplicationUpgradeDescription
-				{
-					ApplicationName = new Uri("fabric:/" + app.Name),
-					TargetApplicationTypeVersion = app.Version,
-					UpgradePolicyDescription = upgradePolicy
-				};
-
-				foreach (var p in app.Parameters)
-					upgradeDescription.ApplicationParameters[p.Key] = p.Value;
-
-				Logger?.LogInfo($"Upgrading app {upgradeDescription.ApplicationName} to version {upgradeDescription.TargetApplicationTypeVersion}");
-				await Client.ApplicationManager.UpgradeApplicationAsync(upgradeDescription);
+				var upgradeDescription = new ApplicationUpgradeDescription("fabric:/" + app.Name, app.Version, app.Parameters, UpgradeKind.Rolling, UpgradeMode.UnmonitoredAuto, 1);
+				Logger?.LogInfo($"Upgrading app {upgradeDescription.Name} to version {upgradeDescription.TargetApplicationTypeVersion}");
+				await Client.Applications.StartApplicationUpgradeAsync(app.Name, upgradeDescription);
 			}
 			else
 			{
-				var appDescription = new ApplicationDescription
-				{
-					ApplicationName = new Uri("fabric:/" + app.Name),
-					ApplicationTypeName = app.Manifest.ApplicationTypeName,
-					ApplicationTypeVersion = app.Manifest.ApplicationTypeVersion
-				};
+				var appDescription = new ApplicationDescription("fabric:/" + app.Name, app.Manifest.ApplicationTypeName, app.Manifest.ApplicationTypeVersion, app.Parameters);
 
-				foreach (var p in app.Parameters)
-					appDescription.ApplicationParameters[p.Key] = p.Value;
-
-				Logger?.LogInfo($"Creating app {appDescription.ApplicationName} with type {appDescription.ApplicationTypeName} version {appDescription.ApplicationTypeVersion}");
+				Logger?.LogInfo($"Creating app {appDescription.Name} with type {appDescription.TypeName} version {appDescription.TypeVersion}");
 				Logger?.LogVerbose($"With parameters");
-				if (appDescription.ApplicationParameters != null)
-					foreach (var parameter in appDescription.ApplicationParameters.Keys)
-						Logger?.LogVerbose($"{parameter} =  {appDescription.ApplicationParameters[(string)parameter]}");
+				if (appDescription.Parameters != null)
+					foreach (var parameter in appDescription.Parameters.Keys)
+						Logger?.LogVerbose($"{parameter} =  {appDescription.Parameters[(string)parameter]}");
 
-				await Client.ApplicationManager.CreateApplicationAsync(appDescription);
+				await Client.Applications.CreateApplicationAsync(appDescription);
 			}
 		}
 
@@ -183,7 +164,7 @@ namespace ServiceFabricSdkContrib.Common
 			try
 			{
 				Symlink.CreateSymbolicLink(Path.Combine(imageStorep, name), app.PackagePath, SymbolicLink.Directory);
-				await Client.ApplicationManager.ProvisionApplicationAsync(name, TimeSpan.FromHours(1), CancellationToken.None);
+				await Client.ApplicationTypes.ProvisionApplicationTypeAsync(new ProvisionApplicationTypeDescription(name), 240, CancellationToken.None);
 				Symlink.DeleteIfExists(Path.Combine(imageStorep, name));
 			}
 			catch (FileNotFoundException f)
@@ -196,9 +177,10 @@ namespace ServiceFabricSdkContrib.Common
 		private async Task UploadApp(string imageStore, ServiceFabricApplicationSpec app)
 		{
 			var name = app.Manifest.ApplicationTypeName + "." + app.Manifest.ApplicationTypeVersion;
-			await Task.Run(() => Client.ApplicationManager.CopyApplicationPackage(imageStore, app.PackagePath, name, TimeSpan.FromHours(1)));
-			await Client.ApplicationManager.ProvisionApplicationAsync(name, TimeSpan.FromHours(1), CancellationToken.None);
-			Client.ApplicationManager.RemoveApplicationPackage(imageStore, name);
+			await Client.Applications.UploadApplicationPackageAsync(app.PackagePath, name);
+			await Client.ApplicationTypes.ProvisionApplicationTypeAsync(new ProvisionApplicationTypeDescription(name), 240);
+			await Client.ImageStore.DeleteImageStoreContentAsync(name);
 		}
 	}
+
 }

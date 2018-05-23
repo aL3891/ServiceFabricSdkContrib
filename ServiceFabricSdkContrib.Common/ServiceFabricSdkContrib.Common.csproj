@@ -3,9 +3,10 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="LibGit2Sharp" Version="0.25.0" />
-    <PackageReference Include="Microsoft.ServiceFabric" Version="6.2.274" />
-    <PackageReference Include="Microsoft.ServiceFabric.Actors" Version="3.1.274" />
-    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
+    <PackageReference Include="LibGit2Sharp" Version="0.26.0-preview-0017" />
+    <PackageReference Include="Microsoft.ServiceFabric.Client.Http" Version="1.0.0-preview59" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\System.Fabric.Management.ServiceModel\System.Fabric.Management.ServiceModel.csproj" />
   </ItemGroup>
 </Project>
