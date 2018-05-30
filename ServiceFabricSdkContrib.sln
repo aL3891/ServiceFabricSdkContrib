@@ -9,7 +9,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceFabricSdkContrib.Pow
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceFabricSdkContrib.Common", "ServiceFabricSdkContrib.Common\ServiceFabricSdkContrib.Common.csproj", "{C2FB5EF6-D823-4081-92FC-16DF330DF3EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Fabric.Management.ServiceModel", "System.Fabric.Management.ServiceModel\System.Fabric.Management.ServiceModel.csproj", "{0119BEB6-5240-4F32-A728-8C8D54BD2CB0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.ServiceFabric.Common", "service-fabric-client-dotnet\src\Microsoft.ServiceFabric.Common\Microsoft.ServiceFabric.Common.csproj", "{C39BEE8C-550D-4BDE-8B6D-949B9A1270CD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.ServiceFabric.Client", "service-fabric-client-dotnet\src\Microsoft.ServiceFabric.Client\Microsoft.ServiceFabric.Client.csproj", "{9FC92973-3350-4603-86F7-B2D321B79BF4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.ServiceFabric.Client.Http", "service-fabric-client-dotnet\src\Microsoft.ServiceFabric.Client.Http\Microsoft.ServiceFabric.Client.Http.csproj", "{32BCC7B7-9625-4600-ABBC-F29887DDBA59}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "System.Fabric.Management.ServiceModel", "System.Fabric.Management.ServiceModel\System.Fabric.Management.ServiceModel.csproj", "{03190CBD-EDFE-4578-816B-A88F2B8F68C0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +35,22 @@ Global
 		{C2FB5EF6-D823-4081-92FC-16DF330DF3EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2FB5EF6-D823-4081-92FC-16DF330DF3EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2FB5EF6-D823-4081-92FC-16DF330DF3EC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0119BEB6-5240-4F32-A728-8C8D54BD2CB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0119BEB6-5240-4F32-A728-8C8D54BD2CB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0119BEB6-5240-4F32-A728-8C8D54BD2CB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0119BEB6-5240-4F32-A728-8C8D54BD2CB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C39BEE8C-550D-4BDE-8B6D-949B9A1270CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C39BEE8C-550D-4BDE-8B6D-949B9A1270CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C39BEE8C-550D-4BDE-8B6D-949B9A1270CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C39BEE8C-550D-4BDE-8B6D-949B9A1270CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FC92973-3350-4603-86F7-B2D321B79BF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FC92973-3350-4603-86F7-B2D321B79BF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FC92973-3350-4603-86F7-B2D321B79BF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FC92973-3350-4603-86F7-B2D321B79BF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32BCC7B7-9625-4600-ABBC-F29887DDBA59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32BCC7B7-9625-4600-ABBC-F29887DDBA59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32BCC7B7-9625-4600-ABBC-F29887DDBA59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32BCC7B7-9625-4600-ABBC-F29887DDBA59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03190CBD-EDFE-4578-816B-A88F2B8F68C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03190CBD-EDFE-4578-816B-A88F2B8F68C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03190CBD-EDFE-4578-816B-A88F2B8F68C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03190CBD-EDFE-4578-816B-A88F2B8F68C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

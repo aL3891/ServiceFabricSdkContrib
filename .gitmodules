@@ -1,0 +1,3 @@
+[submodule "service-fabric-client-dotnet"]
+	path = service-fabric-client-dotnet
+	url = https://github.com/Microsoft/service-fabric-client-dotnet.git
