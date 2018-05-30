@@ -19,7 +19,7 @@
 		</PropertyGroup>
 	</Target>
 
-	<Target
+	<!--<Target
 	Name="GetSFCopyToPublishDirectoryItems"
 	DependsOnTargets="PackageFabricService"
 	Returns="@(AllPublishItemsFullPathWithTargetPath)">
@@ -28,7 +28,7 @@
 				<CopyToPublishDirectory>foo</CopyToPublishDirectory>
 			</AllPublishItemsFullPathWithTargetPath>
 		</ItemGroup>
-	</Target>
+	</Target>-->
 
 	<Target Name="PackageFabricService" AfterTargets="Publish">
 		<PropertyGroup>
