@@ -22,5 +22,5 @@
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.4" />
   </ItemGroup>
 	
-	<Import Project="..\..\ServiceFabricSdkContrib.MsBuild\bin\Debug\netstandard2.0\publish\ServiceFabricSdkContrib.Services.targets" />
+	<Import Project="..\..\ServiceFabricSdkContrib.MsBuild\bin\Debug\netstandard2.0\ServiceFabricSdkContrib.Services.targets" />
 </Project>

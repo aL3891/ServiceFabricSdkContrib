@@ -11,7 +11,7 @@ namespace ServiceFabricSdkContrib.Tests
 	[TestClass]
 	public class ContribFabricClientTest
 	{
-		string BasePath = Path.Combine(new DirectoryInfo(typeof(CommonTest).Assembly.Location).Parent.Parent.Parent.Parent.Parent.FullName, "TestSolution2");
+		string BasePath = Path.Combine(new DirectoryInfo(typeof(ContribFabricClientTest).Assembly.Location).Parent.Parent.Parent.Parent.Parent.FullName, "TestSolution2");
 
 		[TestMethod]
 		public async Task CreateDiffPackageTest()
