@@ -1,4 +1,5 @@
 using Microsoft.ServiceFabric.Client;
+using Microsoft.ServiceFabric.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ServiceFabricSdkContrib.Common;
 using System;
@@ -12,25 +13,43 @@ namespace ServiceFabricSdkContrib.Tests
 	public class ContribFabricClientTest
 	{
 		string BasePath = Path.Combine(new DirectoryInfo(typeof(ContribFabricClientTest).Assembly.Location).Parent.Parent.Parent.Parent.Parent.FullName, "TestSolution2");
+		private ContribFabricClient client;
+
+		[TestInitialize]
+		public async Task Init()
+		{
+			Process.Start(new ProcessStartInfo { FileName = "dotnet", Arguments = "publish", WorkingDirectory = BasePath }).WaitForExit();
+			client = new ContribFabricClient(ServiceFabricClientFactory.Create(new Uri("http://localhost:19080")), new ConsoleLogger());
+
+			var apps = await client.Client.Applications.GetApplicationInfoListAsync();
+			foreach (var app in apps.Data)
+			{
+				await client.Client.Applications.DeleteApplicationAsync(app.Id);
+			}
+
+			var apptypes = await client.Client.ApplicationTypes.GetApplicationTypeInfoListAsync();
+
+			foreach (var type in apptypes.Data)
+			{
+				await client.Client.ApplicationTypes.UnprovisionApplicationTypeAsync(type.Name, new UnprovisionApplicationTypeDescriptionInfo(type.Version));
+			}
+		}
 
 		[TestMethod]
 		public async Task CreateDiffPackageTest()
 		{
-			Process.Start(new ProcessStartInfo { FileName = "dotnet", Arguments = "publish", WorkingDirectory = BasePath }).WaitForExit();
-			var client = new ContribFabricClient(ServiceFabricClientFactory.Create(new Uri("http://localhost:19080")), new ConsoleLogger());
 			await client.CreateDiffPackage(Path.Combine(BasePath, "TestApplication1\\pkg\\Debug"));
 		}
 
 		[TestMethod]
 		public async Task DeploySolutionTest()
 		{
-			Process.Start(new ProcessStartInfo { FileName = "dotnet", Arguments = "publish", WorkingDirectory = BasePath }).WaitForExit();
-			var client = new ContribFabricClient(ServiceFabricClientFactory.Create(new Uri("http://localhost:19080")), new ConsoleLogger());
 			await client.DeployServiceFabricSolution(new ServiceFabricSolution
 			{
 				Applications =  {
 					new ServiceFabricApplicationSpec{
-						 PackagePath =Path.Combine(BasePath, "TestApplication1\\pkg\\Debug"), 
+						 Name ="TestApp1",
+						 PackagePath =Path.Combine(BasePath, "TestApplication1\\pkg\\Debug"),
 					}
 				 }
 			}, false);
@@ -39,8 +58,6 @@ namespace ServiceFabricSdkContrib.Tests
 		[TestMethod]
 		public async Task DeployDiffSolutionTest()
 		{
-			Process.Start(new ProcessStartInfo { FileName = "dotnet", Arguments = "publish", WorkingDirectory = BasePath }).WaitForExit();
-			var client = new ContribFabricClient(ServiceFabricClientFactory.Create(new Uri("http://localhost:19080")), new ConsoleLogger());
 			await client.CreateDiffPackage(Path.Combine(BasePath, "TestApplication1\\pkg\\Debug"));
 		}
 	}

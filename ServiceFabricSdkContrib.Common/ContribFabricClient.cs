@@ -104,6 +104,7 @@ namespace ServiceFabricSdkContrib.Common
 		{
 			var cluster = FabricSerializers.ClusterManifestFromString((await Client.Cluster.GetClusterManifestAsync()).Manifest);
 			var appTypes = await Client.ApplicationTypes.GetApplicationTypeInfoListAsync();
+			Apps.Validate(null);
 			var appsToUpload = Apps.Applications.Where(a => !appTypes.Data.Any(ap => ap.Name == a.Manifest.ApplicationTypeName && ap.Version == a.Manifest.ApplicationTypeVersion)).ToList();
 
 			if (appsToUpload.Any())
@@ -112,9 +113,9 @@ namespace ServiceFabricSdkContrib.Common
 				Logger?.LogVerbose($"Using image store {imageStore}");
 				var imageStorePath = new Uri(imageStore).LocalPath;
 
-				if (symlinkProvision && Directory.Exists(imageStorePath))
-					await Task.WhenAll(appsToUpload.Select(i => UploadAppToLocalPath(imageStore, imageStorePath, i)).ToList());
-				else
+				//if (symlinkProvision && Directory.Exists(imageStorePath))
+				//	await Task.WhenAll(appsToUpload.Select(i => UploadAppToLocalPath(imageStore, imageStorePath, i)).ToList());
+				//else
 					await Task.WhenAll(appsToUpload.Select(i => UploadApp(imageStore, i)).ToList());
 
 				Logger?.LogInfo($"Apps uploaded");
@@ -177,7 +178,7 @@ namespace ServiceFabricSdkContrib.Common
 		private async Task UploadApp(string imageStore, ServiceFabricApplicationSpec app)
 		{
 			var name = app.Manifest.ApplicationTypeName + "." + app.Manifest.ApplicationTypeVersion;
-			await Client.Applications.UploadApplicationPackageAsync(app.PackagePath, name);
+			await Client.ImageStore.UploadApplicationPackageAsync(app.PackagePath,false, name);
 			await Client.ApplicationTypes.ProvisionApplicationTypeAsync(new ProvisionApplicationTypeDescription(name), 240);
 			await Client.ImageStore.DeleteImageStoreContentAsync(name);
 		}
