@@ -4,7 +4,7 @@
 # RootModule = ''
 
 # Version number of this module.
-ModuleVersion = '0.1.5'
+ModuleVersion = '0.1.7'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -19,7 +19,7 @@ Author = 'Allan Lindqvist'
 CompanyName = ''
 
 # Copyright statement for this module
-Copyright = '2017'
+Copyright = '2018'
 
 # Description of the functionality provided by this module
 Description = 'Community cmdlets working with service fabric'

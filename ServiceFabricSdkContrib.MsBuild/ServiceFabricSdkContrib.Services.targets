@@ -8,7 +8,6 @@
 		<EmbeddedResource Remove="pkg\**" CopyToPublishDirectory="Never" />
 		<None Remove="pkg\**" CopyToPublishDirectory="Never" />
 		<PackageFiles Include="PackageRoot\**"/>
-		<PackageFiles Exclude="PackageRoot\ServiceManifest.xml"/>
 	</ItemGroup>
 
 	<Target Name="GenerateSfPublishPath" BeforeTargets="PrepareForPublish">
@@ -19,14 +18,6 @@
 			<PublishDir>pkg\$(Configuration)\Code</PublishDir>
 		</PropertyGroup>
 	</Target>
-
-	<!--<Target	Name="EnsurePublishComplete"
-					AfterTargets="Publish"
-					DependsOnTargets="UpdateServiceVersionGit" Returns="@(dummy)">
-		<ItemGroup>
-			<dummy Include="apa"></dummy>
-		</ItemGroup>
-	</Target>-->
 
 	<Target Name="PackageFabricService" AfterTargets="Publish">
 		<PropertyGroup>
@@ -40,7 +31,7 @@
 	DestinationFiles="@(PackageFiles->Replace('PackageRoot',pkg\$(Configuration)))"/>
 	</Target>
 
-	<Target Name="UpdateServiceVersionGit" Condition="$(UpdateServiceVersionGit) == 'True'" AfterTargets="Build">
+	<Target Name="UpdateServiceVersionGit" Condition="$(UpdateServiceVersionGit) == 'True'" AfterTargets="PackageFabricService">
 		<PropertyGroup>
 			<CheckIndividualSFServicePackages Condition="$(CheckIndividualSFServicePackages) == ''">False</CheckIndividualSFServicePackages>
 			<UpdateServiceBaseVersion Condition="$(UpdateServiceBaseVersion) == ''">False</UpdateServiceBaseVersion>
