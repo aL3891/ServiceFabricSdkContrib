@@ -8,39 +8,39 @@
 		<EmbeddedResource Remove="pkg\**" CopyToPublishDirectory="Never" />
 		<None Remove="pkg\**" CopyToPublishDirectory="Never" />
 		<PackageFiles Include="PackageRoot\**"/>
+		<PackageFiles Exclude="PackageRoot\ServiceManifest.xml"/>
 	</ItemGroup>
 
 	<Target Name="GenerateSfPublishPath" BeforeTargets="PrepareForPublish">
-		<XmlPeek XmlInputPath="PackageRoot\ServiceManifest.xml" Query="x:ServiceManifest/@Name" Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/2011/01/fabric'/&gt;" >
+		<!--<XmlPeek XmlInputPath="PackageRoot\ServiceManifest.xml" Query="x:ServiceManifest/@Name" Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/2011/01/fabric'/&gt;" >
 			<Output TaskParameter="Result" PropertyName="SfServiceName" />
-		</XmlPeek>
+		</XmlPeek>-->
 		<PropertyGroup>
 			<PublishDir>pkg\$(Configuration)\Code</PublishDir>
 		</PropertyGroup>
 	</Target>
 
-	<!--<Target
-	Name="GetSFCopyToPublishDirectoryItems"
-	DependsOnTargets="PackageFabricService"
-	Returns="@(AllPublishItemsFullPathWithTargetPath)">
+	<!--<Target	Name="EnsurePublishComplete"
+					AfterTargets="Publish"
+					DependsOnTargets="UpdateServiceVersionGit" Returns="@(dummy)">
 		<ItemGroup>
-			<AllPublishItemsFullPathWithTargetPath Include="pkg\$(Configuration)\**">
-				<CopyToPublishDirectory>foo</CopyToPublishDirectory>
-			</AllPublishItemsFullPathWithTargetPath>
+			<dummy Include="apa"></dummy>
 		</ItemGroup>
 	</Target>-->
 
 	<Target Name="PackageFabricService" AfterTargets="Publish">
 		<PropertyGroup>
 			<UseHardlinksForServiceFabricIfPossible Condition="$(UseHardlinksForServiceFabricIfPossible) == ''">False</UseHardlinksForServiceFabricIfPossible>
-			<SkipUnchangedFiles Condition="$(SkipUnchangedFiles) == ''">True</SkipUnchangedFiles>
+			<SkipUnchangedFilesForServiceFabric Condition="$(SkipUnchangedFilesForServiceFabric) == ''">True</SkipUnchangedFilesForServiceFabric>
 		</PropertyGroup>
-
-		<Copy SourceFiles="@(PackageFiles)" DestinationFiles="@(PackageFiles->Replace('PackageRoot',pkg\$(Configuration)))">
-		</Copy>
+		<Copy SourceFiles="@(PackageFiles)"
+					SkipUnchangedFiles="$(SkipUnchangedFilesForServiceFabric)"
+					UseHardlinksIfPossible="$(UseHardlinksForServiceFabricIfPossible)"
+					
+	DestinationFiles="@(PackageFiles->Replace('PackageRoot',pkg\$(Configuration)))"/>
 	</Target>
 
-	<Target Name="UpdateServiceVersionGit" Condition="$(UpdateServiceVersionGit) == 'True'" AfterTargets="PackageFabricService">
+	<Target Name="UpdateServiceVersionGit" Condition="$(UpdateServiceVersionGit) == 'True'" AfterTargets="Build">
 		<PropertyGroup>
 			<CheckIndividualSFServicePackages Condition="$(CheckIndividualSFServicePackages) == ''">False</CheckIndividualSFServicePackages>
 			<UpdateServiceBaseVersion Condition="$(UpdateServiceBaseVersion) == ''">False</UpdateServiceBaseVersion>
@@ -55,6 +55,4 @@
 			ProjectReferences="@(_ResolvedProjectReferencePaths)">
 		</UpdateServiceVersionGitTask>
 	</Target>
-
-
 </Project>

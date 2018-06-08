@@ -14,13 +14,13 @@
 		<tags>msbuild ServiceFabric</tags>
 	</metadata>
 	<files>
-		<file src="bin\Release\netstandard2.0\publish\ServiceFabricSdkContrib.Applications.targets"												   target="build\ServiceFabricSdkContrib.Applications.targets"/>
-		<file src="bin\Release\netstandard2.0\publish\ServiceFabricSdkContrib.Common.dll"																		   target="build\ServiceFabricSdkContrib.Common.dll"/>
-		<file src="bin\Release\netstandard2.0\publish\ServiceFabricSdkContrib.MsBuild.dll"																   target="build\ServiceFabricSdkContrib.MsBuild.dll"/>
-		<file src="bin\Release\netstandard2.0\publish\runtimes\win\lib\netstandard2.0\System.Fabric.dll"								                                   target="build\System.Fabric.dll"/>
-		<file src="bin\Release\netstandard2.0\publish\runtimes\win\lib\netstandard2.0\System.Fabric.Management.ServiceModel.dll"                         target="build\System.Fabric.Management.ServiceModel.dll"/>
-		<file src="bin\Release\netstandard2.0\publish\runtimes\win\lib\netstandard2.0\System.Fabric.Strings.dll"                                         target="build\System.Fabric.Strings.dll"/>
-		<file src="bin\Release\netstandard2.0\publish\LibGit2Sharp.dll"                                                  target="build\LibGit2Sharp.dll"/>
-		<file src="bin\Release\netstandard2.0\publish\runtimes\win7-x64\native\git2-6311e88.dll"                                    target="build\git2-6311e88.dll"/>
+		<file src="bin\Release\netstandard2.0\publish\ServiceFabricSdkContrib.Applications.targets"						target="build\ServiceFabricSdkContrib.Applications.targets"/>
+		<file src="bin\Release\netstandard2.0\publish\ServiceFabricSdkContrib.Common.dll"											target="build\ServiceFabricSdkContrib.Common.dll"/>
+		<file src="bin\Release\netstandard2.0\publish\ServiceFabricSdkContrib.MsBuild.dll"										target="build\ServiceFabricSdkContrib.MsBuild.dll"/>
+		<file src="bin\Release\netstandard2.0\publish\Microsoft.ServiceFabric.Client.dll"								      target="build\Microsoft.ServiceFabric.Client.dll"/>
+		<file src="bin\Release\netstandard2.0\publish\Microsoft.ServiceFabric.Client.Http.dll"                target="build\Microsoft.ServiceFabric.Client.Http.dll"/>
+		<file src="bin\Release\netstandard2.0\publish\Microsoft.ServiceFabric.Common.dll"                     target="build\Microsoft.ServiceFabric.Common.dll"/>
+		<file src="bin\Release\netstandard2.0\publish\LibGit2Sharp.dll"                                       target="build\LibGit2Sharp.dll"/>
+		<file src="bin\Release\netstandard2.0\publish\runtimes\win7-x64\native\git2-6311e88.dll"              target="build\git2-6311e88.dll"/>
 	</files>
 </package>

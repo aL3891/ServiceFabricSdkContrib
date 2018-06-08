@@ -49,7 +49,7 @@ namespace ServiceFabricSdkContrib.Tests
 				Applications =  {
 					new ServiceFabricApplicationSpec{
 						 Name ="TestApp1",
-						 PackagePath =Path.Combine(BasePath, "TestApplication1\\pkg\\Debug"),
+						 PackagePath = Path.Combine(BasePath, "TestApplication1\\pkg\\Debug"),
 					}
 				 }
 			}, false);
