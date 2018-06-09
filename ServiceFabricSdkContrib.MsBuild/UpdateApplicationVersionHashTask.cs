@@ -1,12 +1,11 @@
-﻿//using Microsoft.Build.Evaluation;
-using Microsoft.Build.Framework;
-using ServiceFabricSdkContrib.Common;
+﻿// using Microsoft.Build.Evaluation;
 using System;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-
+using Microsoft.Build.Framework;
+using ServiceFabricSdkContrib.Common;
 
 namespace ServiceFabricSdkContrib.MsBuild
 {
@@ -42,10 +41,9 @@ namespace ServiceFabricSdkContrib.MsBuild
 			return true;
 		}
 
-		//public Project GetProject(string projectfile)
-		//{
-		//	return ProjectCollection.GlobalProjectCollection.LoadedProjects.FirstOrDefault(p => p.FullPath.ToLower() == projectfile.ToLower()) ?? new Project(projectfile);
-		//}
+		// public Project GetProject(string projectfile)
+		// {
+		// return ProjectCollection.GlobalProjectCollection.LoadedProjects.FirstOrDefault(p => p.FullPath.ToLower() == projectfile.ToLower()) ?? new Project(projectfile);
+		// }
 	}
 }
-

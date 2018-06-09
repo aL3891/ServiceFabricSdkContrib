@@ -33,6 +33,7 @@ namespace ServiceFabricSdkContrib.Common
 				if (IsSymbolic(pathToTest))
 					return pathToTest;
 			}
+
 			return null;
 		}
 
@@ -48,6 +49,7 @@ namespace ServiceFabricSdkContrib.Common
 				{
 					DeletePathWithSymlinks(d);
 				}
+
 				foreach (var f in Directory.GetFiles(path))
 				{
 					File.Delete(f);
@@ -58,7 +60,6 @@ namespace ServiceFabricSdkContrib.Common
 			}
 		}
 	}
-
 
 	public enum SymbolicLink
 	{

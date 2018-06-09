@@ -1,7 +1,6 @@
-﻿using Microsoft.Build.Framework;
+﻿using System.IO;
+using Microsoft.Build.Framework;
 using ServiceFabricSdkContrib.Common;
-using System.IO;
-
 
 namespace ServiceFabricSdkContrib.MsBuild
 {

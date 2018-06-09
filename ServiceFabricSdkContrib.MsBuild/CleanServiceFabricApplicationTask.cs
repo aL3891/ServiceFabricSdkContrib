@@ -1,13 +1,13 @@
 ﻿using System;
-//using Microsoft.Build.Evaluation;
-using Microsoft.Build.Framework;
-using ServiceFabricSdkContrib.Common;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 
+// using Microsoft.Build.Evaluation;
+using Microsoft.Build.Framework;
+using ServiceFabricSdkContrib.Common;
 
 namespace ServiceFabricSdkContrib.MsBuild
 {

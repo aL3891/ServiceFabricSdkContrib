@@ -1,7 +1,4 @@
-﻿using Microsoft.ServiceFabric.Client;
-using Microsoft.ServiceFabric.Common;
-using ServiceFabricSdkContrib.Common;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,6 +6,9 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.ServiceFabric.Client;
+using Microsoft.ServiceFabric.Common;
+using ServiceFabricSdkContrib.Common;
 
 namespace ServiceFabricSdkContrib.Common
 {
@@ -60,8 +60,8 @@ namespace ServiceFabricSdkContrib.Common
 					{
 						var serverServiceManifest = FabricSerializers.ServiceManifestFromString((await Client.ServiceTypes.GetServiceManifestAsync(serverAppManifest.ApplicationTypeName, serverAppManifest.ApplicationTypeVersion, serviceImport.ServiceManifestRef.ServiceManifestName)).Manifest);
 						var localServiceManifest = FabricSerializers.ServiceManifestFromFile(Path.Combine(packagePath, serviceImport.ServiceManifestRef.ServiceManifestName, "ServiceManifest.xml"));
-						//Logger?.LogInfo($"{serverAppManifest.ApplicationTypeName}.{localService.ServiceManifestRef.ServiceManifestName} {localService.ServiceManifestRef.ServiceManifestVersion} not found on server, checking packages");
 
+						// Logger?.LogInfo($"{serverAppManifest.ApplicationTypeName}.{localService.ServiceManifestRef.ServiceManifestName} {localService.ServiceManifestRef.ServiceManifestVersion} not found on server, checking packages");
 						if (serverServiceManifest.CodePackage != null && localServiceManifest.CodePackage != null)
 							foreach (var package in serverServiceManifest.CodePackage.Where(sp => localServiceManifest.CodePackage.Any(lp => lp.Name == sp.Name && lp.Version == sp.Version)))
 							{
@@ -97,15 +97,16 @@ namespace ServiceFabricSdkContrib.Common
 					}
 				}
 			}
+
 			return true;
 		}
 
-		public async Task<bool> DeployServiceFabricSolution(ServiceFabricSolution Apps, bool symlinkProvision)
+		public async Task<bool> DeployServiceFabricSolution(ServiceFabricSolution apps, bool symlinkProvision)
 		{
 			var cluster = FabricSerializers.ClusterManifestFromString((await Client.Cluster.GetClusterManifestAsync()).Manifest);
 			var appTypes = await Client.ApplicationTypes.GetApplicationTypeInfoListAsync();
-			Apps.Validate(null);
-			var appsToUpload = Apps.Applications.Where(a => !appTypes.Data.Any(ap => ap.Name == a.Manifest.ApplicationTypeName && ap.Version == a.Manifest.ApplicationTypeVersion)).ToList();
+			apps.Validate(null);
+			var appsToUpload = apps.Applications.Where(a => !appTypes.Data.Any(ap => ap.Name == a.Manifest.ApplicationTypeName && ap.Version == a.Manifest.ApplicationTypeVersion)).ToList();
 
 			if (appsToUpload.Any())
 			{
@@ -113,16 +114,15 @@ namespace ServiceFabricSdkContrib.Common
 				Logger?.LogVerbose($"Using image store {imageStore}");
 				var imageStorePath = new Uri(imageStore).LocalPath;
 
-				//if (symlinkProvision && Directory.Exists(imageStorePath))
-				//	await Task.WhenAll(appsToUpload.Select(i => UploadAppToLocalPath(imageStore, imageStorePath, i)).ToList());
-				//else
-					await Task.WhenAll(appsToUpload.Select(i => UploadApp(imageStore, i)).ToList());
+				// if (symlinkProvision && Directory.Exists(imageStorePath))
+				// await Task.WhenAll(appsToUpload.Select(i => UploadAppToLocalPath(imageStore, imageStorePath, i)).ToList());
+				// else
+				await Task.WhenAll(appsToUpload.Select(i => UploadApp(imageStore, i)).ToList());
 
 				Logger?.LogInfo($"Apps uploaded");
 			}
 
-
-			await Task.WhenAll(Apps.Applications.Select(app => DeployServiceFabricApp(app)));
+			await Task.WhenAll(apps.Applications.Select(app => DeployServiceFabricApp(app)));
 			return true;
 		}
 
@@ -168,7 +168,7 @@ namespace ServiceFabricSdkContrib.Common
 				await Client.ApplicationTypes.ProvisionApplicationTypeAsync(new ProvisionApplicationTypeDescription(name), 240, CancellationToken.None);
 				Symlink.DeleteIfExists(Path.Combine(imageStorep, name));
 			}
-			catch (FileNotFoundException f)
+			catch (FileNotFoundException)
 			{
 				Symlink.DeleteIfExists(Path.Combine(imageStorep, name));
 				await UploadApp(imageStore, app);
@@ -178,10 +178,9 @@ namespace ServiceFabricSdkContrib.Common
 		private async Task UploadApp(string imageStore, ServiceFabricApplicationSpec app)
 		{
 			var name = app.Manifest.ApplicationTypeName + "." + app.Manifest.ApplicationTypeVersion;
-			await Client.ImageStore.UploadApplicationPackageAsync(app.PackagePath,true, name);
+			await Client.ImageStore.UploadApplicationPackageAsync(app.PackagePath, true, name);
 			await Client.ApplicationTypes.ProvisionApplicationTypeAsync(new ProvisionApplicationTypeDescription(name), 240);
 			await Client.ImageStore.DeleteImageStoreContentAsync(name);
 		}
 	}
-
 }

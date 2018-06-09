@@ -1,7 +1,7 @@
-﻿using Microsoft.Build.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
 namespace ServiceFabricSdkContrib.MsBuild
@@ -19,7 +19,8 @@ namespace ServiceFabricSdkContrib.MsBuild
 		[Output]
 		public ITaskItem[] DestinationFiles { get; set; }
 
-		List<string> sourcelist = new List<string>(), destlist = new List<string>();
+		List<string> sourcelist = new List<string>();
+		List<string> destlist = new List<string>();
 
 		public void AddFiles(string source, string destination)
 		{

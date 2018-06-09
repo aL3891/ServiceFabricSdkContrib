@@ -1,8 +1,8 @@
-﻿using ServiceFabricSdkContrib.Common;
-using System;
+﻿using System;
 using System.Collections;
 using System.Management.Automation;
 using System.Threading.Tasks;
+using ServiceFabricSdkContrib.Common;
 
 namespace ServiceFabricSdkContrib.Powershell
 {
@@ -43,4 +43,3 @@ namespace ServiceFabricSdkContrib.Powershell
 		}
 	}
 }
-

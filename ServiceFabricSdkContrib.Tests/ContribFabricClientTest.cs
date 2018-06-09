@@ -1,24 +1,24 @@
-using Microsoft.ServiceFabric.Client;
-using Microsoft.ServiceFabric.Common;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ServiceFabricSdkContrib.Common;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.ServiceFabric.Client;
+using Microsoft.ServiceFabric.Common;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ServiceFabricSdkContrib.Common;
 
 namespace ServiceFabricSdkContrib.Tests
 {
 	[TestClass]
 	public class ContribFabricClientTest
 	{
-		string BasePath = Path.Combine(new DirectoryInfo(typeof(ContribFabricClientTest).Assembly.Location).Parent.Parent.Parent.Parent.Parent.FullName, "TestSolution2");
+		string basePath = Path.Combine(new DirectoryInfo(typeof(ContribFabricClientTest).Assembly.Location).Parent.Parent.Parent.Parent.Parent.FullName, "TestSolution2");
 		private ContribFabricClient client;
 
 		[TestInitialize]
 		public async Task Init()
 		{
-			Process.Start(new ProcessStartInfo { FileName = "dotnet", Arguments = "publish", WorkingDirectory = BasePath }).WaitForExit();
+			Process.Start(new ProcessStartInfo { FileName = "dotnet", Arguments = "publish", WorkingDirectory = basePath }).WaitForExit();
 			client = new ContribFabricClient(ServiceFabricClientFactory.Create(new Uri("http://localhost:19080")), new ConsoleLogger());
 
 			var apps = await client.Client.Applications.GetApplicationInfoListAsync();
@@ -38,7 +38,7 @@ namespace ServiceFabricSdkContrib.Tests
 		[TestMethod]
 		public async Task CreateDiffPackageTest()
 		{
-			await client.CreateDiffPackage(Path.Combine(BasePath, "TestApplication1\\pkg\\Debug"));
+			await client.CreateDiffPackage(Path.Combine(basePath, "TestApplication1\\pkg\\Debug"));
 		}
 
 		[TestMethod]
@@ -46,10 +46,10 @@ namespace ServiceFabricSdkContrib.Tests
 		{
 			await client.DeployServiceFabricSolution(new ServiceFabricSolution
 			{
-				Applications =  {
-					new ServiceFabricApplicationSpec{
-						 Name ="TestApp1",
-						 PackagePath = Path.Combine(BasePath, "TestApplication1\\pkg\\Debug"),
+				Applications = {
+					new ServiceFabricApplicationSpec {
+						 Name = "TestApp1",
+						 PackagePath = Path.Combine(basePath, "TestApplication1\\pkg\\Debug"),
 					}
 				 }
 			}, false);
@@ -58,7 +58,7 @@ namespace ServiceFabricSdkContrib.Tests
 		[TestMethod]
 		public async Task DeployDiffSolutionTest()
 		{
-			await client.CreateDiffPackage(Path.Combine(BasePath, "TestApplication1\\pkg\\Debug"));
+			await client.CreateDiffPackage(Path.Combine(basePath, "TestApplication1\\pkg\\Debug"));
 		}
 	}
 }

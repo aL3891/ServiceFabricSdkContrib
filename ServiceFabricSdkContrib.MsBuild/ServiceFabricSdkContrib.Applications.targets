@@ -5,7 +5,8 @@
 	<Target Name="EnsureServicesPublished">
 		<MSBuild
 		Projects="@(ProjectReference)"
-		Targets="Publish" UseResultsCache="true" >
+		Targets="Publish" 
+		SkipNonexistentTargets="true">
 		</MSBuild>
 	</Target>
 

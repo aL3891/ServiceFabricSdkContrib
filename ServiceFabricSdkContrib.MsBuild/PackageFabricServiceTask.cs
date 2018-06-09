@@ -1,7 +1,7 @@
-﻿using Microsoft.Build.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using ServiceFabricSdkContrib.Common;
 
@@ -9,7 +9,10 @@ namespace ServiceFabricSdkContrib.MsBuild
 {
 	public class PackageFabricServiceTask : Task
 	{
-		public string Configuration { get; set; }	
+		List<string> sourcelist = new List<string>();
+		List<string> destlist = new List<string>();
+
+		public string Configuration { get; set; }
 		public string ProjectDir { get; set; }
 		public string PublishDir { get; set; }
 
@@ -17,8 +20,6 @@ namespace ServiceFabricSdkContrib.MsBuild
 		public ITaskItem[] SourceFiles { get; set; }
 		[Output]
 		public ITaskItem[] DestinationFiles { get; set; }
-
-		List<string> sourcelist = new List<string>(), destlist = new List<string>();
 
 		public void AddFiles(string source, string destination)
 		{
