@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.Build.Evaluation;
+//using Microsoft.Build.Evaluation;
 using Microsoft.Build.Framework;
 using ServiceFabricSdkContrib.Common;
 using System.Collections.Generic;

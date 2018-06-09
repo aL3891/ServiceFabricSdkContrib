@@ -23,7 +23,7 @@ namespace ServiceFabricSdkContrib.Powershell
 
 			var logger = new PowershellLogger(this);
 			var client = new ContribFabricClient(connection.FabricClient, logger);
-			ExecuteAsync(logger, client);
+			_ = ExecuteAsync(logger, client);
 			logger.Start();
 		}
 

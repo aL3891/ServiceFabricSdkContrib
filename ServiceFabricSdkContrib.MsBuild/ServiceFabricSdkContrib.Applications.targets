@@ -1,20 +1,15 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	<UsingTask TaskName="ServiceFabricSdkContrib.MsBuild.PackageFabricAppTask" Architecture="x64" AssemblyFile="ServiceFabricSdkContrib.MsBuild.dll" />
 	<UsingTask TaskName="ServiceFabricSdkContrib.MsBuild.UpdateApplicationVersionGitTask" Architecture="x64" AssemblyFile="ServiceFabricSdkContrib.MsBuild.dll" />
-	<UsingTask TaskName="ServiceFabricSdkContrib.MsBuild.CleanServiceFabricApplicationTask" Architecture="x64" AssemblyFile="ServiceFabricSdkContrib.MsBuild.dll" />
 
-
-	<Target Name="PublishRefs" BeforeTargets="PackageFabricApp">
+	<Target Name="EnsureServicesPublished">
 		<MSBuild
 		Projects="@(ProjectReference)"
-		Targets="GetSFCopyToPublishDirectoryItems"
-		SkipNonexistentTargets="true">
-			<Output TaskParameter="TargetOutputs" ItemName="_AllChildProjectPublishItemsWithTargetPath"/>
+		Targets="Publish" UseResultsCache="true" >
 		</MSBuild>
 	</Target>
 
-
-	<Target Name="PackageFabricApp" AfterTargets="Publish" DependsOnTargets="ValidatePackageSettings;GetServiceProjectReferences">
+	<Target Name="PublishFabricApp" AfterTargets="Publish" DependsOnTargets="ValidatePackageSettings;GetServiceProjectReferences;EnsureServicesPublished">
 		<PackageFabricAppTask
       ProjectReferences="@(_ResolvedProjectReferencePaths)"
       ServiceProjectReferences="@(ServiceProjectReference)"
@@ -30,7 +25,7 @@
 		<Copy SourceFiles="@(PkgSourceFiles)" DestinationFiles="@(PkgDestinationFiles)" SkipUnchangedFiles="$(SkipCopyUnchangedFiles)" UseHardlinksIfPossible="$(UseHardlinksForServiceFabricIfPossible)" />
 	</Target>
 
-	<Target Name="UpdateApplicationVersionGit" Condition="$(UpdateApplicationVersionGit) == 'True'" AfterTargets="PackageFabricApp">
+	<Target Name="UpdateApplicationVersionGit" Condition="$(UpdateApplicationVersionGit) == 'True'" AfterTargets="PublishFabricApp">
 		<PropertyGroup>
 			<UpdateApplicationBaseVersion Condition="$(UpdateApplicationBaseVersion) == ''">False</UpdateApplicationBaseVersion>
 			<ApplicationBaseVersion Condition="$(ApplicationBaseVersion) == ''">$(AssemblyVersion)</ApplicationBaseVersion>
@@ -47,14 +42,4 @@
 		</UpdateApplicationVersionGitTask>
 	</Target>
 
-	<Target Name="CleanServiceFabricApp" AfterTargets="IncludePackageLocationOnClean" >
-		<CleanServiceFabricApplicationTask
-			ProjectPath="$(MSBuildProjectFullPath)"
-			CleanItems="@(Clean)">
-			<Output TaskParameter="SymlinkItems" ItemName="SymlinkItems"/>
-		</CleanServiceFabricApplicationTask>
-		<ItemGroup>
-			<Clean Remove="@(SymlinkItems)"/>
-		</ItemGroup>
-	</Target>
 </Project>

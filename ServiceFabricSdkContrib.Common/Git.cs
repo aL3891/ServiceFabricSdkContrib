@@ -47,11 +47,11 @@ namespace ServiceFabricSdkContrib.Common
 				Commit commit = null;
 				//cache latest checked commit and the latest changed commit at that time and use that to limit the lookup
 
-				IEnumerable<Commit> commits = repo.Head.Commits.Take(75);
+				IEnumerable<Commit> commits = repo.Head.Commits.Take(1000);
 				if (latestSha != "")
 					commits = commits.TakeWhile(c => c.Parents.Any(p => p.Sha != latestSha));
 
-				commit = commits.Where(cc => repo.Diff.Compare<TreeChanges>(cc.Parents.First().Tree, cc.Tree).Any(tc => tc.OldPath.Contains(filedir))).FirstOrDefault();
+				commit = commits.Where(cc=> cc.Parents.Any()).Where(cc => repo.Diff.Compare<TreeChanges>(cc.Parents.First().Tree, cc.Tree).Any(tc => tc.OldPath.Contains(filedir))).FirstOrDefault();
 
 				if (commit == null && latestSha == "")
 					commit = repo.Lookup<Commit>(GitExeCommit(baseDir).Result);

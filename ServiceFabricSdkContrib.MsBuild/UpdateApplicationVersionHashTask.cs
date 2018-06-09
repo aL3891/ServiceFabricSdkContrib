@@ -1,4 +1,4 @@
-﻿using Microsoft.Build.Evaluation;
+﻿//using Microsoft.Build.Evaluation;
 using Microsoft.Build.Framework;
 using ServiceFabricSdkContrib.Common;
 using System;
@@ -42,10 +42,10 @@ namespace ServiceFabricSdkContrib.MsBuild
 			return true;
 		}
 
-		public Project GetProject(string projectfile)
-		{
-			return ProjectCollection.GlobalProjectCollection.LoadedProjects.FirstOrDefault(p => p.FullPath.ToLower() == projectfile.ToLower()) ?? new Project(projectfile);
-		}
+		//public Project GetProject(string projectfile)
+		//{
+		//	return ProjectCollection.GlobalProjectCollection.LoadedProjects.FirstOrDefault(p => p.FullPath.ToLower() == projectfile.ToLower()) ?? new Project(projectfile);
+		//}
 	}
 }
 
