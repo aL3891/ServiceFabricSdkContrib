@@ -6,7 +6,8 @@
 		<MSBuild
 		Projects="@(ProjectReference)"
 		Targets="Publish" 
-		SkipNonexistentTargets="true">
+		SkipNonexistentTargets="true"
+		BuildInParallel="true">
 		</MSBuild>
 	</Target>
 

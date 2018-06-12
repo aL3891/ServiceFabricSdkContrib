@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>ServiceFabricSdkContrib.Services</id>
-    <version>0.1.7-beta</version>
+    <version>0.1.8-beta</version>
     <title>ServiceFabric community Sdk for services</title>
     <authors>Allan Lindqvist</authors>
     <owners>Allan Lindqvist</owners>
@@ -25,4 +25,3 @@
 		<file src="bin\Release\netstandard2.0\publish\runtimes\win7-x64\native\git2-6311e88.dll"              target="build\git2-6311e88.dll"/>
 	</files>
 </package>
-<!--https://docs.microsoft.com/en-us/nuget/reference/msbuild-targets-->
