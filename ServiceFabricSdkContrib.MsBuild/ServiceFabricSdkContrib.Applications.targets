@@ -32,7 +32,7 @@
 			<UpdateApplicationBaseVersion Condition="$(UpdateApplicationBaseVersion) == ''">False</UpdateApplicationBaseVersion>
 			<ApplicationBaseVersion Condition="$(ApplicationBaseVersion) == ''">$(AssemblyVersion)</ApplicationBaseVersion>
 			<SkipSFVersionHash Condition="$(SkipSFVersionHash) == ''">False</SkipSFVersionHash>
-			<MaxHashLength Condition="$(MaxHashLength) == ''">8</MaxHashLength>
+			<MaxSFVersionHashLength Condition="$(MaxSFVersionHashLength) == ''">8</MaxSFVersionHashLength>
 		</PropertyGroup>
 		<UpdateApplicationVersionGitTask
 			BaseVersion="$(ApplicationBaseVersion)"

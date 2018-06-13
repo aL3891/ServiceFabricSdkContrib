@@ -37,7 +37,7 @@
 			<UpdateServiceBaseVersion Condition="$(UpdateServiceBaseVersion) == ''">False</UpdateServiceBaseVersion>
 			<ServiceBaseVersion Condition="$(ServiceBaseVersion) == ''">$(AssemblyVersion)</ServiceBaseVersion>
 			<SkipSFVersionHash Condition="$(SkipSFVersionHash) == ''">False</SkipSFVersionHash>
-			<MaxHashLength Condition="$(MaxHashLength) == ''">8</MaxHashLength>		
+			<MaxSFVersionHashLength Condition="$(MaxSFVersionHashLength) == ''">8</MaxSFVersionHashLength>		
 		</PropertyGroup>
 		<UpdateServiceVersionGitTask
       BasePath="$(MSBuildProjectFullPath)"

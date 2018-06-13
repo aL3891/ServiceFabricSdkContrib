@@ -89,12 +89,11 @@ namespace ServiceFabricSdkContrib.Common
 
 		public static string GitDiff(string baseDir)
 		{
+			if (!baseDir.EndsWith("\\"))
+				baseDir += "\\";
 			var repoPath = RepoPath(baseDir);
-			string filedir = "";
-			if (baseDir.Length > repoPath.Length)
-				filedir = baseDir.Substring(repoPath.Length + 1);
 			var repo = repos.GetOrAdd(repoPath, r => new Repository(repoPath));
-			return string.Join("", repo.Diff.Compare<Patch>(new[] { filedir }, false, null, new CompareOptions { Similarity = new SimilarityOptions { WhitespaceMode = WhitespaceMode.IgnoreAllWhitespace } }).Select(tc => tc.Patch));
+			return string.Join("", repo.Diff.Compare<Patch>(new[] { baseDir }, false, null, new CompareOptions { Similarity = new SimilarityOptions { WhitespaceMode = WhitespaceMode.IgnoreAllWhitespace } }).Select(tc => tc.Patch));
 		}
 
 		private static Task<string> RunGitCommand(string command)
