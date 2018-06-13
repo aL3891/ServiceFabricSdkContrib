@@ -36,6 +36,8 @@
 			<CheckIndividualSFServicePackages Condition="$(CheckIndividualSFServicePackages) == ''">False</CheckIndividualSFServicePackages>
 			<UpdateServiceBaseVersion Condition="$(UpdateServiceBaseVersion) == ''">False</UpdateServiceBaseVersion>
 			<ServiceBaseVersion Condition="$(ServiceBaseVersion) == ''">$(AssemblyVersion)</ServiceBaseVersion>
+			<SkipSFVersionHash Condition="$(SkipSFVersionHash) == ''">False</SkipSFVersionHash>
+			<MaxHashLength Condition="$(MaxHashLength) == ''">8</MaxHashLength>		
 		</PropertyGroup>
 		<UpdateServiceVersionGitTask
       BasePath="$(MSBuildProjectFullPath)"
@@ -43,7 +45,9 @@
 			UpdateBaseVersion="$(UpdateServiceBaseVersion)"
 			Configuration="$(Configuration)"
 			CheckIndividualPackages="$(CheckIndividualSFServicePackages)"
-			ProjectReferences="@(_ResolvedProjectReferencePaths)">
+			ProjectReferences="@(_ResolvedProjectReferencePaths)"
+			SkipHash="$(SkipSFVersionHash)"
+			MaxHashLength="$(MaxSFVersionHashLength)">
 		</UpdateServiceVersionGitTask>
 	</Target>
 </Project>

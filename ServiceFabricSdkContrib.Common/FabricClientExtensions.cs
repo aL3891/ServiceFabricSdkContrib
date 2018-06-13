@@ -13,41 +13,16 @@ namespace ServiceFabricSdkContrib.Common
 {
 	public static class FabricClientExtensions
 	{
-		// public static async Task ForeachActor(FabricClient fabricClient, Uri uri, Func<IEnumerable<ActorInformation>, Task> func)
-		// {
-		// var partitions = await fabricClient.QueryManager.GetPartitionListAsync(uri);
-		// await Task.WhenAll(partitions.Select(async partition =>
-		// {
-		// var tasks = new List<Task>();
-		// long key = 0;
-
-		// if (partition.PartitionInformation is Int64RangePartitionInformation rp)
-		// key = rp.LowKey;
-		// if (partition.PartitionInformation is SingletonPartitionInformation si) //??
-		// key = 0;
-		// if (partition.PartitionInformation is NamedPartitionInformation ni)//??
-		// key = ni.Name.GetHashCode();
-
-		// ContinuationToken continuationToken = null;
-		// var actorServiceProxy = ActorServiceProxy.Create(uri, key);
-		// do
-		// {
-		// var queryResult = await actorServiceProxy.GetActorsAsync(continuationToken, CancellationToken.None);
-		// tasks.Add(func(queryResult.Items));
-		// continuationToken = queryResult.ContinuationToken;
-		// } while (continuationToken != null);
-		// return tasks;
-		// }).ToList().SelectMany(a => a.Result));
-		// }
-		public static (string diff, DateTimeOffset date, string version) SetGitVersion(this ServiceManifestType srv, string baseVersion, string baseDir, string targetDir, bool checkPackages, IEnumerable<string> additionalPaths)
+		public static (string diff, DateTimeOffset date, string version) SetGitVersion(this ServiceManifestType srv, string baseVersion, string baseDir, string targetDir, bool checkPackages, IEnumerable<string> additionalPaths, int maxHashLength, bool skipHash)
 		{
 			(var latest, string latestFull, var date) = Git.GitCommit(baseDir);
-			var diff = Git.GitDiff(baseDir);
+			var diff = skipHash ? "" : Git.GitDiff(baseDir);
 			var addDiff = new StringBuilder();
 			foreach (var item in additionalPaths)
 			{
 				(var v, var s, var d) = Git.GitCommit(item, latestFull);
-				addDiff.Append(Git.GitDiff(item));
+				if (!skipHash)
+					addDiff.Append(Git.GitDiff(item));
 				if (date < d)
 				{
 					date = d;
@@ -57,14 +32,14 @@ namespace ServiceFabricSdkContrib.Common
 			}
 
 			DateTimeOffset codeDate = date;
-			srv.Version = VersionHelper.AppendVersion(baseVersion, latest, VersionHelper.Hash(diff + addDiff));
+			srv.Version = VersionHelper.AppendVersion(baseVersion, latest, VersionHelper.Hash(diff + addDiff, maxHashLength));
 			if (srv.ConfigPackage != null)
 				foreach (var cv in srv.ConfigPackage)
-					cv.Version = checkPackages ? VersionHelper.AppendVersion(baseVersion, GetPackageVersion(cv.Name, baseDir, ref date, ref latest, ref latestFull)) : srv.Version;
+					cv.Version = checkPackages ? VersionHelper.AppendVersion(baseVersion, GetPackageVersion(cv.Name, baseDir, ref date, ref latest, ref latestFull, maxHashLength)) : srv.Version;
 
 			if (srv.DataPackage != null)
 				foreach (var cv in srv.DataPackage)
-					cv.Version = checkPackages ? VersionHelper.AppendVersion(baseVersion, GetPackageVersion(cv.Name, baseDir, ref date, ref latest, ref latestFull)) : srv.Version;
+					cv.Version = checkPackages ? VersionHelper.AppendVersion(baseVersion, GetPackageVersion(cv.Name, baseDir, ref date, ref latest, ref latestFull, maxHashLength)) : srv.Version;
 
 			if (srv.CodePackage != null)
 			{
@@ -87,14 +62,14 @@ namespace ServiceFabricSdkContrib.Common
 								}
 							}
 
-							cv.Version = VersionHelper.AppendVersion(baseVersion, latest + VersionHelper.Hash(string.Join("", codeFiles.Select(cf => Git.GitDiff(cf))) + addDiff));
+							cv.Version = VersionHelper.AppendVersion(baseVersion, latest + VersionHelper.Hash(string.Join("", codeFiles.Select(cf => Git.GitDiff(cf))) + addDiff, maxHashLength));
 						}
 						else
 							cv.Version = srv.Version;
 					}
 					else
 					{
-						cv.Version = checkPackages ? VersionHelper.AppendVersion(baseVersion, GetPackageVersion(cv.Name, baseDir, ref date, ref latest, ref latestFull)) : srv.Version;
+						cv.Version = checkPackages ? VersionHelper.AppendVersion(baseVersion, GetPackageVersion(cv.Name, baseDir, ref date, ref latest, ref latestFull, maxHashLength)) : srv.Version;
 					}
 				}
 			}
@@ -102,7 +77,7 @@ namespace ServiceFabricSdkContrib.Common
 			return (diff + addDiff, date, latest);
 		}
 
-		public static ServiceManifestType SetHashVersion(this ServiceManifestType srv, string baseDir, string targetDir)
+		public static ServiceManifestType SetHashVersion(this ServiceManifestType srv, string baseDir, string targetDir, int maxHashLength)
 		{
 			SHA512Managed sha;
 			List<byte> configHash = new List<byte>();
@@ -165,7 +140,7 @@ namespace ServiceFabricSdkContrib.Common
 			return srv;
 		}
 
-		public static ApplicationManifestType SetGitVersion(this ApplicationManifestType appManifest, string baseVersion, IEnumerable<FabricServiceReference> fabricServiceReferences, string configuration)
+		public static ApplicationManifestType SetGitVersion(this ApplicationManifestType appManifest, string baseVersion, IEnumerable<FabricServiceReference> fabricServiceReferences, string configuration, int maxHashLength, bool skipHash)
 		{
 			DateTime latest = DateTime.MinValue;
 			string version = "", diff = "";
@@ -196,14 +171,15 @@ namespace ServiceFabricSdkContrib.Common
 					}
 				}
 
-				diff += File.ReadAllText(diffFile);
+				if (!skipHash)
+					diff += File.ReadAllText(diffFile);
 			}
 
-			appManifest.ApplicationTypeVersion = VersionHelper.AppendVersion(baseVersion, version, VersionHelper.Hash(diff));
+			appManifest.ApplicationTypeVersion = VersionHelper.AppendVersion(baseVersion, version, VersionHelper.Hash(diff, maxHashLength));
 			return appManifest;
 		}
 
-		private static string[] GetPackageVersion(string name, string baseDir, ref DateTimeOffset date, ref string version, ref string latestFull)
+		private static string[] GetPackageVersion(string name, string baseDir, ref DateTimeOffset date, ref string version, ref string latestFull, int maxHashLength)
 		{
 			var path = Path.Combine(baseDir, "PackageRoot", name);
 			var v = Git.GitCommit(path, latestFull);
@@ -215,7 +191,7 @@ namespace ServiceFabricSdkContrib.Common
 				latestFull = v.fullSha;
 			}
 
-			return new[] { v.sha, VersionHelper.Hash(Git.GitDiff(path)) };
+			return new[] { v.sha, VersionHelper.Hash(Git.GitDiff(path), maxHashLength) };
 		}
 	}
 }

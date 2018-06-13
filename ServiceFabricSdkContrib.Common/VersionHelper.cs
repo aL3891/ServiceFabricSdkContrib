@@ -9,10 +9,13 @@ namespace ServiceFabricSdkContrib.Common
 {
 	public class VersionHelper
 	{
-		public static string Hash(string data)
+		public static string Hash(string data, int maxHashLength)
 		{
 			if (data != "")
-				return Uri.EscapeDataString(Convert.ToBase64String(new SHA256Managed().ComputeHash(Encoding.ASCII.GetBytes(data))));
+			{
+				var res = Uri.EscapeDataString(Convert.ToBase64String(new SHA256Managed().ComputeHash(Encoding.ASCII.GetBytes(data))));
+				return res.Substring(0, Math.Min(res.Length, maxHashLength));
+			}
 			else
 				return "";
 		}

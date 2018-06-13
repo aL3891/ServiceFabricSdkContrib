@@ -17,6 +17,7 @@ namespace ServiceFabricSdkContrib.MsBuild
 		public string PackageLocation { get; set; }
 		public string ProjectPath { get; set; }
 		public string Configuration { get; set; }
+		public int MaxHashLength { get; set; }
 
 		public override bool Execute()
 		{
@@ -34,7 +35,7 @@ namespace ServiceFabricSdkContrib.MsBuild
 				}
 			}
 
-			var aggregatedVersion = VersionHelper.Hash(string.Join("", appManifest.ServiceManifestImport.Select(ss => ss.ServiceManifestRef.ServiceManifestVersion)));
+			var aggregatedVersion = VersionHelper.Hash(string.Join("", appManifest.ServiceManifestImport.Select(ss => ss.ServiceManifestRef.ServiceManifestVersion)), MaxHashLength);
 			appManifest.ApplicationTypeVersion = appManifest.ApplicationTypeVersion + "." + aggregatedVersion;
 			FabricSerializers.SaveAppManifest(path, appManifest);
 

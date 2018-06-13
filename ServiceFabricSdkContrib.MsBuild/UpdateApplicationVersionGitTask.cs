@@ -14,12 +14,14 @@ namespace ServiceFabricSdkContrib.MsBuild
 		public string Configuration { get; set; }
 		public string BaseVersion { get; set; }
 		public bool UpdateBaseVersion { get; set; }
+		public int MaxHashLength { get; set; }
+		public bool SkipHash { get; set; }
 
 		public override bool Execute()
 		{
 			var path = Path.Combine(Path.GetDirectoryName(ProjectPath), "pkg", Configuration, "ApplicationManifest.xml");
 			var appManifest = FabricSerializers.AppManifestFromFile(path);
-			appManifest.SetGitVersion(UpdateBaseVersion ? BaseVersion : appManifest.ApplicationTypeVersion, FabricServiceReferenceFactory.Get(ProjectReferences, ServiceProjectReferences), Configuration);
+			appManifest.SetGitVersion(UpdateBaseVersion ? BaseVersion : appManifest.ApplicationTypeVersion, FabricServiceReferenceFactory.Get(ProjectReferences, ServiceProjectReferences), Configuration, MaxHashLength, SkipHash);
 			FabricSerializers.SaveAppManifest(path, appManifest);
 			return true;
 		}

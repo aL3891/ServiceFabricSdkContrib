@@ -31,6 +31,8 @@
 		<PropertyGroup>
 			<UpdateApplicationBaseVersion Condition="$(UpdateApplicationBaseVersion) == ''">False</UpdateApplicationBaseVersion>
 			<ApplicationBaseVersion Condition="$(ApplicationBaseVersion) == ''">$(AssemblyVersion)</ApplicationBaseVersion>
+			<SkipSFVersionHash Condition="$(SkipSFVersionHash) == ''">False</SkipSFVersionHash>
+			<MaxHashLength Condition="$(MaxHashLength) == ''">8</MaxHashLength>
 		</PropertyGroup>
 		<UpdateApplicationVersionGitTask
 			BaseVersion="$(ApplicationBaseVersion)"
@@ -40,7 +42,9 @@
       ApplicationManifestPath="$(ApplicationManifestFilePath)"
       ProjectPath="$(MSBuildProjectFullPath)"
 			Configuration="$(Configuration)"
-      PackageLocation="$(PackageLocation)">
+      PackageLocation="$(PackageLocation)"
+			SkipHash="$(SkipSFVersionHash)"
+			MaxHashLength="$(MaxSFVersionHashLength)">
 		</UpdateApplicationVersionGitTask>
 	</Target>
 
