@@ -14,3 +14,5 @@ TestSolution/msbuild.ProjectImports.zip
 TestSolution2/.vs/
 TestSolution2/packages/
 TestSolution2/Web1/wwwroot/
+ServiceFabricSdkContrib.sln.metaproj
+ServiceFabricSdkContrib.sln.metaproj.tmp
