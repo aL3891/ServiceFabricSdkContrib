@@ -11,7 +11,7 @@
 		</MSBuild>
 	</Target>
 
-	<Target Name="PublishFabricApp" AfterTargets="Publish" DependsOnTargets="ValidatePackageSettings;GetServiceProjectReferences;EnsureServicesPublished">
+	<Target Name="PublishFabricApp" AfterTargets="Publish;Package" DependsOnTargets="ValidatePackageSettings;GetServiceProjectReferences;EnsureServicesPublished">
 		<PackageFabricAppTask
       ProjectReferences="@(_ResolvedProjectReferencePaths)"
       ServiceProjectReferences="@(ServiceProjectReference)"
