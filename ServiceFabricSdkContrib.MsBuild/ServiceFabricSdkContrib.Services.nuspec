@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>ServiceFabricSdkContrib.Services</id>
-    <version>0.1.9-beta</version>
+    <version>0.1.10-beta</version>
     <title>ServiceFabric community Sdk for services</title>
     <authors>Allan Lindqvist</authors>
     <owners>Allan Lindqvist</owners>

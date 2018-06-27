@@ -2,17 +2,13 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/.vs
+/**/.vs
 /**/obj
 /**/bin
-TestSolution/.vs/
-TestSolution/packages/
+/**/packages
 *.binlog
-TestSolution/msbuild.ProjectImports.zip
+*.ProjectImports.zip
 /**/pkg
 /**/publish/
-TestSolution2/.vs/
-TestSolution2/packages/
-TestSolution2/Web1/wwwroot/
-ServiceFabricSdkContrib.sln.metaproj
-ServiceFabricSdkContrib.sln.metaproj.tmp
+*.metaproj
+*.metaproj.tmp
