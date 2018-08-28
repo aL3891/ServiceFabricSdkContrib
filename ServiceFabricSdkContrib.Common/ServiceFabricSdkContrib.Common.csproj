@@ -5,9 +5,10 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="LibGit2Sharp" Version="0.26.0-preview-0023" />
+    <PackageReference Include="Microsoft.ServiceFabric.Client.Http" Version="1.0.0-preview61" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\service-fabric-client-dotnet\src\Microsoft.ServiceFabric.Client.Http\Microsoft.ServiceFabric.Client.Http.csproj" />
+    <!--<ProjectReference Include="..\service-fabric-client-dotnet\src\Microsoft.ServiceFabric.Client.Http\Microsoft.ServiceFabric.Client.Http.csproj" />-->
     <ProjectReference Include="..\System.Fabric.Management.ServiceModel\System.Fabric.Management.ServiceModel.csproj" />
   </ItemGroup>
 </Project>

@@ -13,25 +13,25 @@ namespace ServiceFabricSdkContrib.Tests
 	public class ContribFabricClientTest
 	{
 		string basePath = Path.Combine(new DirectoryInfo(typeof(ContribFabricClientTest).Assembly.Location).Parent.Parent.Parent.Parent.Parent.FullName, "TestSolution2");
-		private ContribFabricClient client;
+		private IServiceFabricClient client;
 
 		[TestInitialize]
 		public async Task Init()
 		{
 			Process.Start(new ProcessStartInfo { FileName = "dotnet", Arguments = "publish", WorkingDirectory = basePath }).WaitForExit();
-			client = new ContribFabricClient(ServiceFabricClientFactory.Create(new Uri("http://localhost:19080")), new ConsoleLogger());
+			client = ServiceFabricClientFactory.Create(new Uri("http://localhost:19080"));
 
-			var apps = await client.Client.Applications.GetApplicationInfoListAsync();
+			var apps = await client.Applications.GetApplicationInfoListAsync();
 			foreach (var app in apps.Data)
 			{
-				await client.Client.Applications.DeleteApplicationAsync(app.Id);
+				await client.Applications.DeleteApplicationAsync(app.Id);
 			}
 
-			var apptypes = await client.Client.ApplicationTypes.GetApplicationTypeInfoListAsync();
+			var apptypes = await client.ApplicationTypes.GetApplicationTypeInfoListAsync();
 
 			foreach (var type in apptypes.Data)
 			{
-				await client.Client.ApplicationTypes.UnprovisionApplicationTypeAsync(type.Name, new UnprovisionApplicationTypeDescriptionInfo(type.Version));
+				await client.ApplicationTypes.UnprovisionApplicationTypeAsync(type.Name, new UnprovisionApplicationTypeDescriptionInfo(type.Version));
 			}
 		}
 

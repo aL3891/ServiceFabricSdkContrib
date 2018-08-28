@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Management.Automation;
 using System.Threading.Tasks;
+using Microsoft.ServiceFabric.Client;
 using ServiceFabricSdkContrib.Common;
 
 namespace ServiceFabricSdkContrib.Powershell
@@ -22,12 +23,15 @@ namespace ServiceFabricSdkContrib.Powershell
 				throw new ArgumentNullException("Service fabric connection not found");
 
 			var logger = new PowershellLogger(this);
-			var client = new ContribFabricClient(connection.FabricClient, logger);
+
+			var client = ServiceFabricClientFactory.Create(new Uri("http://localhost:19080"));
+
+			
 			_ = ExecuteAsync(logger, client);
 			logger.Start();
 		}
 
-		private async Task ExecuteAsync(PowershellLogger logger, ContribFabricClient client)
+		private async Task ExecuteAsync(PowershellLogger logger, IServiceFabricClient client)
 		{
 			try
 			{

@@ -1,35 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Client;
 using Microsoft.ServiceFabric.Common;
-using ServiceFabricSdkContrib.Common;
 
 namespace ServiceFabricSdkContrib.Common
 {
-	public class ContribFabricClient
+	public static class ServiceFabricClientExtensions
 	{
-		public ContribFabricClient(IServiceFabricClient client)
-		{
-			Client = client;
-		}
-
-		public ContribFabricClient(IServiceFabricClient client, ILogger logger)
-		{
-			Client = client;
-			Logger = logger;
-		}
-
-		public IServiceFabricClient Client { get; }
-
-		public ILogger Logger { get; set; }
-
-		public async Task<bool> CreateDiffPackage(string packagePath)
+		public static async Task<bool> CreateDiffPackage(this IServiceFabricClient Client, string packagePath, ILogger Logger = null)
 		{
 			var localAppManifest = FabricSerializers.AppManifestFromFile(Path.Combine(packagePath, "ApplicationManifest.xml"));
 			var appTypes = await Client.ApplicationTypes.GetApplicationTypeInfoListAsync();
@@ -101,7 +82,7 @@ namespace ServiceFabricSdkContrib.Common
 			return true;
 		}
 
-		public async Task<bool> DeployServiceFabricSolution(ServiceFabricSolution apps, bool symlinkProvision)
+		public static async Task<bool> DeployServiceFabricSolution(this IServiceFabricClient Client, ServiceFabricSolution apps, bool symlinkProvision, ILogger Logger = null)
 		{
 			var cluster = FabricSerializers.ClusterManifestFromString((await Client.Cluster.GetClusterManifestAsync()).Manifest);
 			var appTypes = await Client.ApplicationTypes.GetApplicationTypeInfoListAsync();
@@ -117,16 +98,16 @@ namespace ServiceFabricSdkContrib.Common
 				// if (symlinkProvision && Directory.Exists(imageStorePath))
 				// await Task.WhenAll(appsToUpload.Select(i => UploadAppToLocalPath(imageStore, imageStorePath, i)).ToList());
 				// else
-				await Task.WhenAll(appsToUpload.Select(i => UploadApp(imageStore, i)).ToList());
+				await Task.WhenAll(appsToUpload.Select(i => Client.UploadApp(imageStore, i)).ToList());
 
 				Logger?.LogInfo($"Apps uploaded");
 			}
 
-			await Task.WhenAll(apps.Applications.Select(app => DeployServiceFabricApp(app)));
+			await Task.WhenAll(apps.Applications.Select(app => Client.DeployServiceFabricApp(app)));
 			return true;
 		}
 
-		public async Task DeployServiceFabricApp(ServiceFabricApplicationSpec app)
+		public static async Task DeployServiceFabricApp(this IServiceFabricClient Client, ServiceFabricApplicationSpec app, ILogger Logger = null)
 		{
 			var serverAppVersions = await Client.Applications.GetApplicationInfoListAsync();
 
@@ -158,7 +139,7 @@ namespace ServiceFabricSdkContrib.Common
 			}
 		}
 
-		private async Task UploadAppToLocalPath(string imageStore, string imageStorep, ServiceFabricApplicationSpec app)
+		private static async Task UploadAppToLocalPath(this IServiceFabricClient Client, string imageStore, string imageStorep, ServiceFabricApplicationSpec app)
 		{
 			var name = app.Manifest.ApplicationTypeName + "." + app.Manifest.ApplicationTypeVersion;
 
@@ -171,11 +152,11 @@ namespace ServiceFabricSdkContrib.Common
 			catch (FileNotFoundException)
 			{
 				Symlink.DeleteIfExists(Path.Combine(imageStorep, name));
-				await UploadApp(imageStore, app);
+				await Client.UploadApp(imageStore, app);
 			}
 		}
 
-		private async Task UploadApp(string imageStore, ServiceFabricApplicationSpec app)
+		private static async Task UploadApp(this IServiceFabricClient Client, string imageStore, ServiceFabricApplicationSpec app)
 		{
 			var name = app.Manifest.ApplicationTypeName + "." + app.Manifest.ApplicationTypeVersion;
 			await Client.ImageStore.UploadApplicationPackageAsync(app.PackagePath, true, name);
