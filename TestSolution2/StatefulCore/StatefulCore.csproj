@@ -2,7 +2,7 @@
 	<Import Project="..\Common.props" />
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net471</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
     <IsServiceFabricServiceProject>True</IsServiceFabricServiceProject>
 	  <UpdateServiceVersionGit>true</UpdateServiceVersionGit>
@@ -16,9 +16,9 @@
 	</ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.ServiceFabric" version="6.2.274" />
-    <PackageReference Include="Microsoft.ServiceFabric.Data" version="3.1.274" />
-    <PackageReference Include="Microsoft.ServiceFabric.Services" version="3.1.274" />
+    <PackageReference Include="Microsoft.ServiceFabric" version="6.3.187" />
+    <PackageReference Include="Microsoft.ServiceFabric.Data" version="3.2.187" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" version="3.2.187" />
   </ItemGroup>
 	<Import Project="..\..\ServiceFabricSdkContrib.MsBuild\bin\Debug\netstandard2.0\publish\ServiceFabricSdkContrib.Services.targets" />
 </Project>
