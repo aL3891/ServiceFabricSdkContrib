@@ -4,7 +4,6 @@
 		<CodeAnalysisRuleSet>..\StyleCop.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="LibGit2Sharp" Version="0.26.0-preview-0023" />
     <PackageReference Include="Microsoft.ServiceFabric.Client.Http" Version="1.0.0-preview61" />
   </ItemGroup>
   <ItemGroup>

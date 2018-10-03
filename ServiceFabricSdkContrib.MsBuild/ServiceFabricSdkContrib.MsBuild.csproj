@@ -8,7 +8,8 @@
     <None Include="ServiceFabricSdkContrib.Services.nuspec" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.7.179" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.8.166" />
+		<PackageReference Include="LibGit2Sharp" Version="0.26.0-preview-0027" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ServiceFabricSdkContrib.Common\ServiceFabricSdkContrib.Common.csproj" />
