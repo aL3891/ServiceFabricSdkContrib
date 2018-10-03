@@ -12,11 +12,11 @@
 		</MSBuild>
 	</Target>
 
-	<Target Name="DeployFabricApp" AfterTargets="Publish;Package" DependsOnTargets="ValidatePackageSettings;GetServiceProjectReferences;EnsureServicesPublished">
+	<Target Name="DeployFabricApp" AfterTargets="PublishFabricApp" DependsOnTargets="ValidatePackageSettings;GetServiceProjectReferences;EnsureServicesPublished">
 		<PublishFabricAppTask
-      PackageLocation="@(_ResolvedProjectReferencePaths)"
-      ClusterEndPoint="@(ServiceProjectReference)"
-      ThumbPrint="$(MSBuildProjectFullPath)">
+      PackageLocation="@(PackageLocation)"
+      ClusterEndPoint="@(ClusterEndPoint)"
+      ThumbPrint="$(ThumbPrint)">
 		</PublishFabricAppTask>
 	</Target>
 	
