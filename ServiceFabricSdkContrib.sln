@@ -13,6 +13,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "System.Fabric.Management.Se
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceFabricSdkContrib.Tests", "ServiceFabricSdkContrib.Tests\ServiceFabricSdkContrib.Tests.csproj", "{DF7F7675-A657-4E01-93CE-158044B221A8}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.ServiceFabric.Common", "service-fabric-client-dotnet\src\Microsoft.ServiceFabric.Common\Microsoft.ServiceFabric.Common.csproj", "{6488E5A5-49F3-4700-8F5B-34316B87F0B9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.ServiceFabric.Client", "service-fabric-client-dotnet\src\Microsoft.ServiceFabric.Client\Microsoft.ServiceFabric.Client.csproj", "{272EE4AE-8D1B-415B-A1E7-86CD1A5A4103}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.ServiceFabric.Client.Http", "service-fabric-client-dotnet\src\Microsoft.ServiceFabric.Client.Http\Microsoft.ServiceFabric.Client.Http.csproj", "{0039BABB-AFFF-4E09-830C-1BC1869CBFD6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +45,18 @@ Global
 		{DF7F7675-A657-4E01-93CE-158044B221A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF7F7675-A657-4E01-93CE-158044B221A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF7F7675-A657-4E01-93CE-158044B221A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6488E5A5-49F3-4700-8F5B-34316B87F0B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6488E5A5-49F3-4700-8F5B-34316B87F0B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6488E5A5-49F3-4700-8F5B-34316B87F0B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6488E5A5-49F3-4700-8F5B-34316B87F0B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{272EE4AE-8D1B-415B-A1E7-86CD1A5A4103}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{272EE4AE-8D1B-415B-A1E7-86CD1A5A4103}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{272EE4AE-8D1B-415B-A1E7-86CD1A5A4103}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{272EE4AE-8D1B-415B-A1E7-86CD1A5A4103}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0039BABB-AFFF-4E09-830C-1BC1869CBFD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0039BABB-AFFF-4E09-830C-1BC1869CBFD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0039BABB-AFFF-4E09-830C-1BC1869CBFD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0039BABB-AFFF-4E09-830C-1BC1869CBFD6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

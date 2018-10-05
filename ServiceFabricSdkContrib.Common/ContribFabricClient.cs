@@ -159,7 +159,7 @@ namespace ServiceFabricSdkContrib.Common
 		private static async Task UploadApp(this IServiceFabricClient Client, string imageStore, ServiceFabricApplicationSpec app)
 		{
 			var name = app.Manifest.ApplicationTypeName + "." + app.Manifest.ApplicationTypeVersion;
-			await Client.ImageStore.UploadApplicationPackageAsync(app.PackagePath, true, name);
+			await Client.ImageStore.UploadApplicationPackageAsync(Path.GetFullPath(app.PackagePath), true, name);
 			await Client.ApplicationTypes.ProvisionApplicationTypeAsync(new ProvisionApplicationTypeDescription(name), 240);
 			await Client.ImageStore.DeleteImageStoreContentAsync(name);
 		}

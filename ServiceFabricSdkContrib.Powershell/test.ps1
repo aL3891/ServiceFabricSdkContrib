@@ -1,13 +1,13 @@
+dotnet publish
 Connect-ServiceFabricCluster
-ipmo .\bin\Debug\net462\ServiceFabricSdkContrib.Powershell.dll
+ipmo .\bin\Debug\netstandard2.0\publish\ServiceFabricSdkContrib.Powershell.dll
 
-msbuild.exe ..\TestSolution /bl /noconsolelogger /m
+#msbuild ..\TestSolution2\TestSolution.sln /m
 
-ConvertTo-ServiceFabricApplicationDiffPackage @("..\TestSolution\TestApplication1\pkg\Debug", "..\TestSolution\TestApplication2\pkg\Debug", "..\TestSolution\TestApplication3\pkg\Debug")
+ConvertTo-ServiceFabricApplicationDiffPackage @("..\TestSolution2\TestApplication1\pkg\Debug", "..\TestSolution2\TestApplication2\pkg\Debug", "..\TestSolution2\TestApplication3\pkg\Debug")
 
 Publish-ServiceFabricSolution @{ 
-	"TestApplication1" = @{ PackagePath = "..\TestSolution\TestApplication1\pkg\Debug"; ParameterFilePath ="..\TestSolution\TestApplication1\ApplicationParameters\Local.1Node.xml" } 
-	"TestApplication2" = @{ PackagePath = "..\TestSolution\TestApplication2\pkg\Debug"; ParameterFilePath ="..\TestSolution\TestApplication2\ApplicationParameters\Local.1Node.xml" } 
-	"TestApplication3" = @{ PackagePath = "..\TestSolution\TestApplication3\pkg\Debug"; ParameterFilePath ="..\TestSolution\TestApplication3\ApplicationParameters\Local.1Node.xml" } 
-} -UseSymlink
-	
+	"TestApplication1" = @{ PackagePath = "..\TestSolution2\TestApplication1\pkg\Debug"; ParameterFilePath ="..\TestSolution2\TestApplication1\ApplicationParameters\Local.1Node.xml" } 
+	"TestApplication2" = @{ PackagePath = "..\TestSolution2\TestApplication2\pkg\Debug"; ParameterFilePath ="..\TestSolution2\TestApplication2\ApplicationParameters\Local.1Node.xml" } 
+	"TestApplication3" = @{ PackagePath = "..\TestSolution2\TestApplication3\pkg\Debug"; ParameterFilePath ="..\TestSolution2\TestApplication3\ApplicationParameters\Local.1Node.xml" } 
+} 

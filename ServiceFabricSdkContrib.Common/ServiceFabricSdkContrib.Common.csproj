@@ -4,10 +4,8 @@
 		<CodeAnalysisRuleSet>..\StyleCop.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.ServiceFabric.Client.Http" Version="1.0.0-preview61" />
-  </ItemGroup>
-  <ItemGroup>
     <!--<ProjectReference Include="..\service-fabric-client-dotnet\src\Microsoft.ServiceFabric.Client.Http\Microsoft.ServiceFabric.Client.Http.csproj" />-->
+    <ProjectReference Include="..\service-fabric-client-dotnet\src\Microsoft.ServiceFabric.Client.Http\Microsoft.ServiceFabric.Client.Http.csproj" />
     <ProjectReference Include="..\System.Fabric.Management.ServiceModel\System.Fabric.Management.ServiceModel.csproj" />
   </ItemGroup>
 </Project>

@@ -22,6 +22,6 @@
 		<file src="bin\Release\netstandard2.0\publish\Microsoft.ServiceFabric.Common.dll"                     target="build\Microsoft.ServiceFabric.Common.dll"/>
 		<file src="bin\Release\netstandard2.0\publish\System.Fabric.Management.ServiceModel.dll"              target="build\System.Fabric.Management.ServiceModel.dll"/>
 		<file src="bin\Release\netstandard2.0\publish\LibGit2Sharp.dll"                                       target="build\LibGit2Sharp.dll"/>
-		<file src="bin\Release\netstandard2.0\publish\runtimes\win7-x64\native\git2-6311e88.dll"              target="build\git2-6311e88.dll"/>
+		<file src="bin\Release\netstandard2.0\publish\runtimes\win-x64\native\git2-b0d9952.dll"               target="build\git2-b0d9952.dll"/>
 	</files>
 </package>

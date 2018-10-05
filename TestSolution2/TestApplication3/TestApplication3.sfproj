@@ -38,6 +38,9 @@
   <ItemGroup>
     <Content Include="packages.config" />
   </ItemGroup>
+	<ItemGroup>
+		<ServiceFabricInstance Include="TestApplication3"></ServiceFabricInstance>
+	</ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
   <PropertyGroup>
     <ApplicationProjectTargetsPath>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Service Fabric Tools\Microsoft.VisualStudio.Azure.Fabric.ApplicationProject.targets</ApplicationProjectTargetsPath>

@@ -12,11 +12,19 @@
 		</MSBuild>
 	</Target>
 
-	<Target Name="DeployFabricApp" AfterTargets="PublishFabricApp" DependsOnTargets="ValidatePackageSettings;GetServiceProjectReferences;EnsureServicesPublished">
+	<Target Name="DeployFabricApp" AfterTargets="UpdateApplicationVersionGit">
+		<PropertyGroup>
+			<ServiceFabricParametersFile Condition="$(ServiceFabricParametersFile) == ''">ApplicationParameters\Local.1Node.xml</ServiceFabricParametersFile>
+		</PropertyGroup>
 		<PublishFabricAppTask
-      PackageLocation="@(PackageLocation)"
-      ClusterEndPoint="@(ClusterEndPoint)"
-      ThumbPrint="$(ThumbPrint)">
+      PackageLocation="$(PackageLocation)"
+      ClusterEndPoint="$(ServiceFabricEndpoint)"
+			ThumbPrint="$(ServiceFabricThumbPrint)"
+			ProjectPath="$(MSBuildProjectFullPath)"
+			ParametersFile="$(ServiceFabricParametersFile)"
+			Instances="@(ServiceFabricInstance)"
+			>
+			
 		</PublishFabricAppTask>
 	</Target>
 	

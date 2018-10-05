@@ -1,10 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Fabric.Management.ServiceModel;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using ServiceFabricSdkContrib.Common;
 
 namespace ServiceFabricSdkContrib.Common
 {
@@ -29,6 +27,30 @@ namespace ServiceFabricSdkContrib.Common
 
 				app.Manifest = FabricSerializers.AppManifestFromFile(Path.Combine(app.PackagePath, "ApplicationManifest.xml"));
 				app.Version = app.Manifest.ApplicationTypeVersion;
+
+				var parameters = new Dictionary<string, string>();
+
+				foreach (var p in app.Manifest.Parameters)
+				{
+					parameters[p.Name] = p.DefaultValue;
+				}
+
+				if (!string.IsNullOrWhiteSpace(app.ParameterFilePath)) {
+					var x = XElement.Load(app.ParameterFilePath);
+					foreach (var p in x.Element(x.Name.Namespace + "Parameters").Elements(x.Name.Namespace + "Parameter"))
+					{
+						parameters[p.Attribute("Name").Value] = p.Attribute("Value").Value;
+					}
+				}
+
+				if (app.Parameters != null) {
+					foreach (var p in app.Parameters)
+					{
+						parameters[p.Key] = p.Value;
+					}
+				}
+
+				app.Parameters = parameters;
 			}
 		}
 
@@ -39,6 +61,7 @@ namespace ServiceFabricSdkContrib.Common
 				Name = app,
 				Version = ((Hashtable)appHash[app]).ContainsKey("Version") ? ((Hashtable)appHash[app])["Version"].ToString() : null,
 				PackagePath = ((Hashtable)appHash[app]).ContainsKey("PackagePath") ? ((Hashtable)appHash[app])["PackagePath"].ToString() : null,
+				ParameterFilePath = ((Hashtable)appHash[app]).ContainsKey("ParameterFilePath") ? ((Hashtable)appHash[app])["ParameterFilePath"].ToString() : null,
 				Parameters = ParseParameters((Hashtable)appHash[app], basePath)
 			}).ToList();
 
@@ -48,20 +71,6 @@ namespace ServiceFabricSdkContrib.Common
 		private Dictionary<string, string> ParseParameters(Hashtable hashtable, string basePath)
 		{
 			var res = new Dictionary<string, string>();
-
-			if (hashtable.ContainsKey("ParameterFilePath"))
-			{
-				var pp = hashtable["ParameterFilePath"].ToString();
-				if (!Path.IsPathRooted(pp))
-					pp = Path.Combine(basePath, pp);
-
-				var x = XElement.Load(pp);
-				foreach (var p in x.Element(x.Name.Namespace + "Parameters").Elements(x.Name.Namespace + "Parameter"))
-				{
-					res[p.Attribute("Name").Value] = p.Attribute("Value").Value;
-				}
-			}
-
 			if (hashtable.ContainsKey("Parameters"))
 			{
 				var inline = (Hashtable)hashtable["Parameters"];
@@ -70,7 +79,6 @@ namespace ServiceFabricSdkContrib.Common
 					res[item.ToString()] = inline[item].ToString();
 				}
 			}
-
 			return res;
 		}
 	}

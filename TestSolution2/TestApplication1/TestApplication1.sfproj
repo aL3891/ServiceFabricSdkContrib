@@ -38,6 +38,9 @@
     <ProjectReference Include="..\Web1\Web1.csproj" />
     <ProjectReference Include="..\Web2\Web2.csproj" />
   </ItemGroup>
+	<ItemGroup>
+		<ServiceFabricInstance Include="TestApplication1"></ServiceFabricInstance>
+	</ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
   </ItemGroup>

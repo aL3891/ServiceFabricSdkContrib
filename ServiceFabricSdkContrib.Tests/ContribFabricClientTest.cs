@@ -6,6 +6,7 @@ using Microsoft.ServiceFabric.Client;
 using Microsoft.ServiceFabric.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ServiceFabricSdkContrib.Common;
+using ServiceFabricSdkContrib.MsBuild;
 
 namespace ServiceFabricSdkContrib.Tests
 {
@@ -59,6 +60,22 @@ namespace ServiceFabricSdkContrib.Tests
 		public async Task DeployDiffSolutionTest()
 		{
 			await client.CreateDiffPackage(Path.Combine(basePath, "TestApplication1\\pkg\\Debug"));
+		}
+
+		[TestMethod]
+		public void DeployWithMsBuild()
+		{
+			var target = new PublishFabricAppTask
+			{
+				ProjectPath = Path.Combine(basePath, "TestApplication1\\TestApplication1.sfproj"),
+				PackageLocation = "pkg\\Debug",
+				ClusterEndPoint = "http://localhost:19080",
+				Instances = new[] { new Microsoft.Build.Utilities.TaskItem("TestApplication1") },
+				ParametersFile = @"ApplicationParameters\Local.1Node.xml",
+				ThumbPrint = ""
+			};
+
+			target.Execute();
 		}
 	}
 }
