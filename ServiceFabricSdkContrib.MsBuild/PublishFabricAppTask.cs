@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using DasMulli.AssemblyInfoGeneration.Sdk;
 using Microsoft.Build.Framework;
 using Microsoft.ServiceFabric.Client;
 using Microsoft.ServiceFabric.Client.Http;
@@ -12,7 +13,7 @@ using ServiceFabricSdkContrib.Common;
 
 namespace ServiceFabricSdkContrib.MsBuild
 {
-	public class PublishFabricAppTask : Microsoft.Build.Utilities.Task
+	public class PublishFabricAppTask : ContextAwareTask
 	{
 		public string PackageLocation { get; set; }
 		public string ClusterEndPoint { get; set; }
@@ -21,7 +22,7 @@ namespace ServiceFabricSdkContrib.MsBuild
 		public string ParametersFile { get; set; }
 		public ITaskItem[] Instances { get; set; }
 
-		public override bool Execute()
+		protected override bool ExecuteInner()
 		{
 			if (!string.IsNullOrWhiteSpace(ClusterEndPoint))
 			{
