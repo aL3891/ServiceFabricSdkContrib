@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 using System.Threading.Tasks;
 using DasMulli.AssemblyInfoGeneration.Sdk;
 using Microsoft.Build.Framework;
@@ -29,17 +30,23 @@ namespace ServiceFabricSdkContrib.MsBuild
 				IServiceFabricClient client;
 				if (!string.IsNullOrWhiteSpace(ThumbPrint))
 				{
-					var cert = new X509Store(StoreName.My, StoreLocation.CurrentUser).Certificates.Find(X509FindType.FindByThumbprint, ThumbPrint, true)[0];
-					client = new ServiceFabricHttpClient(new Uri(ClusterEndPoint), new ClientSettings(() => new X509SecuritySettings(cert, new RemoteX509SecuritySettings(new List<string> { }, true))));
+					Func<CancellationToken, Task<SecuritySettings>> GetSecurityCredentials = (ct) =>
+					{
+						var clientCert = new X509Store(StoreName.My, StoreLocation.CurrentUser).Certificates.Find(X509FindType.FindByThumbprint, ThumbPrint, true)[0];
+						var remoteSecuritySettings = new RemoteX509SecuritySettings(new List<string> { "server_cert_thumbprint" });
+						return Task.FromResult<SecuritySettings>(new X509SecuritySettings(clientCert, remoteSecuritySettings));
+					};
+
+					client = new ServiceFabricClientBuilder().UseEndpoints(new Uri(ClusterEndPoint)).UseX509Security(GetSecurityCredentials).BuildAsync().Result;
 				}
 				else
-					client = new ServiceFabricHttpClient(new Uri(ClusterEndPoint));
-
-				ExecuteAsync(client).Wait();
+					client = new ServiceFabricClientBuilder().UseEndpoints(new Uri(ClusterEndPoint)).BuildAsync().Result;
 			}
 
 			return true;
 		}
+
+
 
 		private async Task ExecuteAsync(IServiceFabricClient client)
 		{

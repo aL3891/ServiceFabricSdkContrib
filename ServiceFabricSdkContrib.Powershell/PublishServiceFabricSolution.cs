@@ -24,9 +24,8 @@ namespace ServiceFabricSdkContrib.Powershell
 
 			var logger = new PowershellLogger(this);
 
-			var client = ServiceFabricClientFactory.Create(new Uri("http://localhost:19080"));
+			var client = new ServiceFabricClientBuilder().UseEndpoints(new Uri("http://localhost:19080")).BuildAsync().Result;
 
-			
 			_ = ExecuteAsync(logger, client);
 			logger.Start();
 		}

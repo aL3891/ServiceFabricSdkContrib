@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26730.10
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28621.142
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StatelessWebCore", "StatelessWebCore\StatelessWebCore.csproj", "{EF6AF2FD-5EC5-4D6B-B27F-C6CD93CB21A3}"
 EndProject
@@ -26,11 +26,13 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0A8245C8-943A-431D-8F34-42D1AA4F2123}"
 	ProjectSection(SolutionItems) = preProject
 		Common.props = Common.props
+		fabric.props = fabric.props
+		service.props = service.props
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web1", "Web1\Web1.csproj", "{32E8990D-2893-451B-9960-AB292339DD9D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web1", "Web1\Web1.csproj", "{32E8990D-2893-451B-9960-AB292339DD9D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web2", "Web2\Web2.csproj", "{518E0ADD-606F-4C9E-A3FF-D4AB1724DBCC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web2", "Web2\Web2.csproj", "{518E0ADD-606F-4C9E-A3FF-D4AB1724DBCC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

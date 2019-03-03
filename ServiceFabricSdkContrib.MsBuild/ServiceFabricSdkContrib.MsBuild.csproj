@@ -1,15 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
 		<CodeAnalysisRuleSet>..\StyleCop.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;NETCOREAPP2_0</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <None Include="ServiceFabricSdkContrib.Applications.nuspec" />
     <None Include="ServiceFabricSdkContrib.Services.nuspec" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.8.166" />
-		<PackageReference Include="LibGit2Sharp" Version="0.26.0-preview-0027" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.9.20" />
+		<PackageReference Include="LibGit2Sharp" Version="0.26.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ServiceFabricSdkContrib.Common\ServiceFabricSdkContrib.Common.csproj" />

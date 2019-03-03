@@ -12,3 +12,4 @@
 /**/publish/
 *.metaproj
 *.metaproj.tmp
+*.user

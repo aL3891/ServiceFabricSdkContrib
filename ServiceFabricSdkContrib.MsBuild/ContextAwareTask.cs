@@ -1,4 +1,4 @@
-﻿https://raw.githubusercontent.com/dasMulli/AssemblyInfoGenerationSdk/master/src/DasMulli.AssemblyInfoGeneration.Sdk/ContextAwareTask.cs
+﻿// https://raw.githubusercontent.com/dasMulli/AssemblyInfoGenerationSdk/master/src/DasMulli.AssemblyInfoGeneration.Sdk/ContextAwareTask.cs
 // taken and modified from https://github.com/AArnott/Nerdbank.GitVersioning/blob/master/src/MSBuildExtensionTask/ContextAwareTask.cs
 
 using System;
@@ -17,7 +17,7 @@ namespace DasMulli.AssemblyInfoGeneration.Sdk
 	{
 		protected virtual string ManagedDllDirectory => Path.GetDirectoryName(new Uri(this.GetType().GetTypeInfo().Assembly.CodeBase).LocalPath);
 
-		protected virtual string UnmanagedDllDirectory => null;
+		protected virtual string UnmanagedDllDirectory => Path.GetDirectoryName(new Uri(this.GetType().GetTypeInfo().Assembly.CodeBase).LocalPath);
 
 		public override bool Execute()
 		{

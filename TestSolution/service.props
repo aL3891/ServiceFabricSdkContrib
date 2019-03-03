@@ -1,0 +1,3 @@
+﻿<Project>
+	<Import Project="..\ServiceFabricSdkContrib.MsBuild\bin\Debug\netcoreapp2.1\publish\ServiceFabricSdkContrib.Services.targets" />
+</Project>

@@ -3,10 +3,11 @@ using System.IO;
 using System.Linq;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using DasMulli.AssemblyInfoGeneration.Sdk;
 
 namespace ServiceFabricSdkContrib.MsBuild
 {
-	public class PackageFabricAppTask : Task
+	public class PackageFabricAppTask : ContextAwareTask
 	{
 		public ITaskItem[] ProjectReferences { get; set; }
 		public ITaskItem[] ServiceProjectReferences { get; set; }
@@ -40,7 +41,7 @@ namespace ServiceFabricSdkContrib.MsBuild
 			}
 		}
 
-		public override bool Execute()
+		protected override bool ExecuteInner()
 		{
 			var basePath = Path.GetDirectoryName(ProjectPath);
 			foreach (var spr in FabricServiceReferenceFactory.Get(ProjectReferences, ServiceProjectReferences))

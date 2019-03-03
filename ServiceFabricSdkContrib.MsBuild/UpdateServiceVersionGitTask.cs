@@ -4,10 +4,11 @@ using System.IO;
 using System.Linq;
 using Microsoft.Build.Framework;
 using ServiceFabricSdkContrib.Common;
+using DasMulli.AssemblyInfoGeneration.Sdk;
 
 namespace ServiceFabricSdkContrib.MsBuild
 {
-	public class UpdateServiceVersionGitTask : Microsoft.Build.Utilities.Task
+	public class UpdateServiceVersionGitTask : ContextAwareTask
 	{
 		public string TargetDir { get; set; }
 		public string BasePath { get; set; }
@@ -19,7 +20,7 @@ namespace ServiceFabricSdkContrib.MsBuild
 		public int MaxHashLength { get; set; }
 		public bool SkipHash { get; set; }
 
-		public override bool Execute()
+		protected override bool ExecuteInner()
 		{
 			var projectrefs = ProjectReferences?.Select(p => Path.GetDirectoryName(p.GetMetadata("MSBuildSourceProjectFile"))).ToList() ?? new List<string>();
 			var baseDir = Path.GetDirectoryName(BasePath);

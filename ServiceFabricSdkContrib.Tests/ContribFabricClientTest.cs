@@ -20,8 +20,7 @@ namespace ServiceFabricSdkContrib.Tests
 		public async Task Init()
 		{
 			Process.Start(new ProcessStartInfo { FileName = "dotnet", Arguments = "publish", WorkingDirectory = basePath }).WaitForExit();
-			client = ServiceFabricClientFactory.Create(new Uri("http://localhost:19080"));
-
+			var client = new ServiceFabricClientBuilder().UseEndpoints(new Uri("http://localhost:19080")).BuildAsync().Result;
 			var apps = await client.Applications.GetApplicationInfoListAsync();
 			foreach (var app in apps.Data)
 			{

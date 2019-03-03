@@ -21,8 +21,7 @@ namespace ServiceFabricSdkContrib.Powershell
 				throw new ArgumentNullException("Service fabric connection not found");
 
 			var logger = new PowershellLogger(this);
-			var client = ServiceFabricClientFactory.Create(new Uri("http://localhost:19080"));
-
+			var client = new ServiceFabricClientBuilder().UseEndpoints(new Uri("http://localhost:19080")).BuildAsync().Result;
 			var tt = Task.Run(() =>
 			{
 				var tasks = PackagePaths

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26730.10
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28621.142
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stateless", "Stateless\Stateless.csproj", "{267C7013-1D66-4919-A384-BF7A6F3E6959}"
 EndProject
@@ -34,6 +34,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0A8245C8-943A-431D-8F34-42D1AA4F2123}"
 	ProjectSection(SolutionItems) = preProject
 		Common.props = Common.props
+		fabric.props = fabric.props
+		service.props = service.props
 	EndProjectSection
 EndProject
 Global
