@@ -4,11 +4,10 @@ using System.Linq;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using ServiceFabricSdkContrib.Common;
-using DasMulli.AssemblyInfoGeneration.Sdk;
 
 namespace ServiceFabricSdkContrib.MsBuild
 {
-	public class PackageFabricServiceTask : ContextAwareTask
+	public class PackageFabricServiceTask : Task
 	{
 		List<string> sourcelist = new List<string>();
 		List<string> destlist = new List<string>();
@@ -40,7 +39,7 @@ namespace ServiceFabricSdkContrib.MsBuild
 			}
 		}
 
-		protected override bool ExecuteInner()
+		public override bool Execute()
 		{
 			var basePath = ProjectDir;
 			var manifest = FabricSerializers.ServiceManifestFromFile(Path.Combine(basePath, "PackageRoot", "ServiceManifest.xml"));

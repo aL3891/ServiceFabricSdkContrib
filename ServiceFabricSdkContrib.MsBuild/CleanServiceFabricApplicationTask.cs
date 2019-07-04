@@ -8,11 +8,11 @@ using System.Threading;
 // using Microsoft.Build.Evaluation;
 using Microsoft.Build.Framework;
 using ServiceFabricSdkContrib.Common;
-using DasMulli.AssemblyInfoGeneration.Sdk;
+using Microsoft.Build.Utilities;
 
 namespace ServiceFabricSdkContrib.MsBuild
 {
-	public class CleanServiceFabricApplicationTask : ContextAwareTask
+	public class CleanServiceFabricApplicationTask : Task
 	{
 		public string PackageLocation { get; set; }
 		public string ProjectPath { get; set; }
@@ -21,7 +21,7 @@ namespace ServiceFabricSdkContrib.MsBuild
 		public ITaskItem[] SymlinkItems { get; set; }
 		private HashSet<string> symPaths = new HashSet<string>();
 
-		protected override bool ExecuteInner()
+		public override bool Execute()
 		{
 			BasePath = Path.GetDirectoryName(ProjectPath);
 			SymlinkItems = CleanItems.Where(c => IsUnderSymbolicLink(c.ItemSpec)).ToArray();

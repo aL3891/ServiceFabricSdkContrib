@@ -121,7 +121,7 @@ namespace ServiceFabricSdkContrib.Common
 					return;
 				}
 
-				var upgradeDescription = new ApplicationUpgradeDescription("fabric:/" + app.Name, app.Version, app.Parameters, UpgradeKind.Rolling, UpgradeMode.UnmonitoredAuto, 1);
+				var upgradeDescription = new ApplicationUpgradeDescription("fabric:/" + app.Name, app.Version, UpgradeKind.Rolling, app.Parameters, UpgradeMode.Monitored, 15);
 				Logger?.LogInfo($"Upgrading app {upgradeDescription.Name} to version {upgradeDescription.TargetApplicationTypeVersion}");
 				await Client.Applications.StartApplicationUpgradeAsync(app.Name, upgradeDescription);
 			}

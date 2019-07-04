@@ -4,13 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using DasMulli.AssemblyInfoGeneration.Sdk;
 using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
 using ServiceFabricSdkContrib.Common;
 
 namespace ServiceFabricSdkContrib.MsBuild
 {
-	public class UpdateApplicationVersionHashTask : ContextAwareTask
+	public class UpdateApplicationVersionHashTask : Task
 	{
 		public ITaskItem[] ProjectReferences { get; set; }
 		public ITaskItem[] ServiceProjectReferences { get; set; }
@@ -20,7 +20,7 @@ namespace ServiceFabricSdkContrib.MsBuild
 		public string Configuration { get; set; }
 		public int MaxHashLength { get; set; }
 
-		protected override bool ExecuteInner()
+		public override bool Execute()
 		{
 			var basePath = Path.GetDirectoryName(ProjectPath);
 			var path = Path.Combine(basePath, "pkg", Configuration, "ApplicationManifest.xml");

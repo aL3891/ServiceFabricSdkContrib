@@ -1,11 +1,11 @@
 ﻿using System.IO;
 using Microsoft.Build.Framework;
 using ServiceFabricSdkContrib.Common;
-using DasMulli.AssemblyInfoGeneration.Sdk;
+using Microsoft.Build.Utilities;
 
 namespace ServiceFabricSdkContrib.MsBuild
 {
-	public class UpdateApplicationVersionGitTask : ContextAwareTask
+	public class UpdateApplicationVersionGitTask : Task
 	{
 		public ITaskItem[] ProjectReferences { get; set; }
 		public ITaskItem[] ServiceProjectReferences { get; set; }
@@ -18,7 +18,7 @@ namespace ServiceFabricSdkContrib.MsBuild
 		public int MaxHashLength { get; set; }
 		public bool SkipHash { get; set; }
 
-		protected override bool ExecuteInner()
+		public override bool Execute()
 		{
 			var path = Path.Combine(Path.GetDirectoryName(ProjectPath), "pkg", Configuration, "ApplicationManifest.xml");
 			var appManifest = FabricSerializers.AppManifestFromFile(path);

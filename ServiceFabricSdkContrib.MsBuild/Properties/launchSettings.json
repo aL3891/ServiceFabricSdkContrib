@@ -2,9 +2,12 @@
   "profiles": {
     "ServiceFabricSdkContrib.MsBuild": {
       "commandName": "Executable",
-      "executablePath": "C:\\Program Files (x86)\\Microsoft Visual Studio\\Preview\\Community\\MSBuild\\15.0\\Bin\\amd64\\MSBuild.exe",
-      "commandLineArgs": "/t:Publish /bl testsolution.sln",
-      "workingDirectory": "..\\TestSolution2"
+      "executablePath": "dotnet",
+      "commandLineArgs": "msbuild /t:Publish /nodereuse:false testsolution.sln",
+      "workingDirectory": "..\\TestSolution2",
+      "environmentVariables": {
+        "MSBUILDDEBUGONSTART": "2"
+      }
     }
   }
 }

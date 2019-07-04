@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
-using System.Threading.Tasks;
-using DasMulli.AssemblyInfoGeneration.Sdk;
+
 using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
 using Microsoft.ServiceFabric.Client;
 using Microsoft.ServiceFabric.Client.Http;
 using Microsoft.ServiceFabric.Common.Security;
@@ -14,7 +16,7 @@ using ServiceFabricSdkContrib.Common;
 
 namespace ServiceFabricSdkContrib.MsBuild
 {
-	public class PublishFabricAppTask : ContextAwareTask
+	public class PublishFabricAppTask : Task
 	{
 		public string PackageLocation { get; set; }
 		public string ClusterEndPoint { get; set; }
@@ -23,24 +25,31 @@ namespace ServiceFabricSdkContrib.MsBuild
 		public string ParametersFile { get; set; }
 		public ITaskItem[] Instances { get; set; }
 
-		protected override bool ExecuteInner()
+		public override bool Execute()
 		{
+			this.Log.LogWarning("attatch to " + Process.GetCurrentProcess().Id);
+
+			while (!Debugger.IsAttached)
+			{
+				Thread.Sleep(1000);
+			}
+
 			if (!string.IsNullOrWhiteSpace(ClusterEndPoint))
 			{
 				IServiceFabricClient client;
 				if (!string.IsNullOrWhiteSpace(ThumbPrint))
 				{
-					Func<CancellationToken, Task<SecuritySettings>> GetSecurityCredentials = (ct) =>
+					Func<CancellationToken, System.Threading.Tasks.Task<SecuritySettings>> GetSecurityCredentials = (ct) =>
 					{
 						var clientCert = new X509Store(StoreName.My, StoreLocation.CurrentUser).Certificates.Find(X509FindType.FindByThumbprint, ThumbPrint, true)[0];
 						var remoteSecuritySettings = new RemoteX509SecuritySettings(new List<string> { "server_cert_thumbprint" });
-						return Task.FromResult<SecuritySettings>(new X509SecuritySettings(clientCert, remoteSecuritySettings));
+						return System.Threading.Tasks.Task.FromResult<SecuritySettings>(new X509SecuritySettings(clientCert, remoteSecuritySettings));
 					};
 
-					client = new ServiceFabricClientBuilder().UseEndpoints(new Uri(ClusterEndPoint)).UseX509Security(GetSecurityCredentials).BuildAsync().Result;
+					ExecuteAsync(new ServiceFabricClientBuilder().UseEndpoints(new Uri(ClusterEndPoint)).UseX509Security(GetSecurityCredentials)).Wait();
 				}
 				else
-					client = new ServiceFabricClientBuilder().UseEndpoints(new Uri(ClusterEndPoint)).BuildAsync().Result;
+					ExecuteAsync(new ServiceFabricClientBuilder().UseEndpoints(new Uri(ClusterEndPoint))).Wait();
 			}
 
 			return true;
@@ -48,8 +57,17 @@ namespace ServiceFabricSdkContrib.MsBuild
 
 
 
-		private async Task ExecuteAsync(IServiceFabricClient client)
+		private async System.Threading.Tasks.Task ExecuteAsync(ServiceFabricClientBuilder clientbuilder)
 		{
+			object[] parameters = new object[2]
+{
+				clientbuilder,
+				default(CancellationToken)
+};
+			var apa = typeof(ServiceFabricHttpClient).GetMethod("CreateAsync", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, parameters);
+			 
+
+			var client = await clientbuilder.BuildAsync();
 			var apps = new ServiceFabricSolution();
 			apps.Applications.Add(new ServiceFabricApplicationSpec
 			{
