@@ -25,6 +25,9 @@ namespace ServiceFabricSdkContrib.Common
 				if (!Path.IsPathRooted(app.PackagePath))
 					app.PackagePath = Path.Combine(basePath, app.PackagePath);
 
+				if (!Path.IsPathRooted(app.ParameterFilePath))
+					app.ParameterFilePath = Path.Combine(basePath, app.ParameterFilePath);
+
 				app.Manifest = FabricSerializers.AppManifestFromFile(Path.Combine(app.PackagePath, "ApplicationManifest.xml"));
 				app.Version = app.Manifest.ApplicationTypeVersion;
 
@@ -35,7 +38,8 @@ namespace ServiceFabricSdkContrib.Common
 					parameters[p.Name] = p.DefaultValue;
 				}
 
-				if (!string.IsNullOrWhiteSpace(app.ParameterFilePath)) {
+				if (!string.IsNullOrWhiteSpace(app.ParameterFilePath))
+				{
 					var x = XElement.Load(app.ParameterFilePath);
 					foreach (var p in x.Element(x.Name.Namespace + "Parameters").Elements(x.Name.Namespace + "Parameter"))
 					{
@@ -43,7 +47,8 @@ namespace ServiceFabricSdkContrib.Common
 					}
 				}
 
-				if (app.Parameters != null) {
+				if (app.Parameters != null)
+				{
 					foreach (var p in app.Parameters)
 					{
 						parameters[p.Key] = p.Value;
@@ -64,6 +69,14 @@ namespace ServiceFabricSdkContrib.Common
 				ParameterFilePath = ((Hashtable)appHash[app]).ContainsKey("ParameterFilePath") ? ((Hashtable)appHash[app])["ParameterFilePath"].ToString() : null,
 				Parameters = ParseParameters((Hashtable)appHash[app], basePath)
 			}).ToList();
+
+			foreach (var app in Applications)
+			{
+				if (!Path.IsPathRooted(app.PackagePath))
+					app.PackagePath = Path.Combine(basePath, app.PackagePath);
+				if (!Path.IsPathRooted(app.ParameterFilePath))
+					app.ParameterFilePath = Path.Combine(basePath, app.ParameterFilePath);
+			}
 
 			Validate(basePath);
 		}

@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Client;
+using Microsoft.ServiceFabric.Client.Http;
 using Microsoft.ServiceFabric.Common;
+using Microsoft.ServiceFabric.Common.Security;
 
 namespace ServiceFabricSdkContrib.Common
 {
@@ -167,6 +172,36 @@ namespace ServiceFabricSdkContrib.Common
 			{
 				Directory.Delete(Path.Combine(new Uri(imageStore).LocalPath, name), true);
 			}
+		}
+
+		public static Task<IServiceFabricClient> BuildAsyncDirect(this ServiceFabricClientBuilder serviceFabricClientBuilder)
+		{
+			object[] parameters = new object[2]
+			{
+				serviceFabricClientBuilder,
+				default(CancellationToken)
+			};
+
+			return (Task<IServiceFabricClient>)typeof(ServiceFabricHttpClient).GetMethod("CreateAsync", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, parameters);
+		}
+
+		public static Task<IServiceFabricClient> ConnectAsync(this ServiceFabricClientBuilder serviceFabricClientBuilder, string ClusterEndPoint, string ThumbPrint)
+		{
+			var builder = serviceFabricClientBuilder.UseEndpoints(new Uri(ClusterEndPoint));
+
+			if (!string.IsNullOrWhiteSpace(ThumbPrint))
+			{
+				Func<CancellationToken, Task<SecuritySettings>> GetSecurityCredentials = (ct) =>
+				{
+					var clientCert = new X509Store(StoreName.My, StoreLocation.CurrentUser).Certificates.Find(X509FindType.FindByThumbprint, ThumbPrint, true)[0];
+					var remoteSecuritySettings = new RemoteX509SecuritySettings(new List<string> { ThumbPrint });
+					return Task.FromResult<SecuritySettings>(new X509SecuritySettings(clientCert, remoteSecuritySettings));
+				};
+
+				builder = builder.UseX509Security(GetSecurityCredentials);
+			}
+
+			return builder.BuildAsyncDirect();
 		}
 	}
 }

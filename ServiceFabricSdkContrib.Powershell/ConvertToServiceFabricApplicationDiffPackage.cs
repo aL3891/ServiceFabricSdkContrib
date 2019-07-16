@@ -14,29 +14,43 @@ namespace ServiceFabricSdkContrib.Powershell
 		[Parameter(ValueFromPipeline = true, Position = 0)]
 		public string[] PackagePaths { get; set; }
 
+		[Parameter(Mandatory = true)]
+		public string ClusterEndPoint { get; set; }
+
+		[Parameter]
+		public string ThumbPrint { get; set; }
+
 		protected override void ProcessRecord()
 		{
-			dynamic connection = GetVariableValue("ClusterConnection");
-			if (connection == null)
-				throw new ArgumentNullException("Service fabric connection not found");
-
 			var logger = new PowershellLogger(this);
-			var client = new ServiceFabricClientBuilder().UseEndpoints(new Uri("http://localhost:19080")).BuildAsync().Result;
-			var tt = Task.Run(() =>
+			var res = ExecuteAsync(logger, ClusterEndPoint, ThumbPrint, PackagePaths);
+			logger.Start();
+			WriteObject(res.Result);
+		}
+
+		private async Task<string[]> ExecuteAsync(PowershellLogger logger, string clusterEndPoint, string thumbPrint, string[] packagePaths)
+		{
+			try
 			{
-				var tasks = PackagePaths
+				var client = await new ServiceFabricClientBuilder().ConnectAsync(clusterEndPoint, thumbPrint);
+				var tasks = packagePaths
 					.Select(p => string.IsNullOrWhiteSpace(p) ? SessionState.Path.CurrentFileSystemLocation.Path : p)
 					.Select(p => Path.IsPathRooted(p) ? p : Path.Combine(SessionState.Path.CurrentFileSystemLocation.Path, p))
-					.Select(p => new { Path = p, Result = client.CreateDiffPackage(p) })
-					.ToList();
+					.Select(async p => new { Path = p, Result = await client.CreateDiffPackage(p) });
 
-				var res = tasks.Where(t => t.Result.Result).Select(t => t.Path).ToArray();
+				var res = await Task.WhenAll(tasks);
+				return res.Where(t => t.Result).Select(t => t.Path).ToArray();
+			}
+			catch (Exception e)
+			{
+				logger.LogError(e.Message, e);
+			}
+			finally
+			{
 				logger.Stop();
-				return res;
-			});
+			}
 
-			logger.Start();
-			WriteObject(tt.Result);
+			return null;
 		}
 	}
 }

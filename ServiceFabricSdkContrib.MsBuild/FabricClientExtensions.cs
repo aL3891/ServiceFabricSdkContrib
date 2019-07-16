@@ -198,16 +198,5 @@ namespace ServiceFabricSdkContrib.Common
 			return new[] { v.sha, VersionHelper.Hash(Git.GitDiff(path), maxHashLength) };
 		}
 
-		public static Task<IServiceFabricClient> BuildAsyncDirect(this ServiceFabricClientBuilder serviceFabricClientBuilder)
-		{
-			object[] parameters = new object[2]
-			{
-
-				serviceFabricClientBuilder,
-				default(CancellationToken)
-			};
-
-			return (Task<IServiceFabricClient>)typeof(ServiceFabricHttpClient).GetMethod("CreateAsync", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, parameters);
-		}
 	}
 }

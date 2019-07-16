@@ -36,28 +36,15 @@ namespace ServiceFabricSdkContrib.MsBuild
 
 			if (!string.IsNullOrWhiteSpace(ClusterEndPoint))
 			{
-				IServiceFabricClient client;
-				if (!string.IsNullOrWhiteSpace(ThumbPrint))
-				{
-					Func<CancellationToken, System.Threading.Tasks.Task<SecuritySettings>> GetSecurityCredentials = (ct) =>
-					{
-						var clientCert = new X509Store(StoreName.My, StoreLocation.CurrentUser).Certificates.Find(X509FindType.FindByThumbprint, ThumbPrint, true)[0];
-						var remoteSecuritySettings = new RemoteX509SecuritySettings(new List<string> { "server_cert_thumbprint" });
-						return System.Threading.Tasks.Task.FromResult<SecuritySettings>(new X509SecuritySettings(clientCert, remoteSecuritySettings));
-					};
-
-					ExecuteAsync(new ServiceFabricClientBuilder().UseEndpoints(new Uri(ClusterEndPoint)).UseX509Security(GetSecurityCredentials)).Wait();
-				}
-				else
-					ExecuteAsync(new ServiceFabricClientBuilder().UseEndpoints(new Uri(ClusterEndPoint))).Wait();
+				ExecuteAsync(ClusterEndPoint, ThumbPrint).Wait();
 			}
 
 			return true;
 		}
 
-		private async System.Threading.Tasks.Task ExecuteAsync(ServiceFabricClientBuilder clientbuilder)
+		private async System.Threading.Tasks.Task ExecuteAsync(string clusterEndPoint, string thumbPrint)
 		{
-			var client = await clientbuilder.BuildAsyncDirect();
+			var client = await new ServiceFabricClientBuilder().ConnectAsync(clusterEndPoint, thumbPrint);
 			var apps = new ServiceFabricSolution();
 			apps.Applications.Add(new ServiceFabricApplicationSpec
 			{

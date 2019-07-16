@@ -16,25 +16,25 @@ namespace ServiceFabricSdkContrib.Powershell
 		[Parameter]
 		public SwitchParameter UseSymlink { get; set; }
 
+		[Parameter(Mandatory = true)]
+		public string ClusterEndPoint { get; set; }
+
+		[Parameter]
+		public string ThumbPrint { get; set; }
+
 		protected override void ProcessRecord()
 		{
-			dynamic connection = GetVariableValue("ClusterConnection");
-			if (connection == null)
-				throw new ArgumentNullException("Service fabric connection not found");
-
 			var logger = new PowershellLogger(this);
-
-			var client = new ServiceFabricClientBuilder().UseEndpoints(new Uri("http://localhost:19080")).BuildAsync().Result;
-
-			_ = ExecuteAsync(logger, client);
+			_ = ExecuteAsync(logger, ClusterEndPoint, ThumbPrint, SessionState.Path.CurrentFileSystemLocation.Path);
 			logger.Start();
 		}
 
-		private async Task ExecuteAsync(PowershellLogger logger, IServiceFabricClient client)
+		private async Task ExecuteAsync(PowershellLogger logger, string clusterEndPoint, string thumbPrint, string path)
 		{
 			try
 			{
-				var apps = new ServiceFabricSolution(AppsHash, SessionState.Path.CurrentFileSystemLocation.Path);
+				var client = await new ServiceFabricClientBuilder().ConnectAsync(clusterEndPoint, thumbPrint);
+				var apps = new ServiceFabricSolution(AppsHash, path);
 				await client.DeployServiceFabricSolution(apps, UseSymlink.ToBool());
 			}
 			catch (Exception e)
