@@ -4,10 +4,13 @@ using System.Diagnostics;
 using System.Fabric.Management.ServiceModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.ServiceFabric.Client;
+using Microsoft.ServiceFabric.Client.Http;
 using ServiceFabricSdkContrib.MsBuild;
 
 namespace ServiceFabricSdkContrib.Common
@@ -193,6 +196,18 @@ namespace ServiceFabricSdkContrib.Common
 			}
 
 			return new[] { v.sha, VersionHelper.Hash(Git.GitDiff(path), maxHashLength) };
+		}
+
+		public static Task<IServiceFabricClient> BuildAsyncDirect(this ServiceFabricClientBuilder serviceFabricClientBuilder)
+		{
+			object[] parameters = new object[2]
+			{
+
+				serviceFabricClientBuilder,
+				default(CancellationToken)
+			};
+
+			return (Task<IServiceFabricClient>)typeof(ServiceFabricHttpClient).GetMethod("CreateAsync", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, parameters);
 		}
 	}
 }

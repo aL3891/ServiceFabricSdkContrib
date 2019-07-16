@@ -27,12 +27,12 @@ namespace ServiceFabricSdkContrib.MsBuild
 
 		public override bool Execute()
 		{
-			this.Log.LogWarning("attatch to " + Process.GetCurrentProcess().Id);
+			//this.Log.LogWarning("attatch to " + Process.GetCurrentProcess().Id);
 
-			while (!Debugger.IsAttached)
-			{
-				Thread.Sleep(1000);
-			}
+			//while (!Debugger.IsAttached)
+			//{
+			//	Thread.Sleep(1000);
+			//}
 
 			if (!string.IsNullOrWhiteSpace(ClusterEndPoint))
 			{
@@ -55,19 +55,9 @@ namespace ServiceFabricSdkContrib.MsBuild
 			return true;
 		}
 
-
-
 		private async System.Threading.Tasks.Task ExecuteAsync(ServiceFabricClientBuilder clientbuilder)
 		{
-			object[] parameters = new object[2]
-{
-				clientbuilder,
-				default(CancellationToken)
-};
-			var apa = typeof(ServiceFabricHttpClient).GetMethod("CreateAsync", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, parameters);
-			 
-
-			var client = await clientbuilder.BuildAsync();
+			var client = await clientbuilder.BuildAsyncDirect();
 			var apps = new ServiceFabricSolution();
 			apps.Applications.Add(new ServiceFabricApplicationSpec
 			{

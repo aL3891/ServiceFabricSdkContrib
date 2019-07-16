@@ -161,7 +161,12 @@ namespace ServiceFabricSdkContrib.Common
 			var name = app.Manifest.ApplicationTypeName + "." + app.Manifest.ApplicationTypeVersion;
 			await Client.ImageStore.UploadApplicationPackageAsync(Path.GetFullPath(app.PackagePath), true, name);
 			await Client.ApplicationTypes.ProvisionApplicationTypeAsync(new ProvisionApplicationTypeDescription(name), 240);
-			await Client.ImageStore.DeleteImageStoreContentAsync(name);
+			if (imageStore == "fabric:ImageStore")
+				await Client.ImageStore.DeleteImageStoreContentAsync(name);
+			else
+			{
+				Directory.Delete(Path.Combine(new Uri(imageStore).LocalPath, name), true);
+			}
 		}
 	}
 }
