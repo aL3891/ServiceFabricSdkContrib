@@ -166,6 +166,7 @@ namespace ServiceFabricSdkContrib.Common
 			var name = app.Manifest.ApplicationTypeName + "." + app.Manifest.ApplicationTypeVersion;
 			await Client.ImageStore.UploadApplicationPackageAsync(Path.GetFullPath(app.PackagePath), true, name);
 			await Client.ApplicationTypes.ProvisionApplicationTypeAsync(new ProvisionApplicationTypeDescription(name), 240);
+
 			if (imageStore == "fabric:ImageStore")
 				await Client.ImageStore.DeleteImageStoreContentAsync(name);
 			else
@@ -193,13 +194,17 @@ namespace ServiceFabricSdkContrib.Common
 			{
 				Func<CancellationToken, Task<SecuritySettings>> GetSecurityCredentials = (ct) =>
 				{
-					var clientCert = new X509Store(StoreName.My, StoreLocation.CurrentUser).Certificates.Find(X509FindType.FindByThumbprint, ThumbPrint, true)[0];
+					var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+					store.Open(OpenFlags.ReadOnly);
+					var clientCert = store.Certificates.Find(X509FindType.FindByThumbprint, ThumbPrint, false)[0];
 					var remoteSecuritySettings = new RemoteX509SecuritySettings(new List<string> { ThumbPrint });
 					return Task.FromResult<SecuritySettings>(new X509SecuritySettings(clientCert, remoteSecuritySettings));
 				};
 
 				builder = builder.UseX509Security(GetSecurityCredentials);
 			}
+
+			builder.ClientSettings.ClientTimeout = TimeSpan.FromMinutes(15);
 
 			return builder.BuildAsyncDirect();
 		}
