@@ -15,47 +15,11 @@ namespace ServiceFabricSdkContrib.Common
 			Applications = new List<ServiceFabricApplicationSpec>();
 		}
 
-		public void Validate(string basePath)
+		public void Validate()
 		{
 			foreach (var app in Applications)
 			{
-				if (string.IsNullOrWhiteSpace(app.PackagePath))
-					continue;
-
-				if (!Path.IsPathRooted(app.PackagePath))
-					app.PackagePath = Path.Combine(basePath, app.PackagePath);
-
-				if (!Path.IsPathRooted(app.ParameterFilePath))
-					app.ParameterFilePath = Path.Combine(basePath, app.ParameterFilePath);
-
-				app.Manifest = FabricSerializers.AppManifestFromFile(Path.Combine(app.PackagePath, "ApplicationManifest.xml"));
-				app.Version = app.Manifest.ApplicationTypeVersion;
-
-				var parameters = new Dictionary<string, string>();
-
-				foreach (var p in app.Manifest.Parameters)
-				{
-					parameters[p.Name] = p.DefaultValue;
-				}
-
-				if (!string.IsNullOrWhiteSpace(app.ParameterFilePath))
-				{
-					var x = XElement.Load(app.ParameterFilePath);
-					foreach (var p in x.Element(x.Name.Namespace + "Parameters").Elements(x.Name.Namespace + "Parameter"))
-					{
-						parameters[p.Attribute("Name").Value] = p.Attribute("Value").Value;
-					}
-				}
-
-				if (app.Parameters != null)
-				{
-					foreach (var p in app.Parameters)
-					{
-						parameters[p.Key] = p.Value;
-					}
-				}
-
-				app.Parameters = parameters;
+				app.LoadParameters();
 			}
 		}
 
@@ -78,7 +42,7 @@ namespace ServiceFabricSdkContrib.Common
 					app.ParameterFilePath = Path.Combine(basePath, app.ParameterFilePath);
 			}
 
-			Validate(basePath);
+			Validate();
 		}
 
 		private Dictionary<string, string> ParseParameters(Hashtable hashtable, string basePath)

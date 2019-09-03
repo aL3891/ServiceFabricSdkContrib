@@ -91,7 +91,7 @@ namespace ServiceFabricSdkContrib.Common
 		{
 			var cluster = FabricSerializers.ClusterManifestFromString((await Client.Cluster.GetClusterManifestAsync()).Manifest);
 			var appTypes = await Client.ApplicationTypes.GetApplicationTypeInfoListAsync();
-			apps.Validate(null);
+			apps.Validate();
 			var appsToUpload = apps.Applications.Where(a => !appTypes.Data.Any(ap => ap.Name == a.Manifest.ApplicationTypeName && ap.Version == a.Manifest.ApplicationTypeVersion)).ToList();
 
 			if (appsToUpload.Any())
