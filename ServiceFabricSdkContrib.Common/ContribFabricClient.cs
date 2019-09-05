@@ -186,7 +186,7 @@ namespace ServiceFabricSdkContrib.Common
 			return (Task<IServiceFabricClient>)typeof(ServiceFabricHttpClient).GetMethod("CreateAsync", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, parameters);
 		}
 
-		public static Task<IServiceFabricClient> ConnectAsync(this ServiceFabricClientBuilder serviceFabricClientBuilder, string ClusterEndPoint, string ThumbPrint)
+		public static Task<IServiceFabricClient> ConnectAsync(this ServiceFabricClientBuilder serviceFabricClientBuilder, string ClusterEndPoint, string ThumbPrint, StoreLocation storeLocation = StoreLocation.CurrentUser)
 		{
 			var builder = serviceFabricClientBuilder.UseEndpoints(new Uri(ClusterEndPoint));
 
@@ -194,7 +194,7 @@ namespace ServiceFabricSdkContrib.Common
 			{
 				Func<CancellationToken, Task<SecuritySettings>> GetSecurityCredentials = (ct) =>
 				{
-					var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+					var store = new X509Store(StoreName.My, storeLocation);
 					store.Open(OpenFlags.ReadOnly);
 					var clientCert = store.Certificates.Find(X509FindType.FindByThumbprint, ThumbPrint, false)[0];
 					var remoteSecuritySettings = new RemoteX509SecuritySettings(new List<string> { ThumbPrint });
