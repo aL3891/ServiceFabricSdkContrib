@@ -45,7 +45,10 @@ namespace ServiceFabricSdkContrib.Common
 					else
 					{
 						var serverServiceManifest = FabricSerializers.ServiceManifestFromString((await Client.ServiceTypes.GetServiceManifestAsync(serverAppManifest.ApplicationTypeName, serverAppManifest.ApplicationTypeVersion, serviceImport.ServiceManifestRef.ServiceManifestName)).Manifest);
-						var localServiceManifest = FabricSerializers.ServiceManifestFromFile(Path.Combine(packagePath, serviceImport.ServiceManifestRef.ServiceManifestName, "ServiceManifest.xml"));
+						var localServiceManifestPath = Path.Combine(packagePath, serviceImport.ServiceManifestRef.ServiceManifestName, "ServiceManifest.xml");
+						if (!File.Exists(localServiceManifestPath))
+							continue;
+						var localServiceManifest = FabricSerializers.ServiceManifestFromFile(localServiceManifestPath);
 
 						// Logger?.LogInfo($"{serverAppManifest.ApplicationTypeName}.{localService.ServiceManifestRef.ServiceManifestName} {localService.ServiceManifestRef.ServiceManifestVersion} not found on server, checking packages");
 						if (serverServiceManifest.CodePackage != null && localServiceManifest.CodePackage != null)
