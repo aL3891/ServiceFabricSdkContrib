@@ -108,7 +108,10 @@ namespace ServiceFabricSdkContrib.Common
 				Logger?.LogInfo($"Apps uploaded");
 			}
 
-			await Task.WhenAll(apps.Applications.Select(app => Client.DeployServiceFabricApp(app)));
+			foreach (var app in apps.Applications)
+			{
+				await Client.DeployServiceFabricApp(app);
+			}
 			return true;
 		}
 
