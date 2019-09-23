@@ -23,10 +23,11 @@ namespace ServiceFabricSdkContrib.Common
 			Version = Manifest.ApplicationTypeVersion;
 			var parameters = new Dictionary<string, string>();
 
-			foreach (var p in Manifest.Parameters)
-			{
-				parameters[p.Name] = p.DefaultValue;
-			}
+			if (Manifest.Parameters != null)
+				foreach (var p in Manifest.Parameters)
+				{
+					parameters[p.Name] = p.DefaultValue;
+				}
 
 			if (!string.IsNullOrWhiteSpace(ParameterFilePath))
 			{
