@@ -175,10 +175,10 @@ namespace ServiceFabricSdkContrib.Common
 
 			if (imageStore == "fabric:ImageStore")
 				await Client.ImageStore.DeleteImageStoreContentAsync(name);
-			else
-			{
-				Directory.Delete(Path.Combine(new Uri(imageStore).LocalPath, name), true);
-			}
+			//else
+			//{
+			//	Directory.Delete(Path.Combine(new Uri(imageStore).LocalPath, name), true);
+			//}
 		}
 
 		public static Task<IServiceFabricClient> BuildAsyncDirect(this ServiceFabricClientBuilder serviceFabricClientBuilder)

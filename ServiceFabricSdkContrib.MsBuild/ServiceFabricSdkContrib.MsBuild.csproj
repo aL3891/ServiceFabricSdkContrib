@@ -11,7 +11,7 @@
     <None Include="ServiceFabricSdkContrib.Services.nuspec" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.0.461" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.8.0" />
 		<PackageReference Include="LibGit2Sharp" Version="0.27.0-preview-0007" />
   </ItemGroup>
   <ItemGroup>

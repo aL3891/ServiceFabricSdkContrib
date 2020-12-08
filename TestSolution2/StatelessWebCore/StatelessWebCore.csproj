@@ -2,8 +2,7 @@
 	<Import Project="..\Common.props" />
 	<Import Project="..\service.props" />
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
-    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
+    <TargetFramework>net48</TargetFramework>
     <IsServiceFabricServiceProject>True</IsServiceFabricServiceProject>
 	  <UpdateServiceVersionGit>true</UpdateServiceVersionGit>
   </PropertyGroup>
